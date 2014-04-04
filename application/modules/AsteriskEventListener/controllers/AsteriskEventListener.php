@@ -18,7 +18,6 @@ error_reporting(E_ALL);
 
 use PAMI\Client\Impl\ClientImpl as PamiClient;
 use PAMI\Message\Event\EventMessage;
-use PAMI\Listener\IEventListener;
 
 class AsteriskEventListener extends MX_Controller {
 
