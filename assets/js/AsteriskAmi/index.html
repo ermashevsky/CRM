@@ -1,18 +1,54 @@
+<!-- /project_dir/index.html -->
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex,nofollow"/>
     <title></title>
-<script src="js/socket.io.js"></script>
-<!-- <script src="/socket.io/socket.io.js"></script> -->
-<script>
-  var socket = io.connect('http://localhost/',{port: 8580});
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-</script>
 </head>
 <body>
-	Aplicacion de Pruebas
-	Version 9 de Node.JS 
+<div class="demo">
+    <div class="chat">
+        <div class="messages" id="messages"></div>
+ 
+    </div>
+</div>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://localhost:8580/socket.io/socket.io.js"></script>
+<script type="text/javascript"> 
+ // javascript code
+ 
+ // /project_dir/index.html
+$(document).ready(function () {
+        var socket = io.connect('http://localhost:8580');
+        var messages = $("#messages");
+
+ 
+        function msg_system(message) {
+            var m = '<div class="msg system">' + message + '</div>';
+            messages
+                    .append(m)
+                    .scrollTop(messages[0].scrollHeight);
+        }
+ 
+        socket.on('connecting', function () {
+            msg_system('Соединение...');
+        });
+ 
+        socket.on('connect', function () {
+            msg_system('Соединение установлено!');
+        });
+ 
+        socket.on('event', function (data) {
+            msg_system(data);
+        });
+ 
+        function safe(str) {
+            return str.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;');
+        }
+    });
+</script>
 </body>
 </html>
