@@ -15,8 +15,6 @@
         <script src="/assets/js/bootstrap-progressbar.js"></script>
         <script src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
-        <script type="text/javascript" src="/assets/js/storage.js"></script>
-
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -36,12 +34,11 @@
                 var socket = io.connect('http://localhost:8580');
                 var messages = $("#messages");
 
+                function msg_system(message, type) {
 
-                function msg_system(message) {
-                
                     var m = notif({
                         msg: message,
-                        type: 'success',
+                        type: type,
                         width: 300,
                         height: 300,
                         opacity: 1,
@@ -49,6 +46,7 @@
                         position: "center",
                         multiline: true
                     });
+
                     console.log(message);
                     messages
                             .append(m)
@@ -74,9 +72,84 @@
                 });
 
                 socket.on('event', function(data) {
+                    
+                    console.info(data);
                     $('.msg system').empty();
                     
-                    msg_system(data);
+                    if (data.event === "Dial" && data.subevent === "Begin") {
+
+                        var calleridnum = data.calleridnum;
+                        var dialstring = data.dialstring;
+
+                        var string = data.channel; // юрл в котором происходит поиск
+                        var regV = /103/gi;     // шаблон
+                        var result = string.match(regV);  // поиск шаблона в юрл
+                        var dialstring_rep = dialstring.replace("trunk/", "");
+                        //console.info(dialstring_rep);
+
+                        // вывод результата
+                        if (result) {
+                            //client.emit('event', "Исходящий звонок на номер: " + dialstring_rep);
+                            var text = "Исходящий звонок на номер: " + dialstring_rep;
+                            var type = 'success';
+                            msg_system(text, type);
+                        } else {
+                            //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+                            var text = "Входящий звонок с номера: " + calleridnum;
+                            var type = 'success';
+                            msg_system(text, type);
+                        }
+
+                    }
+
+                    if (data.event === "Bridge" && data.bridgestate === "Link") {
+                        //client.emit('event', "Разговор ...");
+                        msg_system("Разговор ...");
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "16") {
+                        //client.emit('event', "Повесили трубку");
+                        
+                        var text = "Повесили трубку";
+                        var type = "success";
+                        msg_system(text, type);
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "17") {
+                        //client.emit('event', "Пользователь занят");
+                        var text = "Номер занят. Перезвоните позже.";
+                        var type = "error";
+                        msg_system(text, type);
+                    }
+                    if (data.event === "Hangup" && data.cause === "19") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+                        
+                        var text = "Пропущенный вызов с номера: " + data.calleridnum;
+                        var type = "error";
+                        msg_system(text, type);
+                    }
+                    if (data.event === "Hangup" && data.cause === "34") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+
+                        var text = "Ошибка вызова";
+                        var type = "error";
+                        msg_system(text, type);
+                    }
+                    if (data.event === "Hangup" && data.cause === "1") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+                        
+                        var text = "Несуществующий номер";
+                        var type = "error";
+                        msg_system(text, type);
+                    }
+                    if (data.event === "Hangup" && data.cause === "21") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+                        
+                        var text = "Вызов отклонен";
+                        var type = "error";
+                        msg_system(text, type);
+                    }
+                    
                 });
 
                 function safe(str) {
@@ -94,6 +167,6 @@
                 <li class="active"><a href="#">Главная</a></li>
                 <li><a href="#">Задачи</a></li>
                 <li><a href="#">Клиенты</a></li>
-                <li class="nav pull-right"><span class="label label-important" id="server_status">Соединение разорвано</span></li>
+                <li class="nav pull-right"></li>
             </ul>
         </div><!--/.nav-collapse -->

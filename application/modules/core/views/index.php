@@ -1,9 +1,6 @@
 <body>
-
-
-
     <div class="container-fluid">
-        <div class="row-fluid">
+        <div class="row">
 
             <div class="span10">
                 <div class="hero-unit">
@@ -49,16 +46,28 @@
 
 
             <div class="span2">
-                <div class="row-fluid">
-
-                    <img src="http://1.gravatar.com/avatar/4e2ccf9c3fb5c4a3722cf58abedfce81?s=140" class="img-polaroid">
-
-                    <div class="span8">
-                        <strong>Ермашевский Денис</strong>
-                        <p>Телефон: 103</p>
-                        <input type="hidden" name="phone_number" value="103" id="phone_num"/>
-                    </div>
+                <div><p><img src="http://1.gravatar.com/avatar/4e2ccf9c3fb5c4a3722cf58abedfce81?s=160" class="img-polaroid"></p>
+                    <table class="table table-striped table-bordered table-condensed">
+                        <tbody>
+                            <tr>
+                                <td><i class="icon-user"></i></td>
+                                <td>Ермашевский Денис</td>
+                            </tr>
+                            <tr>
+                                <td><i class="icon-phone"></i></td>
+                                <td>103</td>
+                            </tr>
+                            <tr>
+                                <td><i class="icon-envelope"></i></td>
+                                <td> <a href="mailto:ermashevsky@dialog64.ru">ermashevsky@dialog64.ru</a></td>
+                            </tr>
+                            <tr>
+                                <td><i class=" icon-asterisk"></i></td>
+                                <td><span class="label label-important" id="server_status">Соединение разорвано</span></td>
+                            </tr>
+                        </tbody></table>
                 </div>
+
                 <div class="sidebar-nav">
                     <div class="messages" id="messages"></div>
                 </div><!--/.well -->
