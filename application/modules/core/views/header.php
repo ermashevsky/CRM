@@ -1,5 +1,5 @@
 <!-- /project_dir/index.html -->
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 <html>
     <head>
         <meta charset="utf-8">
@@ -15,6 +15,7 @@
         <script src="/assets/js/bootstrap-progressbar.js"></script>
         <script src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -47,7 +48,7 @@
                         multiline: true
                     });
 
-                    console.log(message);
+                    //console.log(message);
                     messages
                             .append(m)
                             .scrollTop(messages[0].scrollHeight);
@@ -72,28 +73,31 @@
                 });
 
                 socket.on('event', function(data) {
-                    
+
                     console.info(data);
                     $('.msg system').empty();
+                    var phone_number = $('#hidden_phone_number').val();
                     
                     if (data.event === "Dial" && data.subevent === "Begin") {
 
                         var calleridnum = data.calleridnum;
                         var dialstring = data.dialstring;
-
                         var string = data.channel; // юрл в котором происходит поиск
-                        var regV = /103/gi;     // шаблон
+                        var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
-                        //console.info(dialstring_rep);
-
+                        $.cookie("destuniqueid_begin", data.destuniqueid);
+                        $.cookie("calleridnum", data.calleridnum);
+                        //alert(uniqueid_begin);
+                        
                         // вывод результата
-                        if (result) {
+                        if (result === phone_number) {
                             //client.emit('event', "Исходящий звонок на номер: " + dialstring_rep);
                             var text = "Исходящий звонок на номер: " + dialstring_rep;
                             var type = 'success';
                             msg_system(text, type);
-                        } else {
+                        }
+                        if (dialstring === phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
@@ -101,55 +105,70 @@
                         }
 
                     }
-
+                    
                     if (data.event === "Bridge" && data.bridgestate === "Link") {
                         //client.emit('event', "Разговор ...");
-                        msg_system("Разговор ...");
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && $.cookie('calleridnum') === phone_number){
+                        var text = "Разговор ...";
+                        var type = "success";
+                        msg_system(text, type);
+                    }
                     }
 
                     if (data.event === "Hangup" && data.cause === "16") {
                         //client.emit('event', "Повесили трубку");
+                        //uniquniqueid_begin почему-то undefined
                         
-                        var text = "Повесили трубку";
-                        var type = "success";
-                        msg_system(text, type);
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
+                            var text = "Повесили трубку";
+                            var type = "success";
+                            msg_system(text, type);
+                        }
                     }
 
                     if (data.event === "Hangup" && data.cause === "17") {
                         //client.emit('event', "Пользователь занят");
+                        
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
                         var text = "Номер занят. Перезвоните позже.";
                         var type = "error";
                         msg_system(text, type);
                     }
+                    }
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        
-                        var text = "Пропущенный вызов с номера: " + data.calleridnum;
+
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
+                        var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
                         var type = "error";
                         msg_system(text, type);
                     }
+                    }
                     if (data.event === "Hangup" && data.cause === "34") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && $.cookie('calleridnum') === phone_number){
                         var text = "Ошибка вызова";
                         var type = "error";
                         msg_system(text, type);
                     }
+                    }
                     if (data.event === "Hangup" && data.cause === "1") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && $.cookie('calleridnum') === phone_number){
                         var text = "Несуществующий номер";
                         var type = "error";
                         msg_system(text, type);
                     }
+                    }
                     if (data.event === "Hangup" && data.cause === "21") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        
+                        if($.cookie('destuniqueid_begin') === data.uniqueid && $.cookie('calleridnum') === phone_number){
                         var text = "Вызов отклонен";
                         var type = "error";
                         msg_system(text, type);
                     }
-                    
+                    }
+
                 });
 
                 function safe(str) {
@@ -167,6 +186,6 @@
                 <li class="active"><a href="#">Главная</a></li>
                 <li><a href="#">Задачи</a></li>
                 <li><a href="#">Клиенты</a></li>
-                <li class="nav pull-right"></li>
+                <li class="nav pull-right"><a href="auth/logout">Выйти</a></li>
             </ul>
         </div><!--/.nav-collapse -->

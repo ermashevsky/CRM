@@ -35,12 +35,23 @@ class Core extends MX_Controller {
      */
     function __construct() {
         parent::__construct();
+        $this->load->library('ion_auth');
+        $this->load->library('session');
+        $this->load->library('form_validation');
+        $this->load->database();
+        $this->load->helper('url', 'form');
     }
 
     function index() {
-        $this->load->view('header');
-        $this->load->view('index');
-        $this->load->view('rightsidebar');
+        if (!$this->ion_auth->logged_in()) {
+            redirect('auth/login', 'refresh');
+        } else {
+            $data['user'] = $this -> ion_auth -> user($this -> session -> userdata('user_id')) -> row();
+            
+            $this->load->view('header');
+            $this->load->view('index', $data);
+            $this->load->view('rightsidebar');
+        }
     }
 
 }
