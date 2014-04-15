@@ -62,28 +62,39 @@ class Core_model extends CI_Model {
                 $date->start;
                 $date->answer;
             }
+            $start_call = strtotime($date->start);
+            $end_call = strtotime($end);
+            $duration_in_sec = $end_call - $start_call;
+
+            if ($date->answer !== '0000-00-00 00:00:00') {
+                $answer_call = strtotime($date->answer);
+                $end_call = strtotime($end);
+                $billsec_in_sec = $end_call - $answer_call;
+            }
+            $data = array(
+            'end' => $end,
+            'cause' => $cause,
+            'duration' => abs($duration_in_sec),
+            'billsec' => abs($billsec_in_sec),
+            'disposition' => $disposition
+        );
+        }else{
+            
+            $data = array(
+            'end' => $end,
+            'cause' => $cause,
+            'duration' => '0',
+            'billsec' => '0',
+            'disposition' => $disposition
+        );
+            
         }
 
-        $start_call = strtotime($date->start);
-        $end_call = strtotime($end);
-        $duration_in_sec = $end_call - $start_call;
+
         
-        if($date->answer !=='0000-00-00 00:00:00'){
-            $answer_call = strtotime($date->answer);
-            $end_call = strtotime($end);
-            $billsec_in_sec = $end_call - $answer_call;
-            
-        }
-            $data = array(
-                'end' => $end,
-                'cause' => $cause,
-                'duration' => abs($duration_in_sec),
-                'billsec' => abs($billsec_in_sec),
-                'disposition' => $disposition
-            );
-            
-            $this->db->where('uniqueid', $uniqueid);
-            $this->db->update('cdr', $data);
+
+        $this->db->where('uniqueid', $uniqueid);
+        $this->db->update('cdr', $data);
     }
 
 }

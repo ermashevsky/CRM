@@ -90,6 +90,7 @@
                         $.cookie("destuniqueid_begin", data.destuniqueid);
                         $.cookie("uniqueid", data.uniqueid);
                         $.cookie("calleridnum", data.calleridnum);
+                        $.cookie('destination', data.destination);
                         //alert(uniqueid_begin);
                         insertCallData(data);
                         // вывод результата
@@ -127,6 +128,11 @@
                         if ($.cookie('uniqueid') === data.uniqueid){
                         updateEndCallData(data);
                         }
+                          
+                        if ($.cookie('destination') === data.channel){
+                        updateEndCallData(data);
+                        }
+                        
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
                            updateEndCallData(data); 
                             var text = "Повесили трубку";
