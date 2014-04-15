@@ -76,8 +76,9 @@
 
                     console.info(data);
                     $('.msg system').empty();
+
                     var phone_number = $('#hidden_phone_number').val();
-                    
+
                     if (data.event === "Dial" && data.subevent === "Begin") {
 
                         var calleridnum = data.calleridnum;
@@ -87,19 +88,18 @@
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
                         $.cookie("destuniqueid_begin", data.destuniqueid);
+                        $.cookie("uniqueid", data.uniqueid);
                         $.cookie("calleridnum", data.calleridnum);
                         //alert(uniqueid_begin);
-                        
-                        console.log(typeof result);
-                        console.log(typeof phone_number);
+                        insertCallData(data);
                         // вывод результата
                         if (parseInt(result) === parseInt(phone_number)) {
-                            
+
                             var text = "Исходящий звонок на номер: " + dialstring_rep;
                             var type = 'success';
                             msg_system(text, type);
                         }
-                        
+
                         if (dialstring === phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Входящий звонок с номера: " + calleridnum;
@@ -108,22 +108,27 @@
                         }
 
                     }
-                    
+
                     if (data.event === "Bridge" && data.bridgestate === "Link") {
                         //client.emit('event', "Разговор ...");
-
-                        if($.cookie('destuniqueid_begin') === data.uniqueid2 && data.callerid2 === phone_number){
-                        var text = "Разговор ...";
-                        var type = "success";
-                        msg_system(text, type);
-                    }
+                    updateLinkCallData(data);
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid2 && data.callerid2 === phone_number || data.callerid1 === phone_number) {
+                            var text = "Разговор ...";
+                            var type = "success";
+                            msg_system(text, type);
+                            
+                        }
                     }
 
                     if (data.event === "Hangup" && data.cause === "16") {
                         //client.emit('event', "Повесили трубку");
                         //uniquniqueid_begin почему-то undefined
                         
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
+                        if ($.cookie('uniqueid') === data.uniqueid){
+                        updateEndCallData(data);
+                        }
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                           updateEndCallData(data); 
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
@@ -132,45 +137,59 @@
 
                     if (data.event === "Hangup" && data.cause === "17") {
                         //client.emit('event', "Пользователь занят");
+                         if ($.cookie('uniqueid') === data.uniqueid){
+                        updateEndCallData(data);
+                        }
                         
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
-                        var text = "Номер занят. Перезвоните позже.";
-                        var type = "error";
-                        msg_system(text, type);
-                    }
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                            var text = "Номер занят. Перезвоните позже.";
+                            var type = "error";
+                            msg_system(text, type);
+                        }
                     }
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
-                        var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
-                        var type = "error";
-                        msg_system(text, type);
-                    }
+                        if ($.cookie('uniqueid') === data.uniqueid){
+                            updateEndCallData(data);
+                        }
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                            var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
+                            var type = "error";
+                            msg_system(text, type);
+                        }
                     }
                     if (data.event === "Hangup" && data.cause === "34") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
-                        var text = "Ошибка вызова";
-                        var type = "error";
-                        msg_system(text, type);
-                    }
+                        updateEndCallData(data);
+                        if (data.calleridnum === phone_number) {
+                            var text = "Ошибка вызова";
+                            var type = "error";
+                            msg_system(text, type);
+                        }
                     }
                     if (data.event === "Hangup" && data.cause === "1") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
-                        var text = "Несуществующий номер";
-                        var type = "error";
-                        msg_system(text, type);
-                    }
+                        updateEndCallData(data);
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                            var text = "Несуществующий номер";
+                            var type = "error";
+                            msg_system(text, type);
+                        }
                     }
                     if (data.event === "Hangup" && data.cause === "21") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        if($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number){
-                        var text = "Вызов отклонен";
-                        var type = "error";
-                        msg_system(text, type);
-                    }
+
+//                        var string = data.channel; // юрл в котором происходит поиск
+//                        var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
+//                        var result = string.match(regV);
+//                        console.info(result);
+//                        console.info(phone_number);
+                        updateEndCallData(data);
+                        if ($.cookie('destuniqueid_begin') === data.uniqueid && parseInt(result) === parseInt(phone_number)) {
+                            var text = "Вызов отклонен";
+                            var type = "error";
+                            msg_system(text, type);
+                        }
                     }
 
                 });
@@ -180,6 +199,40 @@
                             .replace(/</g, '&lt;')
                             .replace(/>/g, '&gt;');
                 }
+
+                function insertCallData(data) {
+                    $.ajax({
+                        url: '<?php echo site_url('/core/insertCallData'); ?>',
+                        type: "POST",
+                        data: {data:data},
+                        success: function(data){ 
+                        console.info(data); 
+                        }
+                    });
+                }
+                
+                function updateLinkCallData(data) {
+                    $.ajax({
+                        url: '<?php echo site_url('/core/updateLinkCallData'); ?>',
+                        type: "POST",
+                        data: {data:data},
+                        success: function(data){ 
+                        console.info(data); 
+                        }
+                    });
+                }
+                
+                function updateEndCallData(data) {
+                    $.ajax({
+                        url: '<?php echo site_url('/core/updateEndCallData'); ?>',
+                        type: "POST",
+                        data: {data:data},
+                        success: function(data){ 
+                        console.info(data); 
+                        }
+                    });
+                }
+                
             });
         </script>
     </head>
