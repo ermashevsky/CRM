@@ -92,7 +92,6 @@
                         $.cookie("calleridnum", data.calleridnum);
                         $.cookie('destination', data.destination);
                         //alert(uniqueid_begin);
-                        insertCallData(data);
                         // вывод результата
                         if (parseInt(result) === parseInt(phone_number)) {
 
@@ -112,7 +111,6 @@
 
                     if (data.event === "Bridge" && data.bridgestate === "Link") {
                         //client.emit('event', "Разговор ...");
-                    updateLinkCallData(data);
                         if ($.cookie('destuniqueid_begin') === data.uniqueid2 && data.callerid2 === phone_number || data.callerid1 === phone_number) {
                             var text = "Разговор ...";
                             var type = "success";
@@ -125,16 +123,9 @@
                         //client.emit('event', "Повесили трубку");
                         //uniquniqueid_begin почему-то undefined
                         
-                        if ($.cookie('uniqueid') === data.uniqueid){
-                        updateEndCallData(data);
-                        }
-                          
-                        if ($.cookie('destination') === data.channel){
-                        updateEndCallData(data);
-                        }
                         
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
-                           updateEndCallData(data); 
+
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
@@ -143,9 +134,6 @@
 
                     if (data.event === "Hangup" && data.cause === "17") {
                         //client.emit('event', "Пользователь занят");
-                         if ($.cookie('uniqueid') === data.uniqueid){
-                        updateEndCallData(data);
-                        }
                         
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
                             var text = "Номер занят. Перезвоните позже.";
@@ -155,9 +143,7 @@
                     }
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        if ($.cookie('uniqueid') === data.uniqueid){
-                            updateEndCallData(data);
-                        }
+
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
                             var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
                             var type = "error";
@@ -166,7 +152,7 @@
                     }
                     if (data.event === "Hangup" && data.cause === "34") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        updateEndCallData(data);
+
                         if (data.calleridnum === phone_number) {
                             var text = "Ошибка вызова";
                             var type = "error";
@@ -175,7 +161,7 @@
                     }
                     if (data.event === "Hangup" && data.cause === "1") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        updateEndCallData(data);
+
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
                             var text = "Несуществующий номер";
                             var type = "error";
@@ -185,12 +171,6 @@
                     if (data.event === "Hangup" && data.cause === "21") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
 
-//                        var string = data.channel; // юрл в котором происходит поиск
-//                        var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
-//                        var result = string.match(regV);
-//                        console.info(result);
-//                        console.info(phone_number);
-                        updateEndCallData(data);
                         if ($.cookie('destuniqueid_begin') === data.uniqueid && parseInt(result) === parseInt(phone_number)) {
                             var text = "Вызов отклонен";
                             var type = "error";
