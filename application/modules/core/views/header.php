@@ -87,16 +87,22 @@
                         var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
+                        var destination = data.destination;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumberFromChannel = destination.replace(re, "$2");
+                        
                         $.cookie("destuniqueid_begin", data.destuniqueid);
                         $.cookie("uniqueid", data.uniqueid);
                         $.cookie("calleridnum", data.calleridnum);
-                        $.cookie('destination', data.destination);
-                        //alert(uniqueid_begin);
-                        // вывод результата
+                        $.cookie('destination'+data.destination, data.destination);
+                        $.cookie('dialstring'+data.destination, data.dialstring);
+
                         if (parseInt(result) === parseInt(phone_number)) {
 
                             var text = "Исходящий звонок на номер: " + dialstring_rep;
                             var type = 'success';
+                            $.cookie('call','Out');
                             msg_system(text, type);
                         }
 
@@ -104,6 +110,7 @@
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
+                            $.cookie('call','In');
                             msg_system(text, type);
                         }
 
@@ -111,41 +118,85 @@
 
                     if (data.event === "Bridge" && data.bridgestate === "Link") {
                         //client.emit('event', "Разговор ...");
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid2 && data.callerid2 === phone_number || data.callerid1 === phone_number) {
+                        var channel2 = data.channel2;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber2 = channel2.replace(re, "$2");
+                        
+                        var channel1 = data.channel1;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber1 = channel1.replace(re, "$2");
+                        
+                        if (getNumber2 === phone_number || getNumber1 === phone_number) {
                             var text = "Разговор ...";
                             var type = "success";
                             msg_system(text, type);
-                            
                         }
                     }
 
                     if (data.event === "Hangup" && data.cause === "16") {
                         //client.emit('event', "Повесили трубку");
                         //uniquniqueid_begin почему-то undefined
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
                         
+                        var getNumber = channel.replace(re, "$2");
                         
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                        if (getNumber === phone_number) {
 
                             var text = "Повесили трубку";
                             var type = "success";
+                            msg_system(text, type);
+
+                        }
+                    }
+                    
+                    if (data.event === "Hangup" && data.cause === "26") {
+                        //client.emit('event', "Повесили трубку");
+                        //uniquniqueid_begin почему-то undefined
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number) {
+
+                            var text = "Ответил другой абонент";
+                            var type = "error";
                             msg_system(text, type);
                         }
                     }
 
                     if (data.event === "Hangup" && data.cause === "17") {
                         //client.emit('event', "Пользователь занят");
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
                         
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
-                            var text = "Номер занят. Перезвоните позже.";
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number) {
+                            var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                        console.info($.cookie('call'));
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number && $.cookie('call') === 'In') {
                             var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
+                            var type = "error";
+                            msg_system(text, type);
+                        }
+                        
+                        if(getNumber === phone_number && $.cookie('call') === 'Out'){
+                            var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
                         }
@@ -153,7 +204,12 @@
                     if (data.event === "Hangup" && data.cause === "34") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
 
-                        if (data.calleridnum === phone_number) {
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number) {
                             var text = "Ошибка вызова";
                             var type = "error";
                             msg_system(text, type);
@@ -162,7 +218,12 @@
                     if (data.event === "Hangup" && data.cause === "1") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
 
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid && data.calleridnum === phone_number) {
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number) {
                             var text = "Несуществующий номер";
                             var type = "error";
                             msg_system(text, type);
@@ -171,7 +232,12 @@
                     if (data.event === "Hangup" && data.cause === "21") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
 
-                        if ($.cookie('destuniqueid_begin') === data.uniqueid && parseInt(result) === parseInt(phone_number)) {
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        
+                        if (getNumber === phone_number) {
                             var text = "Вызов отклонен";
                             var type = "error";
                             msg_system(text, type);
