@@ -42,11 +42,7 @@ function start() {
                 connection.query(sql);
             }
             if (data.event === 'Bridge' && data.bridgestate === "Link") {
-                // Create row, using the insert id of the first query
-                // as the exhibit_id foreign key.
-                //var sql = 'INSERT INTO cdr (src,clid,dst,channel,dstchannel,uniqueid) ' +
-                //'VALUES("' +data.calleridnum + '", "'+data.calleridname+'", "'+data.dialstring+'", "'+data.channel+'", "'+data.destination+'", "'+data.uniqueid+'")';
-                //connection.query(sql);
+
                 var answer = getDateTime();
 
                 var updateLinkCall = 'UPDATE cdr SET answer="' + answer + '" where uniqueid="' + data.uniqueid1 + '" and dstchannel="' + data.channel2 + '"';
@@ -68,21 +64,18 @@ function start() {
                         
                         if(rows[i].answer !== "0000-00-00 00:00:00"){
                         
-                            var billsec_seconds = billsec(rows[i].answer);
-                        
+                        var billsec_seconds = billsec(rows[i].answer);
+                       
                         var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="'+billsec_seconds+'" where dstchannel="' + data.channel + '"';
                         connection.query(updateEndCall);
                         console.info(updateEndCall);
-                    
                         }else{
                             var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
                         connection.query(updateEndCall);
                         console.info(updateEndCall);
                         }
                     }
-
                 });
-
             }
 
             if (data.event === 'Hangup' && data.cause === "17") {
@@ -92,31 +85,22 @@ function start() {
                     if (err)
                         throw err;
 
-
-
                     for (var i in row) {
                         var end = getDateTime();
                         var duration_seconds = duration(row[i].start);
-                       if(row[i].answer !== "0000-00-00 00:00:00"){
+                    if(row[i].answer !== "0000-00-00 00:00:00"){
                         
-                            var billsec_seconds = billsec(row[i].answer);
-                        
+                        var billsec_seconds = billsec(row[i].answer);
                         var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="'+billsec_seconds+'" where dstchannel="' + data.channel + '"';
                         connection.query(updateEndCall);
                         console.info(updateEndCall);
-                    
                         }else{
-
                         var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
                         connection.query(updateEndCall);
                         console.info(updateEndCall);
                     }
                     }
-
                 });
-
-
-
             }
 
             if (data.event === 'Hangup' && data.cause === "19") {
@@ -126,7 +110,6 @@ function start() {
                 connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, row, fields) {
                     if (err)
                         throw err;
-
 
                     for (var i in row) {
 
@@ -145,7 +128,6 @@ function start() {
                         console.info(updateEndCall);
                     }
                     }
-
                 });
             }
 
@@ -167,6 +149,17 @@ function start() {
                 var end = getDateTime();
 
                 var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="FAILED", cause="21" where dstchannel="' + data.channel + '"';
+                connection.query(updateEndCall);
+                console.info(updateLinkCall);
+            }
+            
+            if (data.event === 'Hangup' && data.cause === "26") {
+                // Create row, using the insert id of the first query
+                // as the exhibit_id foreign key.
+
+                var end = getDateTime();
+
+                var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="26" where dstchannel="' + data.channel + '"';
                 connection.query(updateEndCall);
                 console.info(updateLinkCall);
             }
