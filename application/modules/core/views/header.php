@@ -175,7 +175,7 @@
                         
                         var getNumber = channel.replace(re, "$2");
                         
-                        if (getNumber === phone_number) {
+                        if (getNumber === phone_number && $.cookie('call') === 'Out') {
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);

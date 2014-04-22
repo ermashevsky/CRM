@@ -1,7 +1,7 @@
 
 function start() {
     var AsteriskAmi = require('./lib/AsteriskAmi'),
-            AMI = new AsteriskAmi({host: '91.196.5.148', port: '5038', username: 'admin2', password: 'admin2'}),
+            AMI = new AsteriskAmi({host: '91.196.5.133', port: '5038', username: 'admin2', password: 'admin2'}),
     express = require('express');
     var mysql = require('mysql');
     var connection = mysql.createConnection({
@@ -48,6 +48,21 @@ function start() {
                 var updateLinkCall = 'UPDATE cdr SET answer="' + answer + '" where uniqueid="' + data.uniqueid1 + '" and dstchannel="' + data.channel2 + '"';
                 connection.query(updateLinkCall);
                 console.info(updateLinkCall);
+
+                var channel = data.channel2;
+                var re = /(.*\/)(\d*)(-.*)/;
+
+                var getNumber = channel.replace(re, "$2");
+
+                var updateEndCall = 'UPDATE cdr SET disposition="ANSWER_BY", answerext="' + getNumber + '" where billsec="0" and cause="16" and uniqueid="' + data.uniqueid1 + '"';
+                connection.query(updateEndCall);
+                console.info(updateEndCall);
+
+                var updateEndCall_26 = 'UPDATE cdr SET disposition="ANSWER_BY", answerext="' + getNumber + '" where billsec="0" and cause="26" and uniqueid="' + data.uniqueid1 + '"';
+                connection.query(updateEndCall_26);
+                console.info(updateEndCall_26);
+
+
             }
 
             if (data.event === 'Hangup' && data.cause === "16") {
@@ -61,18 +76,18 @@ function start() {
                     for (var i in rows) {
                         var end = getDateTime();
                         var duration_seconds = duration(rows[i].start);
-                        
-                        if(rows[i].answer !== "0000-00-00 00:00:00"){
-                        
-                        var billsec_seconds = billsec(rows[i].answer);
-                       
-                        var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="'+billsec_seconds+'" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
-                        }else{
-                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
+
+                        if (rows[i].answer !== "0000-00-00 00:00:00") {
+
+                            var billsec_seconds = billsec(rows[i].answer);
+
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="' + billsec_seconds + '" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        } else {
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="16" , duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
                         }
                     }
                 });
@@ -88,17 +103,17 @@ function start() {
                     for (var i in row) {
                         var end = getDateTime();
                         var duration_seconds = duration(row[i].start);
-                    if(row[i].answer !== "0000-00-00 00:00:00"){
-                        
-                        var billsec_seconds = billsec(row[i].answer);
-                        var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="'+billsec_seconds+'" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
-                        }else{
-                        var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
-                    }
+                        if (row[i].answer !== "0000-00-00 00:00:00") {
+
+                            var billsec_seconds = billsec(row[i].answer);
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="' + billsec_seconds + '" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        } else {
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="BUSY", cause="17", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        }
                     }
                 });
             }
@@ -115,18 +130,18 @@ function start() {
 
                         var end = getDateTime();
                         var duration_seconds = duration(row[i].start);
-                        if(row[i].answer !== "0000-00-00 00:00:00"){
-                        
+                        if (row[i].answer !== "0000-00-00 00:00:00") {
+
                             var billsec_seconds = billsec(row[i].answer);
 
-                        var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="19", duration="' + duration_seconds + '", billsec="'+billsec_seconds+'" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
-                    }else{
-                        var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="19", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
-                        connection.query(updateEndCall);
-                        console.info(updateEndCall);
-                    }
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="19", duration="' + duration_seconds + '", billsec="' + billsec_seconds + '" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        } else {
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="NO ANSWER", cause="19", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        }
                     }
                 });
             }
@@ -152,7 +167,7 @@ function start() {
                 connection.query(updateEndCall);
                 console.info(updateLinkCall);
             }
-            
+
             if (data.event === 'Hangup' && data.cause === "26") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
