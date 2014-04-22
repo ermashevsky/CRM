@@ -1,7 +1,7 @@
 
 function start() {
     var AsteriskAmi = require('./lib/AsteriskAmi'),
-            AMI = new AsteriskAmi({host: '91.196.5.133', port: '5038', username: 'admin2', password: 'admin2'}),
+            AMI = new AsteriskAmi({host: '91.196.5.148', port: '5038', username: 'admin2', password: 'admin2'}),
     express = require('express');
     var mysql = require('mysql');
     var connection = mysql.createConnection({
