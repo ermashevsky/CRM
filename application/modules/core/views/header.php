@@ -15,7 +15,7 @@
         <script src="/assets/js/bootstrap-progressbar.js"></script>
         <script src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
-        <script type="text/javascript" src="/assets/js/jquery.cookie.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -84,6 +84,11 @@
                         var calleridnum = data.calleridnum;
                         var dialstring = data.dialstring;
                         var string = data.channel; // юрл в котором происходит поиск
+                        
+            
+                        var regXfer = new RegExp('xfer', 'ig');
+                        var result_xfer = string.match(regXfer);  // поиск шаблона в юрл
+                        
                         var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
@@ -92,17 +97,18 @@
                         
                         var getNumberFromChannel = destination.replace(re, "$2");
                         
-                        $.cookie("destuniqueid_begin", data.destuniqueid);
-                        $.cookie("uniqueid", data.uniqueid);
-                        $.cookie("calleridnum", data.calleridnum);
-                        $.cookie('destination'+data.destination, data.destination);
-                        $.cookie('dialstring'+data.destination, data.dialstring);
+                        $.totalStorage("destuniqueid_begin", data.destuniqueid);
+                        $.totalStorage("uniqueid", data.uniqueid);
+                        $.totalStorage("calleridnum", data.calleridnum);
+                        $.totalStorage('destination'+data.destination, data.destination);
+                        $.totalStorage('dialstring'+data.destination, data.dialstring);
 
+                        
                         if (parseInt(result) === parseInt(phone_number)) {
 
                             var text = "Исходящий звонок на номер: " + dialstring_rep;
                             var type = 'success';
-                            $.cookie('call','Out');
+                            $.totalStorage('call','Out');
                             msg_system(text, type);
                         }
 
@@ -110,9 +116,18 @@
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
-                            $.cookie('call','In');
+                            $.totalStorage('call','In');
                             msg_system(text, type);
                         }
+
+                        if (dialstring === phone_number && result_xfer) {
+                            //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+                            var text = "Переведенный входящий звонок с номера: " + calleridnum;
+                            var type = 'success';
+                            $.totalStorage('call','In');
+                            msg_system(text, type);
+                        }
+
 
                     }
 
@@ -174,28 +189,43 @@
                         var re = /(.*\/)(\d*)(-.*)/;
                         
                         var getNumber = channel.replace(re, "$2");
-                        
-                        if (getNumber === phone_number && $.cookie('call') === 'Out') {
+                        console.info($.totalStorage('call'));
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
                         }
                     }
+                    
+                    if (data.event === "Hangup" && data.cause === "18") {
+                        //client.emit('event', "Пользователь занят");
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+                        
+                        var getNumber = channel.replace(re, "$2");
+                        console.info($.totalStorage('call'));
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                            var text = "Нет адресата.";
+                            var type = "error";
+                            msg_system(text, type);
+                        }
+                    }
+                    
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
-                        console.info($.cookie('call'));
+                        console.info($.totalStorage('call'));
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
                         
                         var getNumber = channel.replace(re, "$2");
                         
-                        if (getNumber === phone_number && $.cookie('call') === 'In') {
-                            var text = "Пропущенный вызов с номера: " + $.cookie('calleridnum');
+                        if (getNumber === phone_number && $.totalStorage('call') === 'In') {
+                            var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
                         }
                         
-                        if(getNumber === phone_number && $.cookie('call') === 'Out'){
+                        if(getNumber === phone_number && $.totalStorage('call') === 'Out'){
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);

@@ -61,8 +61,29 @@ function start() {
                 var updateEndCall_26 = 'UPDATE cdr SET disposition="ANSWER_BY", answerext="' + getNumber + '" where billsec="0" and cause="26" and uniqueid="' + data.uniqueid1 + '"';
                 connection.query(updateEndCall_26);
                 console.info(updateEndCall_26);
-
-
+                
+                var regXfer = new RegExp('xfer', 'ig');
+                var result_xfer = channel.match(regXfer);  // поиск шаблона в юрл
+                
+                if(result_xfer){
+//                    console.info(data.callerid1);
+//                    console.info(data.callerid2);
+//                    console.info(data.channel2);
+                    
+                    var channel_xfer = data.channel2;
+                    
+                    var re = /(.*\/)(\d*)(@.*)/;
+                    var re2 = /(.*\/)(\d*)(@[a-z]*)(-[a-z]*)(-[a-z]*)(-[a-zA-Z0-9_]*)(;\d)/;
+                    
+                    var getNumber = channel_xfer.replace(re, "$2");
+                    var getChannel = channel_xfer.replace(re2, "$1$2$3$4$5$6");
+                    
+                    console.info('=====> '+getChannel);
+                    
+                    var updateEndCall_xfer = 'UPDATE cdr SET src="'+data.callerid1+'", dst="' +getNumber+ '" where channel like "' + getChannel + '%"';
+                    connection.query(updateEndCall_xfer);
+                    console.info(updateEndCall_xfer);
+                }
             }
 
             if (data.event === 'Hangup' && data.cause === "16") {
@@ -117,7 +138,32 @@ function start() {
                     }
                 });
             }
+            
+            if (data.event === 'Hangup' && data.cause === "18") {
+                // Create row, using the insert id of the first query
+                // as the exhibit_id foreign key.
+                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, row, fields) {
+                    if (err)
+                        throw err;
 
+                    for (var i in row) {
+                        var end = getDateTime();
+                        var duration_seconds = duration(row[i].start);
+                        if (row[i].answer !== "0000-00-00 00:00:00") {
+
+                            var billsec_seconds = billsec(row[i].answer);
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="FAILED", cause="18", duration="' + duration_seconds + '", billsec="' + billsec_seconds + '" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        } else {
+                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="FAILED", cause="18", duration="' + duration_seconds + '", billsec="0" where dstchannel="' + data.channel + '"';
+                            connection.query(updateEndCall);
+                            console.info(updateEndCall);
+                        }
+                    }
+                });
+            }
+            
             if (data.event === 'Hangup' && data.cause === "19") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
