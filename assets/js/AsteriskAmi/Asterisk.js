@@ -94,11 +94,13 @@ function start() {
                     connection.query(updateEndCall_xfer);
                     console.info(updateEndCall_xfer);
                 }
+                storage.removeItem("interception");
             }
 
             if (data.event === 'Hangup' && data.cause === "16") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
+                
                 var channel = data.channel;
                 var template = /(.*\/)(\d*)(-.*)(<ZOMBIE>)/;
                 var getChannelWithoutZombie = channel.replace(template, "$1$2$3");
