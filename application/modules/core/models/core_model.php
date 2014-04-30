@@ -38,63 +38,34 @@ class Core_model extends CI_Model {
         $this->load->library('ion_auth');
     }
 
-    function insertCallData($data) {
-        $this->db->insert('cdr', $data);
-    }
-
-    function updateLinkCallData($uniqueid, $answer) {
-        $data = array(
-            'answer' => $answer
-        );
-
-        $this->db->where('uniqueid', $uniqueid);
-        $this->db->update('cdr', $data);
-    }
-
-    function updateEndCallData($uniqueid, $end, $cause, $disposition) {
-        $this->db->select('start,answer');
-        $this->db->from('cdr');
-        $this->db->where('uniqueid', $uniqueid);
-        $dates = $this->db->get();
-
-        if (0 < $dates->num_rows) {
-            foreach ($dates->result() as $date) {
-                $date->start;
-                $date->answer;
-            }
-            $start_call = strtotime($date->start);
-            $end_call = strtotime($end);
-            $duration_in_sec = $end_call - $start_call;
-
-            if ($date->answer !== '0000-00-00 00:00:00') {
-                $answer_call = strtotime($date->answer);
-                $end_call = strtotime($end);
-                $billsec_in_sec = $end_call - $answer_call;
-            }
-            $data = array(
-            'end' => $end,
-            'cause' => $cause,
-            'duration' => abs($duration_in_sec),
-            'billsec' => abs($billsec_in_sec),
-            'disposition' => $disposition
-        );
-        }else{
-            
-            $data = array(
-            'end' => $end,
-            'cause' => $cause,
-            'duration' => '0',
-            'billsec' => '0',
-            'disposition' => $disposition
-        );
-            
-        }
-
-
+    function getCallEvent($phone_number) {
+        $results = array();
         
+        $this->db->select("id, src, dst, start,billsec,disposition, uniqueid, cause", false);
+        $this->db->from('cdr');
+        $this->db->where_in('disposition', '16, 17, 19');
+        $this->db->or_where('src', $phone_number);
+        $this->db->or_where('dst', $phone_number);
+        $this->db->order_by('start','desc');
+        $this->db->limit(10);
 
-        $this->db->where('uniqueid', $uniqueid);
-        $this->db->update('cdr', $data);
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Core_model();
+                $tmp->id = $row->id;
+                $tmp->uniqueid = $row->uniqueid;
+                $tmp->src = $row->src;
+                $tmp->dst = $row->dst;
+                $tmp->start = $row->start;
+                $tmp->billsec = $row->billsec;
+                $tmp->disposition = $row->disposition;
+                $tmp->cause = $row->cause;
+                
+                $results[$tmp->id] = $tmp;
+            }
+        }
+        return $results;
     }
 
 }

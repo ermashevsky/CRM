@@ -49,94 +49,75 @@ class Core extends MX_Controller {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
 
             $this->load->view('header');
-            $this->load->view('index', $data);
-            $this->load->view('rightsidebar');
+            $this->load->view('index');
+            $this->load->view('rightsidebar', $data);
+            $this->load->view('footer');
         }
     }
 
-    function insertCallData() {
-
-        $data[] = $this->input->post('data');
-        
-        $tmp = array();
-        
-        foreach ($data as $val) {
-
-            $tmp['src'] = $val['calleridnum'];
-            $tmp['clid'] = $val['calleridname'];
-            $tmp['dst'] = $val['dialstring'];
-            $tmp['channel'] = $val['channel'];
-            $tmp['dstchannel'] = $val['destination'];
-            $tmp['uniqueid'] = $val['uniqueid'];
-
-        }
-
-        $this->load->model('core_model');
-        return $this->core_model->insertCallData($tmp);
+    function format_seconds($seconds) {
+        $t = round($seconds);
+        return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
     }
-    
-    function updateLinkCallData() {
-        
-        date_default_timezone_set('Europe/Moscow');
-        
-        $data[] = $this->input->post('data');
-        
-        $tmp = array();
-        
-        foreach ($data as $val) {
-            date_default_timezone_set('Europe/Moscow');
-            $tmp['uniqueid'] = $val['uniqueid1'];
-            $tmp['answer'] = date("Y-m-d H:i:s", now());
 
+    function viewCallEvent($user_phone) {
+        if (!$this->ion_auth->logged_in()) {
+            redirect('auth/login', 'refresh');
+        } else {
+            $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $this->load->model('core_model');
+            $data = $this->core_model->getCallEvent($data['user']->phone);
         }
+        //return $data;
+        echo '<li class="nav-header" style="color:#3a87ad;">История звонков</li>'
+        . '<div style = "width: 200px; height: 370px; overflow: auto;" id = "scrollCall">';
 
-        $this->load->model('core_model');
-        return $this->core_model->updateLinkCallData($tmp['uniqueid'], $tmp['answer']);
-    }
-    
-    function updateEndCallData() {
-        
-        
-        $data[] = $this->input->post('data');
-        print_r($data);
-        
-        $tmp = array();
-        
-        foreach ($data as $val) {
-            
-                $tmp['cause'] = $val['cause'];
-                
-            if($val['cause'] ==='17'){
-                $tmp['disposition'] = 'BUSY';
-            }
-            
-            if($val['cause'] ==='16'){
-                $tmp['disposition'] = 'ANSWERED';
-            }
-            
-            if($val['cause'] ==='19'){
-                $tmp['disposition'] = 'NO ANSWER';
-            }
-            
-            if($val['cause'] ==='34'){
-                $tmp['disposition'] = 'FAILED';
-            }
-            
-            if($val['cause'] ==='21'){
-                $tmp['disposition'] = 'FAILED';
-            }
-            
-            if($val['cause'] ==='1'){
-                $tmp['disposition'] = 'FAILED';
-            }
-            date_default_timezone_set('Europe/Moscow');
-                $tmp['uniqueid'] = $val['uniqueid'];
-                $tmp['end'] = date("Y-m-d H:i:s", now());
+        foreach ($data as $item) {
+            if ($item->src === $user_phone) {
+                $date = date_create($item->start, timezone_open("Europe/Moscow"));
+                $formatted_date = date_format($date, "d.m.Y H:i:s");
 
+                echo '<address style="background: #FFDB58;">
+                    <small><strong>Исходящий <i class="icon-arrow-right"></i></strong></small><br/>
+                    <small>' . $formatted_date . '</small><br/>
+                    <small>Номер:' . $item->dst . '</small><br/>
+                    <small>Длительность:'. $this->format_seconds($item->billsec) .'</small><br/>';
+                switch ($item->cause){
+                    case "16":
+                        echo '<small style="color:#51a351;"><b>Статус: Ответили </b></small><br/></address>';
+                        break;
+                    case "17":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Занят </b></small><br/></address>';
+                        break;
+                    case "19":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Не ответили </b></small><br/></address>';
+                        break;
+                }
+            }
+
+            if ($item->dst === $user_phone) {
+                $date = date_create($item->start, timezone_open("Europe/Moscow"));
+                $formatted_date = date_format($date, "d.m.Y H:i:s");
+
+                echo '<address style="background:#98FF98;">
+                    <small><strong>Входящий <i class="icon-arrow-left"></i></strong></small><br/>
+                    <small>' . $formatted_date . '</small><br/>
+                    <small>Номер:' . $item->src . '</small><br/>
+                    <small>Длительность:' . $this->format_seconds($item->billsec) . '</small><br/>';
+                switch ($item->cause){
+                    case "16":
+                        echo '<small style="color:#51a351;"><b>Статус: Ответили </b></small><br/></address>';
+                        break;
+                    case "17":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
+                        break;
+                    case "19":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
+                        
+                }
+            }
         }
-
-        $this->load->model('core_model');
-        return $this->core_model->updateEndCallData($tmp['uniqueid'], $tmp['end'], $tmp['cause'], $tmp['disposition']);
+        echo '</div>';
     }
 
 }

@@ -16,6 +16,7 @@
         <script src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.scrollpanel.js"></script>
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -72,6 +73,8 @@
                     $('#server_status').removeClass("label label-success").addClass("label label-important");
                 });
 
+                $('#scrollCall').scrollpanel();
+
                 socket.on('event', function(data) {
 
                     console.info(data);
@@ -84,31 +87,31 @@
                         var calleridnum = data.calleridnum;
                         var dialstring = data.dialstring;
                         var string = data.channel; // юрл в котором происходит поиск
-                        
-            
+
+
                         var regXfer = new RegExp('xfer', 'ig');
                         var result_xfer = string.match(regXfer);  // поиск шаблона в юрл
-                        
+
                         var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
                         var destination = data.destination;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumberFromChannel = destination.replace(re, "$2");
-                        
+
                         $.totalStorage("destuniqueid_begin", data.destuniqueid);
                         $.totalStorage("uniqueid", data.uniqueid);
                         $.totalStorage("calleridnum", data.calleridnum);
-                        $.totalStorage('destination'+data.destination, data.destination);
-                        $.totalStorage('dialstring'+data.destination, data.dialstring);
+                        $.totalStorage('destination' + data.destination, data.destination);
+                        $.totalStorage('dialstring' + data.destination, data.dialstring);
 
-                        
+
                         if (parseInt(result) === parseInt(phone_number)) {
 
                             var text = "Исходящий звонок на номер: " + dialstring_rep;
                             var type = 'success';
-                            $.totalStorage('call','Out');
+                            $.totalStorage('call', 'Out');
                             msg_system(text, type);
                         }
 
@@ -116,7 +119,7 @@
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
-                            $.totalStorage('call','In');
+                            $.totalStorage('call', 'In');
                             msg_system(text, type);
                         }
 
@@ -124,7 +127,7 @@
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Переведенный входящий звонок с номера: " + calleridnum;
                             var type = 'success';
-                            $.totalStorage('call','In');
+                            $.totalStorage('call', 'In');
                             msg_system(text, type);
                         }
 
@@ -135,14 +138,14 @@
                         //client.emit('event', "Разговор ...");
                         var channel2 = data.channel2;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber2 = channel2.replace(re, "$2");
-                        
+
                         var channel1 = data.channel1;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber1 = channel1.replace(re, "$2");
-                        
+
                         if (getNumber2 === phone_number || getNumber1 === phone_number) {
                             var text = "Разговор ...";
                             var type = "success";
@@ -155,9 +158,9 @@
                         //uniquniqueid_begin почему-то undefined
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number) {
 
                             var text = "Повесили трубку";
@@ -166,15 +169,15 @@
 
                         }
                     }
-                    
+
                     if (data.event === "Hangup" && data.cause === "26") {
                         //client.emit('event', "Повесили трубку");
                         //uniquniqueid_begin почему-то undefined
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number) {
 
                             var text = "Ответил другой абонент";
@@ -187,7 +190,7 @@
                         //client.emit('event', "Пользователь занят");
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
                         console.info($.totalStorage('call'));
                         if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
@@ -196,12 +199,12 @@
                             msg_system(text, type);
                         }
                     }
-                    
+
                     if (data.event === "Hangup" && data.cause === "18") {
                         //client.emit('event', "Пользователь занят");
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
                         console.info($.totalStorage('call'));
                         if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
@@ -210,22 +213,22 @@
                             msg_system(text, type);
                         }
                     }
-                    
+
                     if (data.event === "Hangup" && data.cause === "19") {
                         //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
                         console.info($.totalStorage('call'));
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number && $.totalStorage('call') === 'In') {
                             var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
                         }
-                        
-                        if(getNumber === phone_number && $.totalStorage('call') === 'Out'){
+
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
@@ -236,9 +239,9 @@
 
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number) {
                             var text = "Ошибка вызова";
                             var type = "error";
@@ -250,9 +253,9 @@
 
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number) {
                             var text = "Несуществующий номер";
                             var type = "error";
@@ -264,9 +267,9 @@
 
                         var channel = data.channel;
                         var re = /(.*\/)(\d*)(-.*)/;
-                        
+
                         var getNumber = channel.replace(re, "$2");
-                        
+
                         if (getNumber === phone_number) {
                             var text = "Вызов отклонен";
                             var type = "error";
@@ -286,37 +289,62 @@
                     $.ajax({
                         url: '<?php echo site_url('/core/insertCallData'); ?>',
                         type: "POST",
-                        data: {data:data},
-                        success: function(data){ 
-                        console.info(data); 
+                        data: {data: data},
+                        success: function(data) {
+                            console.info(data);
                         }
                     });
                 }
-                
+
                 function updateLinkCallData(data) {
                     $.ajax({
                         url: '<?php echo site_url('/core/updateLinkCallData'); ?>',
                         type: "POST",
-                        data: {data:data},
-                        success: function(data){ 
-                        console.info(data); 
+                        data: {data: data},
+                        success: function(data) {
+                            console.info(data);
                         }
                     });
                 }
-                
+
                 function updateEndCallData(data) {
                     $.ajax({
                         url: '<?php echo site_url('/core/updateEndCallData'); ?>',
                         type: "POST",
-                        data: {data:data},
-                        success: function(data){ 
-                        console.info(data); 
+                        data: {data: data},
+                        success: function(data) {
+                            console.info(data);
                         }
                     });
                 }
-                
+
             });
         </script>
+        <style>
+            #scrollCall {
+                width: 140px;
+                height: 200px;
+                border: 2px solid #ccc;
+                padding-left:4px;
+            }
+            .sp-scrollbar {
+                width: 10px;
+                margin: 4px;
+                background-color: #ccc;
+                cursor: pointer;
+            } 
+            .sp-thumb {
+                background-color: #aaa;
+            }
+
+            .sp-scrollbar.active
+            .sp-thumb {
+                background-color: #999;
+            }
+            address{
+                padding-left: 4px;
+            }
+        </style>
     </head>
     <body>
 
