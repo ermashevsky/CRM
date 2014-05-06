@@ -47,8 +47,9 @@ class Core extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
-
-            $this->load->view('header');
+            $this->load->module('menu');
+            $menu = array('menu' => $this->menu->render('header') );
+            $this->load->view('header', $menu);
             $this->load->view('index');
             $this->load->view('rightsidebar', $data);
             $this->load->view('footer');
