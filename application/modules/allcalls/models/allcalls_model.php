@@ -37,7 +37,12 @@ class Allcalls_model extends CI_Model {
         parent::__construct();
         $this->load->library('ion_auth');
     }
-
+    
+    function format_seconds($seconds) {
+        $t = round($seconds);
+        return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
+    }
+    
     function getAllCall($phone_number) {
         $results = array();
         
@@ -68,6 +73,90 @@ class Allcalls_model extends CI_Model {
         return $results;
     }
 
+    function getFilteredCalls($date_time, $date_time2, $src, $dst, $status_call,$type_call,$user_phone_number,$phone_number){
+        $results = array();
+        
+        if($type_call === 'allcall' && $status_call === 'all_status'){
+
+            $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
+            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            AND (
+             `src` =  '".$user_phone_number."'
+            OR  `dst` =  '".$user_phone_number."'
+            )
+            AND (
+             `src` like  '%".$phone_number."%'
+            OR  `dst` like  '%".$phone_number."%'
+            )
+            order by `end` asc");
+
+        }
+        if($status_call !== 'all_status' && $type_call === 'allcall'){
+            
+            $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
+            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            AND (
+             `src` =  '".$user_phone_number."'
+            OR  `dst` =  '".$user_phone_number."'
+            )
+            AND (
+             `src` like  '%".$phone_number."%'
+            OR  `dst` like  '%".$phone_number."%'
+            )
+            AND `disposition` = '".$status_call."'
+            order by `end` asc");
+        }
+        
+        if($status_call !== 'all_status' && $type_call !== 'allcall'){
+            
+            $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
+            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            AND `src` like  '%".$src."%'
+            AND `dst` like  '%".$dst."%'
+            AND `disposition` = '".$status_call."'
+            order by `end` asc");
+        }
+        if($status_call === 'all_status' && $type_call !== 'allcall'){
+            
+            $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
+            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            AND `src` like  '%".$src."%'
+            AND `dst` like  '%".$dst."%'
+            order by `end` asc");
+        }
+        //$res = $this->db->get();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Allcalls_model();
+                $tmp->id = $row->id;
+                $tmp->uniqueid = $row->uniqueid;
+                $tmp->src = $row->src;
+                $tmp->dst = $row->dst;
+                $tmp->start = $row->start;
+                $tmp->answer = $row->answer;
+                $tmp->end = $row->end;
+                $tmp->billsec = $this->format_seconds($row->billsec);
+                $tmp->disposition = $row->disposition;
+                $tmp->cause = $row->cause;
+                
+                $results[$tmp->id] = $tmp;
+            }
+        }
+        return $results;
+    }
 }
 
 //End of file core_model.php

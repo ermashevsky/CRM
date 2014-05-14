@@ -18,7 +18,9 @@
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.scrollpanel.js"></script>
-        
+        <script type="text/javascript" src="/assets/js/jquery.datetimepicker.js"></script>
+        <script type="text/javascript" src="/assets/js/date.format.js"></script>
+
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
         <link href="/assets/css/bootstrap-button.css" rel="stylesheet">
@@ -28,6 +30,7 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/uploadify.css" />
         <link rel="stylesheet" href="/assets/css/bootstrap-tagsinput.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
+        <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
 
         <script src="http://localhost:8580/socket.io/socket.io.js"></script>
         <script type="text/javascript">
@@ -36,12 +39,101 @@
             // /project_dir/index.html
             $(document).ready(function() {
 
+                        $("#dst_block").css('display', 'none');
+                        $("#src_block").css('display', 'none');
+                        $("#number_block").css('display', 'block');
+                        
+                $('#type_call').on('change', function() {
+                    if (this.value === 'allcall') {
+                        $("#dst_block").css('display', 'none');
+                        $("#src_block").css('display', 'none');
+                        
+                        $("#dst_block").css('display', 'none');
+                        $("#src_block").css('display', 'none');
+                        $("#number_block").css('display', 'block');
+                    }
+                    if (this.value === 'outcall') {
+                        $("#src").val($('#hidden_phone_number').val());
+                        $("#src").attr('readonly', true);
+                        $("#dst").val('');
+                        $("#dst").attr('readonly', false);
+                        $("#dst_block").css('display', 'block');
+                        $("#src_block").css('display', 'block');
+                        $("#number_block").css('display', 'none');
+                    }
+                    if (this.value === 'incall') {
+                        $("#dst").val($('#hidden_phone_number').val());
+                        $("#dst").attr('readonly', true);
+                        $("#src").val('');
+                        $("#src").attr('readonly', false);
+                        $("#dst_block").css('display', 'block');
+                        $("#src_block").css('display', 'block');
+                        $("#number_block").css('display', 'none');
+                    }
+                });
+
+                $("#date_time").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    value: new Date().format('dd.mm.yyyy 00:00:00'),
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+                $('#date_time2').datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    value: new Date().format('dd.mm.yyyy 23:59:00'),
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+                function getListAction(){
+                // Print hello on the console.
+                    $.post( '<?php echo site_url('/allcalls/actionList'); ?>',function(data){
+                        console.info(data);
+                    });
+                }
+                
+                $("button#submit").click(function() {
+                    
+                    $.post('<?php echo site_url('/allcalls/getFilteredCalls'); ?>', $('#form_filter_call').serialize(),
+                            function(data) {
+                                $('#table_all_calls').empty();
+                                $('#table_all_calls').append('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="allcalls"><thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>');
+                                console.log(data); //  2pm
+                                $.each(data, function() {
+                                    // this = object in array
+                                    // access attributes: this.Id, this.Name, etc
+                                    if (this.src === $('#hidden_phone_number').val()) {
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>'+getListAction()+'</td></tr>');
+                                    }
+                                    if (this.dst === $('#hidden_phone_number').val()) {
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>'+getListAction()+'</td></tr>');
+                                    }
+                                });
+                                $('#allcalls').dataTable({
+                                    "sPaginationType": "full_numbers",
+                                    "oLanguage": {
+                                        "sUrl": "/assets/js/dataTables.russian.txt"
+                                    },
+                                    "aaSorting": [[0, "desc"]]
+                                });
+                                $.extend($.fn.dataTableExt.oStdClasses, {
+                                    "sWrapper": "dataTables_wrapper form-inline"
+                                });
+                                $('#form-content').modal('hide');
+                            }, "json");
+                });
+
                 $('#allcalls').dataTable({
                     "sPaginationType": "full_numbers",
                     "oLanguage": {
                         "sUrl": "/assets/js/dataTables.russian.txt"
                     },
-                    "aaSorting": [[ 0, "desc" ]]
+                    "aaSorting": [[0, "desc"]]
                 });
                 $.extend($.fn.dataTableExt.oStdClasses, {
                     "sWrapper": "dataTables_wrapper form-inline"
@@ -333,9 +425,9 @@
                 }
 
             });
-            function play(){
-        alert("Выбрано воспроизведение");    
-        }
+            function play() {
+                alert("Выбрано воспроизведение");
+            }
         </script>
         <style>
             #scrollCall {
@@ -367,6 +459,33 @@
             }
             #actionList, #selectAction {
                 vertical-align: middle;
+            }
+            #allcalls_info, #allcalls_paginate{
+                margin-top: 10px;
+                font-size: 12px;
+            }
+            .dataTables_length select {
+                width: auto !important;
+                font-size: 12px;
+            }
+            .dataTables_length label{
+                font-size: 12px;
+            }
+            .dataTables_filter input{
+                width: 120px;
+                font-size: 12px;
+            }
+            .dataTables_filter label{
+                font-size: 12px;
+            }
+            #form_filter_call select{
+                width: auto !important;  
+            }
+            #form_filter_call{
+                margin: 10px;
+            }
+            #form-content{
+                width: 550px!important;
             }
         </style>
     </head>

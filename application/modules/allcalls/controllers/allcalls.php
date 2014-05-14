@@ -95,5 +95,24 @@ class Allcalls extends MX_Controller {
             echo '</table>';
         }
     }
+    
+    function getFilteredCalls(){
+        
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        $date_time      = $this -> input -> post('date_time');
+        $date_time2     = $this -> input -> post('date_time2');
+        $type_call      = $this -> input -> post('type_call');
+        $src            = trim($this -> input -> post('src'));
+        $dst            = trim($this -> input -> post('dst'));
+        $status_call    = $this -> input -> post('status_call');
+        $phone_number    = $this -> input -> post('phone_number');
+        $user_phone_number = $data['user']->phone;
+        
+        $this->load->model('allcalls_model');
+        $filtered_call_data = $this->allcalls_model->getFilteredCalls($date_time,$date_time2,$src,$dst,$status_call,$type_call,$user_phone_number,$phone_number);
+        
+        echo json_encode($filtered_call_data);
+    }
 
 }
