@@ -195,6 +195,33 @@ class Tasks_model extends CI_Model {
         $this->db->delete('tasks'); 
         $this->db->trans_complete();
     }
+    
+    function closeTask($id){
+        date_default_timezone_set('Europe/Moscow');
+        $data = array(
+            'end_date' => date("Y-m-d H:i:s"),
+            'status' => 'Решена'
+        );
+        
+        $this->db->trans_start();
+        $this->db->where('id', $id);
+        $this->db->update('tasks', $data); 
+        $this->db->trans_complete();
+        //echo $this->db->last_query(); 
+    }
+    
+    function reopenTask($id){
+        
+        $data = array(
+            'end_date' => NULL,
+            'status' => 'В работе',
+        );
+        
+        $this->db->trans_start();
+        $this->db->where('id', $id);
+        $this->db->update('tasks', $data); 
+        $this->db->trans_complete();
+    }
 }
 
 //End of file core_model.php

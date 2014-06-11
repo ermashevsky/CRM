@@ -77,7 +77,11 @@ class Tasks extends MX_Controller {
             $task_name = trim($this->input->post('task_name'));
             $task_description = trim($this->input->post('task_description'));
             $reminder_date = trim($this->input->post('reminder_date'));
-
+            
+            $user = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $fullname = $user->first_name." ".$user->last_name;
+            
+            if($reminder_date !== ""){
             $data = array(
                 'status' => $status,
                 'priority'=>$priority,
@@ -85,9 +89,23 @@ class Tasks extends MX_Controller {
                 'category'=>$category,
                 'task_name'=>$task_name,
                 'task_description'=>$task_description,
-                'reminder_date'=>date('Y-m-d H:i:s',strtotime($reminder_date))
+                'reminder_date'=>date('Y-m-d H:i:s',strtotime($reminder_date)),
+                'end_date'=>NULL,
+                'initiator' => $fullname
             );
-
+            }else{
+                $data = array(
+                    'status' => $status,
+                    'priority'=>$priority,
+                    'assigned'=>$assigned,
+                    'category'=>$category,
+                    'task_name'=>$task_name,
+                    'task_description'=>$task_description,
+                    'reminder_date'=> NULL,
+                    'end_date'=>NULL,
+                    'initiator' => $fullname
+                );    
+            }
             $this->load->model('tasks_model');
             $this->tasks_model->addTask($data);
             
@@ -169,5 +187,16 @@ class Tasks extends MX_Controller {
         $this->tasks_model->updateTaskParameters($id, $status, $priority, $assigned, $category, $task_description, $task_name, $reminder_date);
         redirect('tasks/viewTask/'.$id, 'refresh');
     }
-
+    
+    function closeTask($id){
+        $this->load->model('tasks_model');
+        $this->tasks_model->closeTask($id);
+        redirect('tasks/viewTask/'.$id, 'refresh');
+    }
+    
+    function reopenTask($id){
+        $this->load->model('tasks_model');
+        $this->tasks_model->reopenTask($id);
+        redirect('tasks/viewTask/'.$id, 'refresh');
+    }
 }

@@ -10,6 +10,12 @@
                             <h3>
                                 <?php
                                 echo $row->task_name;
+                                echo " ";
+                                if(is_null($row->end_date)){
+                                    echo anchor("tasks/closeTask/" . $row->id, "Закрыть задачу", "class='btn btn-mini btn-info'");
+                                }else{
+                                    echo anchor("tasks/reopenTask/" . $row->id, "Открыть задачу", "class='btn btn-mini btn-info'");
+                                }
                                 ?>
                             </h3>
                             <h6>Добавил(а): Ермашевский Денис</h6>

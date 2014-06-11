@@ -5,6 +5,7 @@
                 <h3>Задачи</h3>
                 <?php
                 echo anchor("tasks/addTask/", "Создать задачу", "class='btn btn-mini btn-info pull-left'");
+                echo "<span>".anchor("tasks/filterTask/", "Фильтр задач", "class='btn btn-mini btn-info pull-left'")."</span>";
                 ?>
 <!--
                 <div class="span4">
