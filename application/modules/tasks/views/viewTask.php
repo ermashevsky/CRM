@@ -9,7 +9,12 @@
                             ?>
                             <h3>
                                 <?php
-                                echo $row->task_name;
+                                if($row->task_name!==""){
+                                   echo $row->task_name;
+                                }else{
+                                   echo substr($row->task_description, 0, 80).'...';
+                                }
+                         
                                 echo " ";
                                 if(is_null($row->end_date)){
                                     echo anchor("tasks/closeTask/" . $row->id, "Закрыть задачу", "class='btn btn-mini btn-info'");

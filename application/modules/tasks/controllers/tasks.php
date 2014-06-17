@@ -65,7 +65,7 @@ class Tasks extends MX_Controller {
         $this->load->library('form_validation');
         $this->form_validation->set_error_delimiters('<div class="alert alert-error">', '</div>');
 
-        $this->form_validation->set_rules('task_name', 'Заголовок', 'required|xss_clean|trim');
+        //$this->form_validation->set_rules('task_name', 'Заголовок', 'required|xss_clean|trim');
         $this->form_validation->set_rules('task_description', 'Описание', 'required|xss_clean|trim');
 
         if ($this->form_validation->run() === TRUE) {

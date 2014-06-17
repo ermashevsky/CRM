@@ -58,6 +58,7 @@ class Tasks_model extends CI_Model {
                 $tmp->status = $row->status;
                 $tmp->priority = $row->priority;
                 $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
                 $tmp->assigned = $row->assigned;
                 $tmp->create_date = $row->create_date;
                 $tmp->end_date = $row->end_date;

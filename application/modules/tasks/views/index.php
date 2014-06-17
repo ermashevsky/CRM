@@ -36,8 +36,14 @@
                             . '<td>' . $rows->category . '</td>'
                             . '<td>' . $rows->status . '</td>'
                             . '<td>' . $rows->priority . '</td>'
-                            . '<td>' . anchor("tasks/viewTask/" . $rows->id, $rows->task_name) . '</td>'
-                            . '<td>' . $crmUser ->getUserById($rows->assigned). '</td>'
+                            . '<td>';
+                        if($rows->task_name!==""){
+                                echo anchor("tasks/viewTask/" . $rows->id, $rows->task_name);
+                        }else{
+                                echo anchor("tasks/viewTask/" . $rows->id,  substr($rows->task_description, 0, 80).'...');
+                        }
+                                    echo '</td>';
+                            echo '<td>' . $crmUser ->getUserById($rows->assigned). '</td>'
                             . '<td>' . date('d.m.Y H:i:s',strtotime($rows->create_date)) . '</td>'
                             . '<td>' . anchor("tasks/deleteTask/" . $rows->id, "Удалить", "class='btn btn-mini btn-danger pull-left'").'</td>'
                             . '</tr>';
