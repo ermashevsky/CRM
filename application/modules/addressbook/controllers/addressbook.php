@@ -440,8 +440,21 @@ class AddressBook extends MX_Controller {
         $organizationid = $this->input->post('organizationid');
         $organization_note = $this->input->post('organization_note');
         $contact_id = $this->input->post('contact_id');
-        
+        if(empty($organizationid)){
         $data = array(
+            'contact_name' => $contact_name,
+            'job_position' => $job_position,
+            'private_phone_number' => $private_phone_number,
+            'mobile_number' => $mobile_number,
+            'email' => $email,
+            'address' => $address,
+            'birthday' => $birthday,
+            'comment' => $comment,
+            'organization_id' => NULL,
+            'organization_note' => $organization_note
+        );
+        }else{
+          $data = array(
             'contact_name' => $contact_name,
             'job_position' => $job_position,
             'private_phone_number' => $private_phone_number,
@@ -452,8 +465,8 @@ class AddressBook extends MX_Controller {
             'comment' => $comment,
             'organization_id' => $organizationid,
             'organization_note' => $organization_note
-        );
-
+        );  
+        }
         $this->load->model('addressbook_model');
         $this->addressbook_model->updateContactData($data, $contact_id);
         redirect('addressbook/index', 'refresh');

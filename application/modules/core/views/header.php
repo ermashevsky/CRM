@@ -30,7 +30,15 @@
         <script src="http://localhost:8580/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             // javascript code
-
+            function getContactDetail(phone_number) {
+                  $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
+                    function(data) {
+                        if(data !== ""){
+                        $("div#ui_notifIt").append("Звонит " + data);
+                        $('div#ui_notifIt').css('text-align','center');
+                    }
+                  });
+                }
             // /project_dir/index.html
             $(document).ready(function() {
                 var socket = io.connect('http://localhost:8580');
@@ -117,6 +125,9 @@
 
                         if (dialstring === phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+                            
+                            getContactDetail(calleridnum);
+                            
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
                             $.totalStorage('call', 'In');

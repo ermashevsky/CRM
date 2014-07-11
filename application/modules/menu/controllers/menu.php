@@ -46,6 +46,9 @@ class Menu {
                             array('name'  => 'Все звонки', 
                                   'slug'  => 'allcalls',
                                   'class' => ''),
+                            array('name'  => 'Адресная книга', 
+                                  'slug'  => 'addressbook',
+                                  'class' => ''),
                             
                             array('name'  => 'Календарь', 
                                   'slug'  => 'calendar',

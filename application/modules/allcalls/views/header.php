@@ -38,16 +38,25 @@
 
             // /project_dir/index.html
             $(document).ready(function() {
+                function getContactDetail(phone_number) {
+                  $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
+                    function(data) {
+                        if(data !== ""){
+                        $("div#ui_notifIt").append("Звонит " + data);
+                        $('div#ui_notifIt').css('text-align','center');
+                    }
+                  });
+                }
 
-                        $("#dst_block").css('display', 'none');
-                        $("#src_block").css('display', 'none');
-                        $("#number_block").css('display', 'block');
-                        
+                $("#dst_block").css('display', 'none');
+                $("#src_block").css('display', 'none');
+                $("#number_block").css('display', 'block');
+
                 $('#type_call').on('change', function() {
                     if (this.value === 'allcall') {
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
-                        
+
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
                         $("#number_block").css('display', 'block');
@@ -90,15 +99,15 @@
                     todayButton: true,
                     dayOfWeekStart: 1
                 });
-                function getListAction(){
-                // Print hello on the console.
-                    $.post( '<?php echo site_url('/allcalls/actionList'); ?>',function(data){
+                function getListAction() {
+                    // Print hello on the console.
+                    $.post('<?php echo site_url('/allcalls/actionList'); ?>', function(data) {
                         console.info(data);
                     });
                 }
-                
+
                 $("button#submit").click(function() {
-                    
+
                     $.post('<?php echo site_url('/allcalls/getFilteredCalls'); ?>', $('#form_filter_call').serialize(),
                             function(data) {
                                 $('#table_all_calls').empty();
@@ -108,10 +117,10 @@
                                     // this = object in array
                                     // access attributes: this.Id, this.Name, etc
                                     if (this.src === $('#hidden_phone_number').val()) {
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>'+getListAction()+'</td></tr>');
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + getListAction() + '</td></tr>');
                                     }
                                     if (this.dst === $('#hidden_phone_number').val()) {
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>'+getListAction()+'</td></tr>');
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + getListAction() + '</td></tr>');
                                     }
                                 });
                                 $('#allcalls').dataTable({
@@ -223,9 +232,13 @@
 
                         if (dialstring === phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+                            
+                            getContactDetail(calleridnum);
+                            
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
                             $.totalStorage('call', 'In');
+                            
                             msg_system(text, type);
                         }
 
@@ -490,7 +503,6 @@
         </style>
     </head>
     <body>
-
         <div class="container-fluid">
             <?php
             echo $menu;

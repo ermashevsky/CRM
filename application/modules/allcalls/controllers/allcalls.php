@@ -62,15 +62,14 @@ class Allcalls extends MX_Controller {
     }
 
     function actionList() {
-        return '<div class="btn-group">
-  <button class="btn dropdown-toggle btn-mini" data-toggle="dropdown"> Выберите действие <span class="caret"></span></button>
-  <ul class="dropdown-menu">
-    <li><a href="#" onclick="setCalendar();return false;">Календарь</a></li>
-    <li><a href="#" onclick="setNote();return false;">Заметка</a></li>
-    <li><a href="#" onclick="setTask();return false;">Задача</a></li>
-    <li><a href="#" onclick="play();return false;">Воспроизвести</a></li>
-  </ul>
-</div>';
+        return '<div class="btn-toolbar">
+                    <div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setNote();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#" onclick="setTask();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
+                    </div>
+                </div>';
     }
 
     function getAllCalls() {

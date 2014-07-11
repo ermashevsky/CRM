@@ -35,9 +35,13 @@
                             . '<td>' . $rows->job_position . '</td>'
                             . '<td>' . $rows->private_phone_number . '</td>'
                             . '<td>' . $rows->email . '</td>'
-                            . '<td>' . $rows->address . '</td>'
-                            . '<td>' . anchor("addressbook/viewOrganizationDetails/" . $rows->organization_id, $rows->organization_name) . '</td>'
-                            . '</tr>';
+                            . '<td>' . $rows->address . '</td>';
+                            if(is_null($rows->organization_id)||$rows->organization_id === "0"){
+                                echo '<td></td>';
+                            }else{
+                                echo '<td>' . anchor("addressbook/viewOrganizationDetails/" . $rows->organization_id, $rows->organization_name) . '</td>';
+                            }
+                            echo '</tr>';
                         }
                         ?>
                     </tbody>

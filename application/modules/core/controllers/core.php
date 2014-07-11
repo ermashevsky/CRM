@@ -120,5 +120,14 @@ class Core extends MX_Controller {
         }
         echo '</div>';
     }
-
+    
+    function getContactDetail(){
+        
+        $phone_number = $this -> input -> post('phone_number');
+        
+        $this->load->model('core_model');
+        $contactDetail = $this->core_model->getContactDetail($phone_number);
+        
+        return $contactDetail;
+    }
 }

@@ -67,6 +67,34 @@ class Core_model extends CI_Model {
         }
         return $results;
     }
+    
+    function getContactDetail($phone_number){
+        $results = array();
+        
+        $this->db->select("id, organization_name as contact_name", false);
+        $this->db->from('organization');
+        $this->db->where('phone_number', $phone_number);
+        $this->db->or_where('alt_phone_number', $phone_number);
+        
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            $ret = $res->row();
+            echo $ret->contact_name;
+        }
+        if(empty($results)){
+        
+        $this->db->select("id,contact_name", false);
+        $this->db->from('contacts');
+        $this->db->where('private_phone_number', $phone_number);
+        $this->db->or_where('mobile_number', $phone_number);
+        
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            $ret = $res->row();
+            echo $ret->contact_name;
+        }
+        }
+    }
 
 }
 
