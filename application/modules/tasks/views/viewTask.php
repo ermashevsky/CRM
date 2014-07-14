@@ -93,14 +93,7 @@
                             <?php
                             echo anchor("tasks/deleteTask/" . $row->id, "Удалить", "class='btn btn-mini btn-danger pull-right'");
                             echo anchor("tasks/editTask/" . $row->id, "Редактировать", "class='btn btn-mini btn-success pull-right'");
-                            ?>
-                            <h4>Прикрепленные файлы</h4>
-                            <ul>
-                                <li>CRM структура_21.05.2014_3.png (19,476 КБ)  <a href="#"><i class="icon-trash"></i></a> Антон Рудов, 21-05-2014 10:54</li>
-                                <li>contact_form.png (351,234 КБ)  <a href="#"><i class="icon-trash"></i></a> Денис Ермашевский, 22-05-2014 17:01</li>
-                                <li>Screenshot - 03.06.2014 - 13_38_02.png (366,938 КБ)  <a href="#"><i class="icon-trash"></i></a> Денис Ермашевский, 03-06-2014 13:39</li>
-                            </ul>
-                            <?php
+
                         endforeach;
                         ?>
                         <br/>

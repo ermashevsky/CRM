@@ -66,7 +66,7 @@ class Allcalls extends MX_Controller {
                     <div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setNote();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#" onclick="setTask();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#taskWindow" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                         <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
                     </div>
                 </div>';
@@ -86,9 +86,21 @@ class Allcalls extends MX_Controller {
             foreach ($call_data as $calls) {
                 $date = new DateTime($calls->end);
                 if ($calls->dst === $data['user']->phone) {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td>' . $this->actionList() . '</td></tr>';
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
+                    <div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setNote();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
+                    </div>
+                </div></td></tr>';
                 } else {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td>' . $this->actionList() . '</td></tr>';
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setNote();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
+                    </div></td></tr>';
                 }
             }
             echo '</table>';

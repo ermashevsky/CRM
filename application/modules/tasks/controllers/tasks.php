@@ -77,6 +77,7 @@ class Tasks extends MX_Controller {
             $task_name = trim($this->input->post('task_name'));
             $task_description = trim($this->input->post('task_description'));
             $reminder_date = trim($this->input->post('reminder_date'));
+            $id_call = trim($this->input->post('id_call'));
             
             $user = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $fullname = $user->first_name." ".$user->last_name;
@@ -91,7 +92,8 @@ class Tasks extends MX_Controller {
                 'task_description'=>$task_description,
                 'reminder_date'=>date('Y-m-d H:i:s',strtotime($reminder_date)),
                 'end_date'=>NULL,
-                'initiator' => $fullname
+                'initiator' => $fullname,
+                'id_call' => $id_call
             );
             }else{
                 $data = array(
@@ -103,7 +105,8 @@ class Tasks extends MX_Controller {
                     'task_description'=>$task_description,
                     'reminder_date'=> NULL,
                     'end_date'=>NULL,
-                    'initiator' => $fullname
+                    'initiator' => $fullname,
+                    'id_call' => $id_call
                 );    
             }
             $this->load->model('tasks_model');
@@ -198,5 +201,10 @@ class Tasks extends MX_Controller {
         $this->load->model('tasks_model');
         $this->tasks_model->reopenTask($id);
         redirect('tasks/viewTask/'.$id, 'refresh');
+    }
+    
+    function getCRMUsers(){
+        $this->load->model('tasks_model');
+        echo json_encode($this->tasks_model->getAllCRMUsers());
     }
 }
