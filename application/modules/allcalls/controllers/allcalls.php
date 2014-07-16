@@ -97,7 +97,7 @@ class Allcalls extends MX_Controller {
                 } else {
                     echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem('.$calls->id.','.$calls->dst.');return false;" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>
                         <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                         <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
                     </div></td></tr>';

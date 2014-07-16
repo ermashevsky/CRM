@@ -80,9 +80,7 @@ class Core_model extends CI_Model {
         if (0 < $res->num_rows) {
             $ret = $res->row();
             echo $ret->contact_name;
-        }
-        if(empty($results)){
-        
+        }else{
         $this->db->select("id,contact_name", false);
         $this->db->from('contacts');
         $this->db->where('private_phone_number', $phone_number);
@@ -92,8 +90,19 @@ class Core_model extends CI_Model {
         if (0 < $res->num_rows) {
             $ret = $res->row();
             echo $ret->contact_name;
+        }else{
+            $this->db->select("id,first_name, last_name", false);
+            $this->db->from('users');
+            $this->db->where('phone', $phone_number);
+            //$this->db->or_where('mobile_number', $phone_number);
+        
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            $ret = $res->row();
+            echo $ret->first_name." ".$ret->last_name ." (внутр.)";
+        } 
         }
-        }
+    }
     }
 
 }

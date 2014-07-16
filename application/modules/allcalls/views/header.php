@@ -39,44 +39,65 @@
                 $('input#id_call').val(id_call);
             }
 
+            function notify(message, type) {
+                notif({
+                    msg: message,
+                    type: type,
+                    width: 300,
+                    height: 300,
+                    opacity: 1,
+                    autohide: true,
+                    position: "center",
+                    multiline: true
+                });
+            }
+
             function setContactItem(call_id, dst) {
                 //panel with buttons
 
                 $('#modalContactItem').modal('show');
-                
-                $("button#setOrganizationItem").click(function(){
-                    
+
+                $("button#setOrganizationItem").click(function() {
+
                     $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': dst},
                     function(data) {
 
-                       if (data !== "") {
-                                $('#modalContactItem').modal('hide');
-                                console.info("Контакт существует");
-                            }else{
+                        if (data !== "") {
+                            $('#modalContactItem').modal('hide');
+                            
+                            var message = "Контакт с номером "+dst+" существует.";
+                            var type = "success";
+                            notify(message, type);
+                            
+                        } else {
                             $("input#phone_number").val(dst);
-                       
+
                             $('#modalContactItem').modal('hide');
                             $("#modalOrganizationContactItem").modal("show");
-                            
-                       }
-                       
+
+                        }
+
                     });
                 });
-                
-                $("button#setContactItem").click(function(){
-                    
+
+                $("button#setContactItem").click(function() {
+
                     $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': dst},
                     function(data) {
-                       if (data !== "") {
-                                $('#modalContactItem').modal('hide');
-                                console.info("Контакт существует");
-                            }else{
+                        if (data !== "") {
+                            $('#modalContactItem').modal('hide');
+                            
+                            var message = "Контакт существует.";
+                            var type = "success";
+                            notify(message, type);
+                            
+                        } else {
                             $("input#private_phone_number").val(dst);
-                       
+
                             $('#modalContactItem').modal('hide');
                             $("#modalContactItemForm").modal("show");
-                            
-                       }     
+
+                        }
                     });
                 });
             }
@@ -92,7 +113,7 @@
             ;
             // /project_dir/index.html
             $(document).ready(function() {
-                
+
                 $("button#button1id_saveOrganization").click(function() {
 
                     $.post('<?php echo site_url('addressbook/addOrganizationData'); ?>', $('form#organizationData').serialize(),
@@ -105,7 +126,7 @@
 
 
                 });
-                
+
                 $("button#button1id_saveContact").click(function() {
 
                     $.post('<?php echo site_url('/addressbook/insertNewContactRow'); ?>', $('form#contactData').serialize(),
@@ -118,7 +139,7 @@
 
 
                 });
-                
+
                 getCRMUsers();
                 $("button#button1id").click(function() {
 
@@ -619,8 +640,8 @@
     </head>
 
     <body>
-        
-<!-- Task Modal Form -->
+
+        <!-- Task Modal Form -->
         <div class="modal hide fade" id="taskWindow" style="width:600px; ">
             <div class="modal-header">
                 <a href="#" class="pull-right" data-dismiss="modal">×</a>
@@ -747,19 +768,19 @@
                 </div>
             </div>
         </div>
-<!-- End of Task Modal Form -->
+        <!-- End of Task Modal Form -->
 
-<!-- Contact Modal Form -->
+        <!-- Contact Modal Form -->
         <div id="modalContactItem" class="modal hide fade" style="width:500px;">
             <div class="modal-header">
                 <h4>Какой тип контакта добавить в адресную книгу?</h4>
             </div>
             <div class="modal-body">
                 <p>
-                    <div class="controls">
-                        <button id="setOrganizationItem" name="setOrganizationItem" class="btn btn-large btn-block btn-success">Организацию</button>
-                        <button id="setContactItem" name="setContactItem" class="btn btn-large btn-block btn-success">Контакт</button>
-                    </div>
+                <div class="controls">
+                    <button id="setOrganizationItem" name="setOrganizationItem" class="btn btn-large btn-block btn-success">Организацию</button>
+                    <button id="setContactItem" name="setContactItem" class="btn btn-large btn-block btn-success">Контакт</button>
+                </div>
                 </p>
             </div>
             <div class="modal-footer">
@@ -772,95 +793,95 @@
                 </div>
             </div>
         </div>
-<!-- End of Contact Modal Form -->
+        <!-- End of Contact Modal Form -->
 
-<!-- Organization Contact Modal Form -->
-<div id="modalOrganizationContactItem" class="modal hide fade" >
+        <!-- Organization Contact Modal Form -->
+        <div id="modalOrganizationContactItem" class="modal hide fade" >
             <div class="modal-header">
                 <h4>Новая организация</h4>
             </div>
             <div class="modal-body" style="max-height:600px;">
                 <form action="<?php echo site_url('/addressbook/addOrganizationData'); ?>" method="post" accept-charset="utf-8" class="form-horizontal" id="organizationData">                            <fieldset>
 
-                                <!-- Form Name -->
-                                <!-- Text input-->
-                                <div class="control-group">
-                                     <label for="organization_name" class="control-label">Наименование</label>                                    <div class="controls">
-                                        <input type="text" name="organization_name" value="" id="organization_name" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
+                        <!-- Form Name -->
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="organization_name" class="control-label">Наименование</label>                                    <div class="controls">
+                                <input type="text" name="organization_name" value="" id="organization_name" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
 
-                                <!-- Text input-->
-                                <div class="control-group">
-                                     <label for="address" class="control-label">Адрес организации</label>                                    <div class="controls">
-                                        <input type="text" name="address" value="" id="address" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="address" class="control-label">Адрес организации</label>                                    <div class="controls">
+                                <input type="text" name="address" value="" id="address" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
 
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="phone_number" class="control-label">Телефон (основной)</label>                                    <div class="controls">
-                                        <input type="text" name="phone_number" value="" id="phone_number" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="phone_number" class="control-label">Телефон (основной)</label>                                    <div class="controls">
+                                <input type="text" name="phone_number" value="" id="phone_number" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
 
-                                <!-- Text input-->
-                                <div class="control-group">
-                                     <label for="email" class="control-label">Email</label>                                    <div class="controls">
-                                        <input type="text" name="email" value="" id="email" placeholder="" class="input-xlarge">                                    </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="email" class="control-label">Email</label>                                    <div class="controls">
+                                <input type="text" name="email" value="" id="email" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="comment" class="control-label">Комментарий</label>                                    <div class="controls">
+                                <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
+                        </div>
+                        <div class="accordion" id="accordion2">
+                            <div class="accordion-group">
+                                <div class="accordion-heading">
+                                    <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                        Дополнительная информация ...
+                                    </a>
                                 </div>
-                                <div class="control-group">
-                                    <label for="comment" class="control-label">Комментарий</label>                                    <div class="controls">
-                                        <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
-                                </div>
-                                <div class="accordion" id="accordion2">
-                                    <div class="accordion-group">
-                                        <div class="accordion-heading">
-                                            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-                                                Дополнительная информация ...
-                                            </a>
+                                <div id="collapseOne" class="accordion-body collapse">
+                                    <div class="accordion-inner">
+                                        <!-- Text input-->
+                                        <div class="control-group">
+                                            <label for="short_organization_name" class="control-label">Краткое наименование</label>                                                    <div class="controls">
+                                                <input type="text" name="short_organization_name" value="" id="short_organization_name" placeholder="" class="input-xlarge">                                                    </div>
                                         </div>
-                                        <div id="collapseOne" class="accordion-body collapse">
-                                            <div class="accordion-inner">
-                                                <!-- Text input-->
-                                                <div class="control-group">
-                                                    <label for="short_organization_name" class="control-label">Краткое наименование</label>                                                    <div class="controls">
-                                                        <input type="text" name="short_organization_name" value="" id="short_organization_name" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
-                                                <div class="control-group">
-                                                    <label for="full_organization_name" class="control-label">Полное наименование</label>                                                    <div class="controls">
-                                                        <input type="text" name="full_organization_name" value="" id="full_organization_name" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
-                                                <div class="control-group">
-                                                    <label for="alt_address" class="control-label">Дополнительный адрес</label>                                                    <div class="controls">
-                                                        <input type="text" name="alt_address" value="" id="alt_address" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
-                                                <div class="control-group">
-                                                    <label for="inn" class="control-label">ИНН</label>                                                    <div class="controls">
-                                                        <input type="text" name="inn" value="" id="inn" placeholder="" class="input-xlarge">                                                        
-                                                    </div>
-                                                </div>
-
-                                                <!-- Text input-->
-                                                <div class="control-group">
-                                                    <label for="alt_phone_number" class="control-label">Телефон (доп.)</label>                                                    <div class="controls">
-                                                           <input type="text" name="alt_phone_number" value="" id="alt_phone_number" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
-
-                                                <!-- Text input-->
-                                                <div class="control-group">
-                                                    <label for="fax" class="control-label">Факс</label>                                                    <div class="controls">
-                                                        <input type="text" name="fax" value="" id="fax" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
-
-                                                <!-- Text input-->
-                                                <div class="control-group">
-                                                    <label for="web_url" class="control-label">Web</label>                                                    <div class="controls">
-                                                        <input type="text" name="web_url" value="" id="web_url" placeholder="" class="input-xlarge">                                                    </div>
-                                                </div>
+                                        <div class="control-group">
+                                            <label for="full_organization_name" class="control-label">Полное наименование</label>                                                    <div class="controls">
+                                                <input type="text" name="full_organization_name" value="" id="full_organization_name" placeholder="" class="input-xlarge">                                                    </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="alt_address" class="control-label">Дополнительный адрес</label>                                                    <div class="controls">
+                                                <input type="text" name="alt_address" value="" id="alt_address" placeholder="" class="input-xlarge">                                                    </div>
+                                        </div>
+                                        <div class="control-group">
+                                            <label for="inn" class="control-label">ИНН</label>                                                    <div class="controls">
+                                                <input type="text" name="inn" value="" id="inn" placeholder="" class="input-xlarge">                                                        
                                             </div>
+                                        </div>
+
+                                        <!-- Text input-->
+                                        <div class="control-group">
+                                            <label for="alt_phone_number" class="control-label">Телефон (доп.)</label>                                                    <div class="controls">
+                                                <input type="text" name="alt_phone_number" value="" id="alt_phone_number" placeholder="" class="input-xlarge">                                                    </div>
+                                        </div>
+
+                                        <!-- Text input-->
+                                        <div class="control-group">
+                                            <label for="fax" class="control-label">Факс</label>                                                    <div class="controls">
+                                                <input type="text" name="fax" value="" id="fax" placeholder="" class="input-xlarge">                                                    </div>
+                                        </div>
+
+                                        <!-- Text input-->
+                                        <div class="control-group">
+                                            <label for="web_url" class="control-label">Web</label>                                                    <div class="controls">
+                                                <input type="text" name="web_url" value="" id="web_url" placeholder="" class="input-xlarge">                                                    </div>
                                         </div>
                                     </div>
                                 </div>
-                            </fieldset>
-                        </form>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
             <div class="modal-footer">
                 <!-- Button (Double) -->
@@ -868,70 +889,70 @@
                     <label class="control-label" for="button1id"></label>
                     <div class="controls">
                         <div class="controls">
-                        <button id="button1id_saveOrganization" name="button1id" class="btn btn-success">Сохранить</button>
-                        <button id="cancelForm" name="button2id" class="btn btn-danger" data-dismiss="modal">Отменить</button>
-                    </div>
+                            <button id="button1id_saveOrganization" name="button1id" class="btn btn-success">Сохранить</button>
+                            <button id="cancelForm" name="button2id" class="btn btn-danger" data-dismiss="modal">Отменить</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-<!-- End of Contact Modal Form -->
+        <!-- End of Contact Modal Form -->
 
-<!-- Contact Modal Form -->
-<div id="modalContactItemForm" class="modal hide fade" >
+        <!-- Contact Modal Form -->
+        <div id="modalContactItemForm" class="modal hide fade" >
             <div class="modal-header">
                 <h4>Новый контакт</h4>
             </div>
             <div class="modal-body" style="max-height:600px;">
                 <form action="<?php echo site_url('/addressbook/insertNewContactRow'); ?>" method="post" accept-charset="utf-8" class="form-horizontal" id="contactData">                            <fieldset>
 
-                                <!-- Form Name -->
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="contact_name" class="control-label">ФИО</label>                                    <div class="controls">
-                                        <input type="text" name="contact_name" value="" id="contact_name" placeholder="" class="input-xlarge">                                        
-                                    </div>
-                                </div>
+                        <!-- Form Name -->
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="contact_name" class="control-label">ФИО</label>                                    <div class="controls">
+                                <input type="text" name="contact_name" value="" id="contact_name" placeholder="" class="input-xlarge">                                        
+                            </div>
+                        </div>
 
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="job_position" class="control-label">Должность</label>                                    <div class="controls">
-                                        <input type="text" name="job_position" value="" id="job_position" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="job_position" class="control-label">Должность</label>                                    <div class="controls">
+                                <input type="text" name="job_position" value="" id="job_position" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
 
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="private_phone_number" class="control-label">Телефон (основной)</label>                                    <div class="controls">
-                                        <input type="text" name="private_phone_number" value="" id="private_phone_number" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="mobile_number" class="control-label">Мобильный</label>                                    <div class="controls">
-                                        <input type="text" name="mobile_number" value="" id="mobile_number" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="email" class="control-label">Email</label>                                    <div class="controls">
-                                        <input type="text" name="email" value="" id="email" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="address" class="control-label">Адрес</label>                                    <div class="controls">
-                                        <input type="text" name="address" value="" id="address" placeholder="" class="input-xlarge"> 
-                                    </div>
-                                </div>
-                                <!-- Text input-->
-                                <div class="control-group">
-                                    <label for="birthday" class="control-label">Дата рождения</label>                                    <div class="controls">
-                                        <input type="text" name="birthday" value="" id="birthday" placeholder="" class="input-xlarge">                                    </div>
-                                </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="private_phone_number" class="control-label">Телефон (основной)</label>                                    <div class="controls">
+                                <input type="text" name="private_phone_number" value="" id="private_phone_number" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="mobile_number" class="control-label">Мобильный</label>                                    <div class="controls">
+                                <input type="text" name="mobile_number" value="" id="mobile_number" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="email" class="control-label">Email</label>                                    <div class="controls">
+                                <input type="text" name="email" value="" id="email" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="address" class="control-label">Адрес</label>                                    <div class="controls">
+                                <input type="text" name="address" value="" id="address" placeholder="" class="input-xlarge"> 
+                            </div>
+                        </div>
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label for="birthday" class="control-label">Дата рождения</label>                                    <div class="controls">
+                                <input type="text" name="birthday" value="" id="birthday" placeholder="" class="input-xlarge">                                    </div>
+                        </div>
 
-                                <div class="control-group">
-                                    <label for="comment" class="control-label">Дополнительно</label>                                    <div class="controls">
-                                        <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
-                                </div>
-                            </fieldset>
-                        </form>
+                        <div class="control-group">
+                            <label for="comment" class="control-label">Дополнительно</label>                                    <div class="controls">
+                                <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
             <div class="modal-footer">
                 <!-- Button (Double) -->
@@ -939,14 +960,14 @@
                     <label class="control-label" for="button1id"></label>
                     <div class="controls">
                         <div class="controls">
-                        <button id="button1id_saveContact" name="button1id" class="btn btn-success">Сохранить</button>
-                        <button id="cancelForm" name="button2id" class="btn btn-danger" data-dismiss="modal">Отменить</button>
-                    </div>
+                            <button id="button1id_saveContact" name="button1id" class="btn btn-success">Сохранить</button>
+                            <button id="cancelForm" name="button2id" class="btn btn-danger" data-dismiss="modal">Отменить</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-<!-- End of Contact Modal Form -->
+        <!-- End of Contact Modal Form -->
         <div class="container-fluid">
             <?php
             echo $menu;
