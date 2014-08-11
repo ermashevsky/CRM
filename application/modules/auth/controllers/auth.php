@@ -1,6 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Auth extends MX_Controller {
+class Auth extends CI_Controller {
 
 	function __construct()
 	{
@@ -40,11 +40,10 @@ class Auth extends MX_Controller {
 			{
 				$data['users'][$k]->groups = $this->ion_auth->get_users_groups($user->id)->result();
 			}
-
-                        $this->load->view('auth/header');
+                        $this->load->module('menu');
+                        $menu = array('menu' => $this->menu->render('header'));
+                        $this->load->view('auth/header',$menu);
 			$this->load->view('auth/index', $data);
-                        $this->load->view('auth/rightbar');
-                        $this->load->view('auth/footer');
 		}
 	}
 
@@ -323,7 +322,9 @@ class Auth extends MX_Controller {
 			// insert csrf check
 			$data['csrf'] = $this->_get_csrf_nonce();
 			$data['user'] = $this->ion_auth->user($id)->row();
-
+                        $this->load->module('menu');
+                        $menu = array('menu' => $this->menu->render('header'));
+                        $this->load->view('auth/header',$menu);
 			$this->load->view('auth/deactivate_user', $data);
 		}
 		else
@@ -451,6 +452,166 @@ class Auth extends MX_Controller {
 			
 		}
 	}
+        
+        function edit_user($id)
+	{
+		if ( ! $this -> ion_auth -> logged_in()) {
+			redirect('admin', 'refresh');
+		}
+		$user = $this -> ion_auth -> user($id) -> row();
+		$groups = $this -> ion_auth -> groups() -> result_array();
+		$currentGroups = $this -> ion_auth -> get_users_groups($id) -> result();
+
+		//validate form input
+		$this -> form_validation -> set_rules('first_name', 'First Name', 'required|xss_clean');
+		$this -> form_validation -> set_rules('last_name', 'Last Name', 'required|xss_clean');
+		$this -> form_validation -> set_rules('email', 'Email', 'required|valid_email');
+		$this -> form_validation -> set_rules('phone', 'Телефон', 'required|xss_clean|min_length[2]|max_length[15]');
+		$this -> form_validation -> set_rules('company', 'Company', 'required|xss_clean');
+		$this -> form_validation -> set_rules('groups', 'Группа', 'xss_clean');
+
+		if ($this -> form_validation -> run() === TRUE) {
+			//$id = (int) $this -> input -> post('id');
+			$data = array(
+				'first_name' => $this -> input -> post('first_name'),
+				'last_name' => $this -> input -> post('last_name'),
+				'username' => $this -> input -> post('username'),
+				'email' => $this -> input -> post('email'),
+				'company' => $this -> input -> post('company'),
+				'phone' => $this -> input -> post('phone'),);
+			//Update the groups user belongs to
+			$groupData = $this -> input -> post('groups');
+
+			if (isset($groupData) && ! empty($groupData)) {
+
+				$this -> ion_auth -> remove_from_group('', $id);
+
+				foreach ($groupData as $grp) {
+					$this -> ion_auth -> add_to_group($grp, $id);
+				}
+			}
+
+
+			//update the password if it was posted
+			if ($this -> input -> post('password')) {
+				$this -> form_validation -> set_rules('password', 'Password', 'required|min_length[' . $this -> config -> item('min_password_length', 'ion_auth') . ']|max_length[' . $this -> config -> item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
+				$this -> form_validation -> set_rules('password_confirm', 'Password Confirmation', 'required');
+
+				$data['password'] = $this -> input -> post('password');
+			}
+		}
+		if ($this -> form_validation -> run() === TRUE) {//check to see if we are editing the user
+			//redirect them back to the admin page
+			//EXECUTE THE RESET PASSWORD HERE IF CHECKED
+			$this -> session -> set_flashdata('ion_message', 'User edited');
+			$this -> ion_auth -> update($user -> id, $data);
+			redirect('auth/index', 'refresh');
+		} else { //display the edit user form
+			//set the flash data error message if there is one
+			$this -> data['message'] = (validation_errors() ? validation_errors() : ($this -> ion_auth -> errors() ? $this -> ion_auth -> errors() : $this -> session -> flashdata('ion_message')));
+			//get posted ID if exists, else the one from uri.
+			//in order to get user datas from table
+			$id = (isset($id)) ? $id : (int) $this -> uri -> segment(3);
+			//get current user datas from table and set default form values
+			$user = $this -> ion_auth -> user($id) -> row();
+			//passing user id to view
+			$this -> data['user_id'] = $user -> id;
+			//process the phone number
+			if (isset($user -> phone) && ! empty($user -> phone)) {
+				$user -> phone = explode(' ', $user -> phone);
+			}
+
+			//prepare form
+			//pass the user to the view
+			$this -> data['user'] = $user;
+			$this -> data['groups'] = $groups;
+			$this -> data['currentGroups'] = $currentGroups;
+
+			$this -> data['username'] = array(
+				'name' => 'username',
+				'id' => 'username',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('username', $user -> username),
+				'readonly' => 'true',
+			);
+
+			$this -> data['first_name'] = array(
+				'name' => 'first_name',
+				'id' => 'first_name',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('first_name', $user -> first_name),
+			);
+
+			$this -> data['last_name'] = array(
+				'name' => 'last_name',
+				'id' => 'last_name',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('last_name', $user -> last_name),
+			);
+
+			$this -> data['email'] = array(
+				'name' => 'email',
+				'id' => 'email',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('email', $user -> email),
+			);
+                        
+                        $this -> data['work_position'] = array(
+				'name' => 'work_position',
+				'id' => 'work_position',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('work_position', $user -> work_position),
+			);
+                        
+			$this -> data['company'] = array(
+				'name' => 'company',
+				'id' => 'company',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('company', $user -> company),
+			);
+                        
+                        $this -> data['password'] = array(
+				'name' => 'password',
+				'id' => 'password',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('password'),
+			);
+                        
+                        $this -> data['password_confirm'] = array(
+				'name' => 'password_confirm',
+				'id' => 'password_confirm',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('password_confirm'),
+			);
+
+			$this -> data['phone'] = array(
+				'name' => 'phone',
+				'id' => 'phone',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('phone', $user -> phone[0]),
+			);
+
+			$this -> data['id'] = array(
+				'name' => 'id',
+				'id' => 'id',
+				'type' => 'hidden',
+				'value' => $this -> form_validation -> set_value('id', $user -> id),
+			);
+
+			$this->load->module('menu');
+                        $menu = array('menu' => $this->menu->render('header'));
+                        $this->load->view('auth/header',$menu);
+			$this -> load -> view('auth/edit_user', $this -> data);
+//            $this->load->view('auth/footer');
+		}
+	}
+        
+        function delete_user($id){
+            $this -> ion_auth ->delete_user($id);
+            $this->session->set_flashdata('message', "Пользователь удален");
+	    redirect("auth", 'refresh');
+            
+        }
 
 	function _get_csrf_nonce()
 	{

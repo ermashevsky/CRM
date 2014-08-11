@@ -2,21 +2,19 @@
     <div class="container-fluid">
         <div class="row">
 
-            <div class="span10">
-                <div class="hero-unit">
-                    <h1>Hello, world!</h1>
-                    <p>This is a template for a simple marketing or informational website. It includes a large callout called the hero unit and three supporting pieces of content. Use it as a starting point to create something more unique.</p>
-                    <p><a class="btn btn-primary btn-large">Learn more »</a></p>
-                </div>
+            <div class="span16">
                 <div class="row-fluid">
-                    <div class="span12">
-                        <h3>Пользователи</h3>
-                        <div id="infoMessage"><?php echo $message; ?></div>
-                        <table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered table-condensed" id="user_list">
+                    
+                        <h3 style="color:#08c;">Пользователи</h3>
+                        <div id="infoMessage" class="label label-info"><?php echo $message; ?></div>
+                        <table class='table table-striped table-bordered table-condensed' cellspacing="0" width="100%" id="user_list">
                             <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Фамилия</th>
                                     <th>Имя</th>
+                                    <th>Должность</th>
+                                    <th>Подразделение</th>
                                     <th>Email</th>
                                     <th>Телефон</th>
                                     <th>Роль (Группа)</th>
@@ -25,46 +23,34 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($users as $user): ?>
+                                <?php
+                                $n = 1;
+                                foreach ($users as $user): ?>
                                     <tr>
+                                        <td><?php echo $n++; ?></td>
                                         <td><?php echo $user->last_name; ?></td>
                                         <td><?php echo $user->first_name; ?></td>
+                                        <td><?php echo $user->work_position; ?></td>
+                                        <td><?php echo $user->company; ?></td>
                                         <td><?php echo $user->email; ?></td>
-                                        <td><?php echo $user->email; ?></td>
+                                        <td><?php echo $user->phone; ?></td>
                                         <td>
                                             <?php foreach ($user->groups as $group): ?>
                                                 <?php echo $group->name; ?><br />
                                             <?php endforeach ?>
                                         </td>
-                                        <td><?php echo ($user->active) ? anchor("auth/deactivate/" . $user->id, 'Active') : anchor("auth/activate/" . $user->id, 'Inactive'); ?></td>
-                                        <td>Редактировать | Удалить</td>
+                                        <td><?php echo ($user->active) ? anchor("auth/deactivate/" . $user->id, 'Активен', array('class' => 'btn btn-info btn-mini')) : anchor("auth/activate/" . $user->id, 'Заблокирован', array('class' => 'btn btn-danger btn-mini')); ?></td>
+                                        <td><?php echo anchor("auth/edit_user/" . $user->id, 'Редактировать', array('class' => 'btn btn-success btn-mini'));?> | <?php echo anchor("auth/delete_user/" . $user->id, 'Удалить', array('class' => 'btn btn-danger btn-mini'));?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
-                        <p><a class="btn btn-primary btn-small" href="#" data-toggle="modal" data-target=".bs-example-modal-sm">Добавить пользователя</a></p>
-                    </div><!--/span-->
-                </div><!--/row-->
-                <div class="row-fluid">
-                    <div class="span4">
-                        <h2>Heading</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                        <p><a class="btn" href="#">View details »</a></p>
-                    </div><!--/span-->
-                    <div class="span4">
-                        <h2>Heading</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                        <p><a class="btn" href="#">View details »</a></p>
-                    </div><!--/span-->
-                    <div class="span4">
-                        <h2>Heading</h2>
-                        <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                        <p><a class="btn" href="#">View details »</a></p>
-                    </div><!--/span-->
+                        <p><a class="btn btn-info btn-small" href="#" data-toggle="modal" data-target=".bs-example-modal-sm">Добавить пользователя</a></p>
+                    
                 </div><!--/row-->
             </div><!--/span-->
             
-            <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+            <div class="modal hide fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
     <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -171,14 +157,6 @@
     
   </div>
 </div>
-
-<!-- File Button --> 
-<div class="control-group">
-  <label class="control-label" for="photo_upload">Фотография</label>
-  <div class="controls">
-    <input id="photo_upload" name="photo_upload" class="input-file" type="file">
-  </div>
-</div>
 </fieldset>
 </form>
      
@@ -190,4 +168,4 @@
       </div>
     </div>
   </div>
-</div>
+</div>           

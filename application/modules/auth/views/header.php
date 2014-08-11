@@ -4,23 +4,36 @@
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
         <title></title>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
+               <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="/assets/js/bootstrap.min.js"></script>
         <script src="/assets/js/bootstrap-button.js"></script>
         <script src="/assets/js/bootstrap-fileupload.js"></script>
         <script src="/assets/js/bootstrap-notify.js"></script>
         <script src="/assets/js/jquery.uploadify.min.js"></script>
+        <script src="/assets/js/bootbox.min.js"></script>
         <script src="/assets/js/jquery.dataTables.js"></script>
-
-
+        <script src="/assets/js/bootstrap-progressbar.js"></script>
+        <script src="/assets/js/bootstrap-tagsinput.js"></script>
+        <script type="text/javascript" src="/assets/js/notifIt.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.scrollpanel.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.datetimepicker.js"></script>
+        <script type="text/javascript" src="/assets/js/date.format.js"></script>
+        <script type="text/javascript" src="/assets/js/select2.js"></script>
+        <script type="text/javascript" src="/assets/js/select2_locale_ru.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.form-validator.min.js"></script>
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
         <link href="/assets/css/bootstrap-button.css" rel="stylesheet">
         <link href="/assets/css/bootstrap-fileupload.css" rel="stylesheet">
-        <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
         <link href="/assets/css/jquery.dataTables.css" rel="stylesheet">
-        <link href="/assets/css/jquery.dataTables_themeroller.css" rel="stylesheet">
+        <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="/assets/css/uploadify.css" />
+        <link rel="stylesheet" href="/assets/css/bootstrap-tagsinput.css">
+        <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
+        <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
+        <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
         <style>
 
             div.dataTables_length label {
@@ -99,9 +112,36 @@
             div.dataTables_scrollFoot table {
                 border-top: none;
             }
-
-
-
+            #user_list{
+              font-size: 12px;  
+            }
+#user_list_info, #user_list_paginate, #user_list_info, #user_list_paginate{
+                margin-top: 10px;
+                font-size: 12px;
+            }
+            .dataTables_length select {
+                width: auto !important;
+                font-size: 12px;
+                margin-top:10px;
+            }
+            .dataTables_length label{
+                font-size: 12px;
+            }
+            .dataTables_filter input{
+                width: 120px;
+                font-size: 12px;
+            }
+            .dataTables_filter label{
+                font-size: 12px;
+            }
+            .dataTables_paginate{
+                margin-top: 10px;
+                font-size: 12px;
+            }
+            .dataTables_info{
+                margin-top: 10px;
+                font-size: 12px;
+            }
 
             /*
              * TableTools styles
@@ -374,7 +414,7 @@
                     url: "<?php echo site_url('auth/create_user'); ?>",
                     data: form,
                     success: function(data) {
-                        $(".modal .fade .bs-example-modal-sm").modal('hide');
+                        $(".modal.fade.bs-example-modal-sm").modal('hide');
                     }
 
                 });
@@ -384,3 +424,9 @@
         </script>
 
     </head>
+    
+<div class="container-fluid">
+            <?php
+            echo $menu;
+            ?>
+        </div>
