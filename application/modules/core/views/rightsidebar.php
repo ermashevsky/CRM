@@ -1,5 +1,5 @@
 <div class="span2">
-    <div><p><img src="http://1.gravatar.com/avatar/4e2ccf9c3fb5c4a3722cf58abedfce81?s=160" class="img-polaroid"></p>
+    <div><p><img src="/assets/img/avatar-blank.jpg" class="img-polaroid"></p>
         <table class="table table-striped table-bordered table-condensed">
             <tbody>
                 <tr>
