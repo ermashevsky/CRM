@@ -32,8 +32,9 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
 
-        <script src="http://localhost:8580/socket.io/socket.io.js"></script>
+        <script src="http://dialog.crm64.ru:8580/socket.io/socket.io.js"></script>
         <script type="text/javascript">
+            var address = "dialog.crm64.ru";
             // javascript code
             function setTask(id_call) {
                 $('input#id_call').val(id_call);
@@ -284,7 +285,7 @@
                     "sWrapper": "dataTables_wrapper form-inline"
                 });
 
-                var socket = io.connect('http://localhost:8580');
+                var socket = io.connect('http://'+address+':8580');
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -421,7 +422,9 @@
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
-
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
 
@@ -438,6 +441,9 @@
                             var text = "Ответил другой абонент";
                             var type = "error";
                             msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
 
@@ -452,6 +458,9 @@
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
 
@@ -466,6 +475,9 @@
                             var text = "Нет адресата.";
                             var type = "error";
                             msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
 
@@ -481,12 +493,18 @@
                             var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
 
                         if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "34") {
@@ -501,6 +519,9 @@
                             var text = "Ошибка вызова";
                             var type = "error";
                             msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "1") {
@@ -515,6 +536,9 @@
                             var text = "Несуществующий номер";
                             var type = "error";
                             msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "21") {
@@ -529,6 +553,9 @@
                             var text = "Вызов отклонен";
                             var type = "error";
                             msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
                     }
 
