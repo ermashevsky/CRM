@@ -67,7 +67,6 @@ class Allcalls extends MX_Controller {
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setNote();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
                         <a href="#taskWindow" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
-                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
                     </div>
                 </div>';
     }
@@ -91,7 +90,6 @@ class Allcalls extends MX_Controller {
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setContactItem('.$calls->id.','.$calls->src.');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
                         <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
-                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
                     </div>
                 </div></td></tr>';
                 } else {
@@ -99,7 +97,6 @@ class Allcalls extends MX_Controller {
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>
                         <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
-                        <a href="#" onclick="play();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-play"></i></a>
                     </div></td></tr>';
                 }
             }

@@ -41,7 +41,7 @@ class Core_model extends CI_Model {
     function getCallEvent($phone_number) {
         $results = array();
         
-        $this->db->select("id, src, dst, start,billsec,disposition, uniqueid, cause", false);
+        $this->db->select("id, src, dst, start,end, billsec,disposition, uniqueid, cause", false);
         $this->db->from('cdr');
         $this->db->where_in('disposition', '16, 17, 19');
         $this->db->or_where('src', $phone_number);
@@ -58,6 +58,7 @@ class Core_model extends CI_Model {
                 $tmp->src = $row->src;
                 $tmp->dst = $row->dst;
                 $tmp->start = $row->start;
+                $tmp->end = $row->end;
                 $tmp->billsec = $row->billsec;
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;

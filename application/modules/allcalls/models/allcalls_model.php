@@ -46,26 +46,44 @@ class Allcalls_model extends CI_Model {
     function getAllCall($phone_number) {
         $results = array();
         
-        $this->db->select("id, src, dst, start, answer, end, billsec,disposition, uniqueid, cause", false);
-        $this->db->from('cdr');
-        $this->db->or_where('src', $phone_number);
-        $this->db->or_where('dst', $phone_number);
-        $this->db->order_by('end','asc');
-      
-        $res = $this->db->get();
+//        $this->db->select("id, src, dst, start, answe, end, billsec,disposition, uniqueid, cause", false);
+//        $this->db->from('cdr');
+////        $this->db->or_where('src', $phone_number);
+////        $this->db->or_where('dst', $phone_number);
+//        $this->db->where("start BETWEEN " .date("Y-m-d 00:00:00"). " AND ". date("Y-m-d 23:59:59"));
+//        $this->db->where()
+//        $this->db->order_by('end','asc');
+      $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d 00:00:00')."'
+            AND  '".date('Y-m-d 23:59:59')."'
+            AND (
+             `channel` like  '%/".$phone_number."%'
+            OR  `dstchannel` like  '%/".$phone_number."%'
+            )
+            order by `end` asc");
+        //$res = $this->db->get();
         if (0 < $res->num_rows) {
             foreach ($res->result() as $row) {
                 $tmp = new Allcalls_model();
                 $tmp->id = $row->id;
                 $tmp->uniqueid = $row->uniqueid;
                 $tmp->src = $row->src;
-                $tmp->dst = $row->dst;
                 $tmp->start = $row->start;
                 $tmp->answer = $row->answer;
                 $tmp->end = $row->end;
                 $tmp->billsec = $row->billsec;
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;
+                $pos = strripos($row->dst, "#");
+                
+                if($pos !== false){
+                    list($str, $shlak) = explode("#", $row->dst);
+                    $tmp->dst = $shlak;
+                }else{
+                    $tmp->dst = $row->dst;
+                }
                 
                 $results[$tmp->id] = $tmp;
             }
@@ -144,13 +162,19 @@ class Allcalls_model extends CI_Model {
                 $tmp->id = $row->id;
                 $tmp->uniqueid = $row->uniqueid;
                 $tmp->src = $row->src;
-                $tmp->dst = $row->dst;
                 $tmp->start = $row->start;
                 $tmp->answer = $row->answer;
                 $tmp->end = $row->end;
                 $tmp->billsec = $this->format_seconds($row->billsec);
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;
+                $pos = strripos($row->dst, "#");
+                if($pos === false){
+                    $tmp->dst = $row->dst;
+                }else{
+                list($str, $shlak) = explode("#", $row->dst);
+                    $tmp->dst = $shlak;
+                }
                 
                 $results[$tmp->id] = $tmp;
             }

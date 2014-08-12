@@ -75,45 +75,72 @@ class Core extends MX_Controller {
 
         foreach ($data as $item) {
             if ($item->src === $user_phone) {
-                $date = date_create($item->start, timezone_open("Europe/Moscow"));
+                $date = date_create($item->end, timezone_open("Europe/Moscow"));
                 $formatted_date = date_format($date, "d.m.Y H:i:s");
-
+                
+                $pos = strripos($item->dst, "#");
+                if($pos === false){
+                    $dst = $item->dst;
+                }else{
+                list($str, $shlak) = explode("#", $item->dst);
+                    $dst = $shlak;
+                }
+                
                 echo '<address style="background: #FFDB58;">
                     <small><strong>Исходящий <i class="icon-arrow-right"></i></strong></small><br/>
                     <small>' . $formatted_date . '</small><br/>
-                    <small>Номер:' . $item->dst . '</small><br/>
+                    <small>Номер:' . $dst . '</small><br/>
                     <small>Длительность:'. $this->format_seconds($item->billsec) .'</small><br/>';
-                switch ($item->cause){
-                    case "16":
+                switch ($item->disposition){
+                    case "ANSWERED":
                         echo '<small style="color:#51a351;"><b>Статус: Ответили </b></small><br/></address>';
                         break;
-                    case "17":
+                    case "BUSY":
                         echo '<small style="color:#ee5f5b;"><b>Статус: Занят </b></small><br/></address>';
                         break;
-                    case "19":
+                    case "NO ANSWER":
                         echo '<small style="color:#ee5f5b;"><b>Статус: Не ответили </b></small><br/></address>';
+                        break;
+                    case "CALL INTERCEPTION":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Перехваченный </b></small><br/></address>';
+                        break;
+                    case "ANSWER_BY":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Переведенный </b></small><br/></address>';
+                        break;
+                    case "":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Разговор </b></small><br/></address>';
                         break;
                 }
             }
 
             if ($item->dst === $user_phone) {
-                $date = date_create($item->start, timezone_open("Europe/Moscow"));
+                $date = date_create($item->end, timezone_open("Europe/Moscow"));
                 $formatted_date = date_format($date, "d.m.Y H:i:s");
-
+                
                 echo '<address style="background:#98FF98;">
                     <small><strong>Входящий <i class="icon-arrow-left"></i></strong></small><br/>
                     <small>' . $formatted_date . '</small><br/>
                     <small>Номер:' . $item->src . '</small><br/>
                     <small>Длительность:' . $this->format_seconds($item->billsec) . '</small><br/>';
-                switch ($item->cause){
-                    case "16":
+                switch ($item->disposition){
+                    case "ANSWERED":
                         echo '<small style="color:#51a351;"><b>Статус: Ответили </b></small><br/></address>';
                         break;
-                    case "17":
+                    case "BUSY":
                         echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
                         break;
-                    case "19":
+                    case "NO ANSWER":
                         echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
+                        break;
+                    case "CALL INTERCEPTION":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Перехваченный </b></small><br/></address>';
+                        break;
+                    case "ANSWER_BY":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Переведенный </b></small><br/></address>';
+                        break;
+                    case "":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Разговор </b></small><br/></address>';
+                        break;
                         
                 }
             }
