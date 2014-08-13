@@ -76,6 +76,7 @@ class Allcalls_model extends CI_Model {
                 $tmp->billsec = $row->billsec;
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;
+                
                 $pos = strripos($row->dst, "#");
                 
                 if($pos !== false){
@@ -168,6 +169,11 @@ class Allcalls_model extends CI_Model {
                 $tmp->billsec = $this->format_seconds($row->billsec);
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;
+                $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem('.$row->id.','.$row->src.');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask('.$row->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
                 $pos = strripos($row->dst, "#");
                 if($pos === false){
                     $tmp->dst = $row->dst;

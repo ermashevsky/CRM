@@ -240,7 +240,7 @@
                     // Print hello on the console.
                     $.post('<?php echo site_url('/allcalls/actionList'); ?>', function(data) {
                         console.info(data);
-                    });
+                    },'json');
                 }
 
                 $("button#submit").click(function() {
@@ -254,10 +254,10 @@
                                     // this = object in array
                                     // access attributes: this.Id, this.Name, etc
                                     if (this.src === $('#hidden_phone_number').val()) {
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + getListAction() + '</td></tr>');
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                     if (this.dst === $('#hidden_phone_number').val()) {
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + getListAction() + '</td></tr>');
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                 });
                                 $('#allcalls').dataTable({
