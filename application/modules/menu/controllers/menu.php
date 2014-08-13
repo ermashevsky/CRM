@@ -87,9 +87,9 @@ class Menu extends CI_Controller {
 //                    array('name' => 'Календарь',
 //                        'slug' => 'calendar',
 //                        'class' => ''),
-                    array('name' => 'Задачи',
-                        'slug' => 'tasks',
-                        'class' => ''),
+//                    array('name' => 'Задачи',
+//                        'slug' => 'tasks',
+//                        'class' => ''),
                     array('name' => 'Выход',
                         'slug' => 'auth/logout',
                         'class' => 'nav pull-right')
