@@ -43,7 +43,7 @@ class Allcalls_model extends CI_Model {
         return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
     }
     
-    function getAllCall($phone_number) {
+    function getAllCall($phone_number, $external_phone) {
         $results = array();
         
 //        $this->db->select("id, src, dst, start, answe, end, billsec,disposition, uniqueid, cause", false);
@@ -89,6 +89,44 @@ class Allcalls_model extends CI_Model {
                 
                 $results[$tmp->id] = $tmp;
             }
+        }else{
+           $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+            FROM  `cdr` 
+            WHERE  `end` 
+            BETWEEN  '".date('Y-m-d 00:00:00')."'
+            AND  '".date('Y-m-d 23:59:59')."'
+            AND (
+             `src` like  '%".$external_phone."%'
+            OR  `dst` like  '%".$external_phone."%'
+            )
+            order by `end` asc");
+      
+        //$res = $this->db->get();
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Allcalls_model();
+                $tmp->id = $row->id;
+                $tmp->uniqueid = $row->uniqueid;
+                $tmp->src = $row->src;
+                $tmp->start = $row->start;
+                $tmp->answer = $row->answer;
+                $tmp->end = $row->end;
+                $tmp->billsec = $row->billsec;
+                $tmp->disposition = $row->disposition;
+                $tmp->cause = $row->cause;
+                
+                $pos = strripos($row->dst, "#");
+                
+                if($pos !== false){
+                    list($str, $shlak) = explode("#", $row->dst);
+                    $tmp->dst = $shlak;
+                }else{
+                    $tmp->dst = $row->dst;
+                }
+                
+                $results[$tmp->id] = $tmp;
+            }
+        } 
         }
         return $results;
     }

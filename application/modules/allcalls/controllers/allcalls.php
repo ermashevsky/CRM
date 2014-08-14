@@ -47,6 +47,8 @@ class Allcalls extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             $menu = array('menu' => $this->menu->render('header') );
             $this->load->view('header', $menu);
@@ -77,7 +79,7 @@ class Allcalls extends MX_Controller {
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $this->load->model('allcalls_model');
-            $call_data = $this->allcalls_model->getAllCall($data['user']->phone);
+            $call_data = $this->allcalls_model->getAllCall($data['user']->phone,$data['user']->external_phone);
             
             echo '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="allcalls">'
             . '<thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>';
@@ -102,7 +104,16 @@ class Allcalls extends MX_Controller {
                         <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>
                 </div></td></tr>';
-                } else {
+                }
+                if ($calls->dst === $data['user']->external_phone) {
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
+                    <div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem('.$calls->id.','.$calls->src.');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>
+                </div></td></tr>';
+                }else {
                     echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>

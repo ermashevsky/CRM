@@ -188,8 +188,37 @@
                 $("#dst_block").css('display', 'none');
                 $("#src_block").css('display', 'none');
                 $("#number_block").css('display', 'block');
+                if($('#hidden_usergroup').val()  === 'admin'){
+                   $('#type_call').on('change', function() {
+                    if (this.value === 'allcall') {
+                        $("#dst_block").css('display', 'none');
+                        $("#src_block").css('display', 'none');
 
-                $('#type_call').on('change', function() {
+                        $("#dst_block").css('display', 'none');
+                        $("#src_block").css('display', 'none');
+                        $("#number_block").css('display', 'block');
+                    }
+                    if (this.value === 'outcall') {
+                        $("#src").val($('#hidden_phone_number').val());
+                        $("#src").attr('readonly', false);
+                        $("#dst").val('');
+                        $("#dst").attr('readonly', false);
+                        $("#dst_block").css('display', 'block');
+                        $("#src_block").css('display', 'block');
+                        $("#number_block").css('display', 'none');
+                    }
+                    if (this.value === 'incall') {
+                        $("#dst").val($('#hidden_phone_number').val());
+                        $("#dst").attr('readonly', false);
+                        $("#src").val('');
+                        $("#src").attr('readonly', false);
+                        $("#dst_block").css('display', 'block');
+                        $("#src_block").css('display', 'block');
+                        $("#number_block").css('display', 'none');
+                    }
+                });  
+                }else{
+                   $('#type_call').on('change', function() {
                     if (this.value === 'allcall') {
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
@@ -216,7 +245,9 @@
                         $("#src_block").css('display', 'block');
                         $("#number_block").css('display', 'none');
                     }
-                });
+                }); 
+                }
+                
 
                 $("#date_time").datetimepicker({
                     format: 'd.m.Y H:i:s',
@@ -258,6 +289,10 @@
                                     }
                                     if (this.dst === $('#hidden_phone_number').val()) {
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
+                                    }
+                                    if($('#hidden_usergroup').val()  === 'admin'){
+                                        alert ('РГШ');
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                 });
                                 $('#allcalls').dataTable({

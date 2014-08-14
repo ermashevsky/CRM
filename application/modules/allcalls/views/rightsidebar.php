@@ -15,6 +15,7 @@
                     <td>
                         <input type="hidden" id="hidden_phone_number" name="hidden_phone_number" value="<?php echo $user->phone; ?>" />
                         <input type="hidden" id="hidden_external_phone_number" name="hidden_external_phone_number" value="<?php echo $user->external_phone; ?>" />
+                        <input type="hidden" id="hidden_usergroup" name="hidden_usergroup" value="<?php echo $user->group; ?>" />
                         <?php
                         echo $user->phone;
                         ?>
