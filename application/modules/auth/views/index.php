@@ -16,7 +16,8 @@
                                     <th>Должность</th>
                                     <th>Подразделение</th>
                                     <th>Email</th>
-                                    <th>Телефон</th>
+                                    <th>Телефон (внутр.)</th>
+                                    <th>Телефон (внешн.)</th>
                                     <th>Роль (Группа)</th>
                                     <th>Статус</th>
                                     <th>Действия</th>
@@ -37,13 +38,14 @@
                                         <td><?php echo $user->company; ?></td>
                                         <td><?php echo $user->email; ?></td>
                                         <td><?php echo $user->phone; ?></td>
+                                        <td><?php echo $user->external_phone; ?></td>
                                         <td>
                                             <?php foreach ($user->groups as $group): ?>
                                                 <?php echo $group->name; ?><br />
                                             <?php endforeach ?>
                                         </td>
                                         <td><?php echo ($user->active) ? anchor("auth/deactivate/" . $user->id, 'Активен', array('class' => 'btn btn-info btn-mini')) : anchor("auth/activate/" . $user->id, 'Заблокирован', array('class' => 'btn btn-danger btn-mini')); ?></td>
-                                        <td><?php echo anchor("auth/edit_user/" . $user->id, 'Редактировать', array('class' => 'btn btn-success btn-mini'));?> | <?php echo anchor("auth/delete_user/" . $user->id, 'Удалить', array('class' => 'btn btn-danger btn-mini'));?></td>
+                                        <td><?php echo anchor("auth/edit_user/" . $user->id, '<i class="icon-pencil"></i>', array('class' => 'btn btn-success btn-mini'));?> | <?php echo anchor("auth/delete_user/" . $user->id, '<i class="icon-trash"></i>', array('class' => 'btn btn-danger btn-mini'));?></td>
                                     </tr>
                                 <?php
                                 }
