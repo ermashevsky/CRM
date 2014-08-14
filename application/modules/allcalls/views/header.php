@@ -114,7 +114,7 @@
             ;
             // /project_dir/index.html
             $(document).ready(function() {
-
+                
                 $("button#button1id_saveOrganization").click(function() {
 
                     $.post('<?php echo site_url('addressbook/addOrganizationData'); ?>', $('form#organizationData').serialize(),
@@ -333,7 +333,242 @@
                     $('.msg system').empty();
 
                     var phone_number = $('#hidden_phone_number').val();
+                    
 
+                    if (data.event === "Dial" && data.subevent === "Begin") {
+
+                        var calleridnum = data.calleridnum;
+                        var dialstring = data.dialstring;
+                        var string = data.channel; // юрл в котором происходит поиск
+
+
+                        var regXfer = new RegExp('xfer', 'ig');
+                        var result_xfer = string.match(regXfer);  // поиск шаблона в юрл
+
+                        var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
+                        var result = string.match(regV);  // поиск шаблона в юрл
+                        var dialstring_rep = dialstring.replace("trunk/", "");
+                        var destination = data.destination;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumberFromChannel = destination.replace(re, "$2");
+
+                        $.totalStorage("destuniqueid_begin", data.destuniqueid);
+                        $.totalStorage("uniqueid", data.uniqueid);
+                        $.totalStorage("calleridnum", data.calleridnum);
+                        $.totalStorage('destination' + data.destination, data.destination);
+                        $.totalStorage('dialstring' + data.destination, data.dialstring);
+
+
+                        if (parseInt(result) === parseInt(phone_number)) {
+
+                            var text = "Исходящий звонок на номер: " + dialstring_rep;
+                            var type = 'success';
+                            $.totalStorage('call', 'Out');
+                            msg_system(text, type);
+                        }
+
+                        if (dialstring === phone_number) {
+                            //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+
+                            getContactDetail(calleridnum);
+
+                            var text = "Входящий звонок с номера: " + calleridnum;
+                            var type = 'success';
+                            $.totalStorage('call', 'In');
+
+                            msg_system(text, type);
+                        }
+
+                        if (dialstring === phone_number && result_xfer) {
+                            //client.emit('event', "Входящий звонок с номера: " + calleridnum);
+                            var text = "Переведенный входящий звонок с номера: " + calleridnum;
+                            var type = 'success';
+                            $.totalStorage('call', 'In');
+                            msg_system(text, type);
+                        }
+
+
+                    }
+
+                    if (data.event === "Bridge" && data.bridgestate === "Link") {
+                        //client.emit('event', "Разговор ...");
+                        var channel2 = data.channel2;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber2 = channel2.replace(re, "$2");
+
+                        var channel1 = data.channel1;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber1 = channel1.replace(re, "$2");
+
+                        if (getNumber2 === phone_number || getNumber1 === phone_number) {
+                            var text = "Разговор ...";
+                            var type = "success";
+                            msg_system(text, type);
+                        }
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "16") {
+                        //client.emit('event', "Повесили трубку");
+                        //uniquniqueid_begin почему-то undefined
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number) {
+
+                            var text = "Повесили трубку";
+                            var type = "success";
+                            msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "26") {
+                        //client.emit('event', "Повесили трубку");
+                        //uniquniqueid_begin почему-то undefined
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number) {
+
+                            var text = "Ответил другой абонент";
+                            var type = "error";
+                            msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "17") {
+                        //client.emit('event', "Пользователь занят");
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+                        console.info($.totalStorage('call'));
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                            var text = "Номер занят.";
+                            var type = "error";
+                            msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "18") {
+                        //client.emit('event', "Пользователь занят");
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+                        console.info($.totalStorage('call'));
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                            var text = "Нет адресата.";
+                            var type = "error";
+                            msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+
+                    if (data.event === "Hangup" && data.cause === "19") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+                        console.info($.totalStorage('call'));
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number && $.totalStorage('call') === 'In') {
+                            var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
+                            var type = "error";
+                            msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+
+                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                            var text = "Не берут трубку";
+                            var type = "error";
+                            msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+                    if (data.event === "Hangup" && data.cause === "34") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number) {
+                            var text = "Ошибка вызова";
+                            var type = "error";
+                            msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+                    if (data.event === "Hangup" && data.cause === "1") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number) {
+                            var text = "Несуществующий номер";
+                            var type = "error";
+                            msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+                    if (data.event === "Hangup" && data.cause === "21") {
+                        //client.emit('event', "Пропущенный вызов с номера: " + data.calleridnum);
+
+                        var channel = data.channel;
+                        var re = /(.*\/)(\d*)(-.*)/;
+
+                        var getNumber = channel.replace(re, "$2");
+
+                        if (getNumber === phone_number) {
+                            var text = "Вызов отклонен";
+                            var type = "error";
+                            msg_system(text, type);
+                             setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
+                        }
+                    }
+                    
+           /**
+                     * 
+                     * 
+                     * 
+                     * 
+                     * 
+                     * 
+                     * */
+                    var phone_number = $('#hidden_external_phone_number').val();
                     if (data.event === "Dial" && data.subevent === "Begin") {
 
                         var calleridnum = data.calleridnum;

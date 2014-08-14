@@ -78,14 +78,24 @@ class Allcalls extends MX_Controller {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $this->load->model('allcalls_model');
             $call_data = $this->allcalls_model->getAllCall($data['user']->phone);
-
+            
             echo '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="allcalls">'
             . '<thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>';
 
             foreach ($call_data as $calls) {
+                $pos = strripos($calls->dst, "mera/");
+               
+                if($pos !== false){
+                    list($str, $shlak) = explode("mera/", $calls->dst);
+                    $dst = $shlak;
+                    
+                }else{
+                    $dst =  $calls->dst;
+                }
+                
                 $date = new DateTime($calls->end);
                 if ($calls->dst === $data['user']->phone) {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
                     <div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setContactItem('.$calls->id.','.$calls->src.');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
@@ -93,7 +103,7 @@ class Allcalls extends MX_Controller {
                     </div>
                 </div></td></tr>';
                 } else {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $calls->dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>
                         <a href="#taskWindow" onclick="setTask('.$calls->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>

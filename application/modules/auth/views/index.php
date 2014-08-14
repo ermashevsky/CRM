@@ -25,7 +25,10 @@
                             <tbody>
                                 <?php
                                 $n = 1;
-                                foreach ($users as $user): ?>
+                                foreach ($users as $user):
+                                if($user->username !== 'su'){
+                                ?>
+                                
                                     <tr>
                                         <td><?php echo $n++; ?></td>
                                         <td><?php echo $user->last_name; ?></td>
@@ -42,7 +45,9 @@
                                         <td><?php echo ($user->active) ? anchor("auth/deactivate/" . $user->id, 'Активен', array('class' => 'btn btn-info btn-mini')) : anchor("auth/activate/" . $user->id, 'Заблокирован', array('class' => 'btn btn-danger btn-mini')); ?></td>
                                         <td><?php echo anchor("auth/edit_user/" . $user->id, 'Редактировать', array('class' => 'btn btn-success btn-mini'));?> | <?php echo anchor("auth/delete_user/" . $user->id, 'Удалить', array('class' => 'btn btn-danger btn-mini'));?></td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php
+                                }
+                                endforeach; ?>
                             </tbody>
                         </table>
                         <p><a class="btn btn-info btn-small" href="#" data-toggle="modal" data-target=".bs-example-modal-sm">Добавить пользователя</a></p>

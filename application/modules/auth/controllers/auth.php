@@ -14,8 +14,8 @@ class Auth extends CI_Controller {
 			$this->load->library('mongo_db') :
 			$this->load->database();
 	}
-
-	//redirect if needed, otherwise display the user list
+        
+     //redirect if needed, otherwise display the user list
 	function index()
 	{
 

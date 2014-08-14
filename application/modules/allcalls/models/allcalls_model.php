@@ -63,6 +63,7 @@ class Allcalls_model extends CI_Model {
             OR  `dstchannel` like  '%/".$phone_number."%'
             )
             order by `end` asc");
+      
         //$res = $this->db->get();
         if (0 < $res->num_rows) {
             foreach ($res->result() as $row) {
