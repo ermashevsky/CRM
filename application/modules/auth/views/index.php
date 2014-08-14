@@ -134,6 +134,14 @@
   </div>
 </div>
 
+<!-- Text input-->
+<div class="control-group">
+  <label class="control-label" for="phone">Телефон (внешн.)</label>
+  <div class="controls">
+    <input id="external_phone" name="external_phone" type="text" placeholder="Введите внешний телефон" class="input-xlarge" required="">
+    
+  </div>
+</div>
 <!-- Select Basic -->
 <div class="control-group">
   <label class="control-label" for="group">Группа (Роль)</label>

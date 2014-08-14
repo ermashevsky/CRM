@@ -32,6 +32,9 @@
                                 <?php echo form_input($phone); ?>
                             </p>
                             
+                            <p>Телефон (внешн.)<br />
+                                <?php echo form_input($external_phone); ?>
+                            </p>
                             <p>Пароль:*<br />
                             <?php echo form_password($password);?>
                             </p>

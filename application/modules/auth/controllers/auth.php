@@ -365,6 +365,7 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('last_name', 'Last Name', 'required|xss_clean');
 		$this->form_validation->set_rules('email', 'Email Address', 'required|valid_email');
 		$this->form_validation->set_rules('phone', 'First Part of Phone', 'required|xss_clean');
+                $this->form_validation->set_rules('external_phone', 'First Part of Phone', 'required|xss_clean');
 		$this->form_validation->set_rules('work_dept', 'Company Name', 'required|xss_clean');
 		$this->form_validation->set_rules('password', 'Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'required');
@@ -379,6 +380,7 @@ class Auth extends CI_Controller {
 				'last_name' => $this->input->post('last_name'),
 				'company' => $this->input->post('work_dept'),
 				'phone' => $this->input->post('phone'),
+                                'external_phone' => $this->input->post('external_phone'),
                                 'work_position' => $this->input->post('work_position'),
 			);
 		}
@@ -429,6 +431,11 @@ class Auth extends CI_Controller {
 				'type' => 'text',
 				'value' => $this->form_validation->set_value('phone'),
 			);
+                        $data['external_phone'] = array('name' => 'external_phone',
+				'id' => 'external_phone',
+				'type' => 'text',
+				'value' => $this->form_validation->set_value('external_phone'),
+			);                        
                         $data['group'] = array('name' => 'group',
 				'id' => 'group',
 				'type' => 'text',
@@ -467,6 +474,7 @@ class Auth extends CI_Controller {
 		$this -> form_validation -> set_rules('last_name', 'Last Name', 'required|xss_clean');
 		$this -> form_validation -> set_rules('email', 'Email', 'required|valid_email');
 		$this -> form_validation -> set_rules('phone', 'Телефон', 'required|xss_clean|min_length[2]|max_length[15]');
+                $this -> form_validation -> set_rules('external_phone', 'Телефон', 'required|xss_clean|min_length[11]|max_length[15]');
 		$this -> form_validation -> set_rules('company', 'Company', 'required|xss_clean');
 		$this -> form_validation -> set_rules('groups', 'Группа', 'xss_clean');
 
@@ -478,7 +486,8 @@ class Auth extends CI_Controller {
 				'username' => $this -> input -> post('username'),
 				'email' => $this -> input -> post('email'),
 				'company' => $this -> input -> post('company'),
-				'phone' => $this -> input -> post('phone'),);
+				'phone' => $this -> input -> post('phone'),
+                                'external_phone' => $this -> input -> post('external_phone'),);
 			//Update the groups user belongs to
 			$groupData = $this -> input -> post('groups');
 
@@ -589,6 +598,13 @@ class Auth extends CI_Controller {
 				'id' => 'phone',
 				'type' => 'text',
 				'value' => $this -> form_validation -> set_value('phone', $user -> phone[0]),
+			);
+                        
+                        $this -> data['external_phone'] = array(
+				'name' => 'external_phone',
+				'id' => 'external_phone',
+				'type' => 'text',
+				'value' => $this -> form_validation -> set_value('external_phone', $user -> external_phone),
 			);
 
 			$this -> data['id'] = array(
