@@ -61,13 +61,13 @@ class Core extends MX_Controller {
         return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
     }
 
-    function viewCallEvent($user_phone) {
+    function viewCallEvent($user_phone, $external_phone) {
         if (!$this->ion_auth->logged_in()) {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $this->load->model('core_model');
-            $data = $this->core_model->getCallEvent($data['user']->phone);
+            $data = $this->core_model->getCallEvent($data['user']->phone,$data['user']->external_phone);
         }
         //return $data;
         echo '<li class="nav-header" style="color:#3a87ad;">История звонков</li>'
@@ -114,6 +114,45 @@ class Core extends MX_Controller {
             }
 
             if ($item->dst === $user_phone) {
+                $date = date_create($item->end, timezone_open("Europe/Moscow"));
+                $formatted_date = date_format($date, "d.m.Y H:i:s");
+                
+                echo '<address style="background:#98FF98;">
+                    <small><strong>Входящий <i class="icon-arrow-left"></i></strong></small><br/>
+                    <small>' . $formatted_date . '</small><br/>
+                    <small>Номер:' . $item->src . '</small><br/>
+                    <small>Длительность:' . $this->format_seconds($item->billsec) . '</small><br/>';
+                switch ($item->disposition){
+                    case "ANSWERED":
+                        echo '<small style="color:#51a351;"><b>Статус: Ответили </b></small><br/></address>';
+                        break;
+                    case "BUSY":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
+                        break;
+                    case "NO ANSWER":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Пропущенный </b></small><br/></address>';
+                        break;
+                    case "CALL INTERCEPTION":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Перехваченный </b></small><br/></address>';
+                        break;
+                    case "ANSWER_BY":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Переведенный </b></small><br/></address>';
+                        break;
+                    case "":
+                        echo '<small style="color:#ee5f5b;"><b>Статус: Разговор </b></small><br/></address>';
+                        break;
+                        
+                }
+            }
+            $pos = strripos($item->dst, "#");
+                if($pos === false){
+                    $dst = $item->dst;
+                }else{
+                list($str, $shlak) = explode("#", $item->dst);
+                    $dst = $shlak;
+                }
+                
+            if ($dst === $external_phone) {
                 $date = date_create($item->end, timezone_open("Europe/Moscow"));
                 $formatted_date = date_format($date, "d.m.Y H:i:s");
                 

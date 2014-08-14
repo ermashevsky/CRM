@@ -38,14 +38,15 @@ class Core_model extends CI_Model {
         $this->load->library('ion_auth');
     }
 
-    function getCallEvent($phone_number) {
+    function getCallEvent($phone_number, $external_phone) {
         $results = array();
         
         $this->db->select("id, src, dst, start,end, billsec,disposition, uniqueid, cause", false);
         $this->db->from('cdr');
         $this->db->where_in('disposition', '16, 17, 19');
-        $this->db->or_where('src', $phone_number);
-        $this->db->or_where('dst', $phone_number);
+        $this->db->or_like('src', $phone_number);
+        $this->db->or_like('dst', $phone_number);
+        $this->db->or_like('dst', $external_phone);
         $this->db->order_by('start','desc');
         $this->db->limit(10);
 
@@ -74,8 +75,8 @@ class Core_model extends CI_Model {
         
         $this->db->select("id, organization_name as contact_name", false);
         $this->db->from('organization');
-        $this->db->where('phone_number', $phone_number);
-        $this->db->or_where('alt_phone_number', $phone_number);
+        $this->db->like('phone_number', $phone_number);
+        $this->db->or_like('alt_phone_number', $phone_number);
         
         $res = $this->db->get();
         if (0 < $res->num_rows) {
@@ -84,8 +85,8 @@ class Core_model extends CI_Model {
         }else{
         $this->db->select("id,contact_name", false);
         $this->db->from('contacts');
-        $this->db->where('private_phone_number', $phone_number);
-        $this->db->or_where('mobile_number', $phone_number);
+        $this->db->like('private_phone_number', $phone_number);
+        $this->db->or_like('mobile_number', $phone_number);
         
         $res = $this->db->get();
         if (0 < $res->num_rows) {
@@ -94,7 +95,8 @@ class Core_model extends CI_Model {
         }else{
             $this->db->select("id,first_name, last_name", false);
             $this->db->from('users');
-            $this->db->where('phone', $phone_number);
+            $this->db->like('phone', $phone_number);
+            $this->db->or_like('external_phone', $phone_number);
             //$this->db->or_where('mobile_number', $phone_number);
         
         $res = $this->db->get();

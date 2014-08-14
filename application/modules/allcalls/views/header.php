@@ -291,7 +291,7 @@
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                     if($('#hidden_usergroup').val()  === 'admin'){
-                                        alert ('РГШ');
+                                        
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                 });
@@ -602,10 +602,11 @@
                      * 
                      * 
                      * 
-                     * */
-                    var phone_number = $('#hidden_external_phone_number').val();
+                     * */       var trunk_name = "mera_dynamic_ANI/74#";
+                    var external_phone_number = trunk_name + $('#hidden_external_phone_number').val();
+                    
                     if (data.event === "Dial" && data.subevent === "Begin") {
-
+                        
                         var calleridnum = data.calleridnum;
                         var dialstring = data.dialstring;
                         var string = data.channel; // юрл в котором происходит поиск
@@ -614,7 +615,7 @@
                         var regXfer = new RegExp('xfer', 'ig');
                         var result_xfer = string.match(regXfer);  // поиск шаблона в юрл
 
-                        var regV = new RegExp(phone_number, 'ig'); ///102/gi;     // шаблон
+                        var regV = new RegExp(external_phone_number, 'ig'); ///102/gi;     // шаблон
                         var result = string.match(regV);  // поиск шаблона в юрл
                         var dialstring_rep = dialstring.replace("trunk/", "");
                         var destination = data.destination;
@@ -629,15 +630,7 @@
                         $.totalStorage('dialstring' + data.destination, data.dialstring);
 
 
-                        if (parseInt(result) === parseInt(phone_number)) {
-
-                            var text = "Исходящий звонок на номер: " + dialstring_rep;
-                            var type = 'success';
-                            $.totalStorage('call', 'Out');
-                            msg_system(text, type);
-                        }
-
-                        if (dialstring === phone_number) {
+                        if (dialstring === external_phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
 
                             getContactDetail(calleridnum);
@@ -647,9 +640,12 @@
                             $.totalStorage('call', 'In');
 
                             msg_system(text, type);
+                            setTimeout(function(){
+                               window.location.reload();
+                             }, 5000);
                         }
 
-                        if (dialstring === phone_number && result_xfer) {
+                        if (dialstring === external_phone_number && result_xfer) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
                             var text = "Переведенный входящий звонок с номера: " + calleridnum;
                             var type = 'success';
@@ -672,7 +668,7 @@
 
                         var getNumber1 = channel1.replace(re, "$2");
 
-                        if (getNumber2 === phone_number || getNumber1 === phone_number) {
+                        if (getNumber2 === external_phone_number || getNumber1 === external_phone_number) {
                             var text = "Разговор ...";
                             var type = "success";
                             msg_system(text, type);
@@ -687,7 +683,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number) {
+                        if (getNumber === external_phone_number) {
 
                             var text = "Повесили трубку";
                             var type = "success";
@@ -706,7 +702,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number) {
+                        if (getNumber === external_phone_number) {
 
                             var text = "Ответил другой абонент";
                             var type = "error";
@@ -724,7 +720,7 @@
 
                         var getNumber = channel.replace(re, "$2");
                         console.info($.totalStorage('call'));
-                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                        if (getNumber === external_phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
@@ -741,7 +737,7 @@
 
                         var getNumber = channel.replace(re, "$2");
                         console.info($.totalStorage('call'));
-                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                        if (getNumber === external_phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Нет адресата.";
                             var type = "error";
                             msg_system(text, type);
@@ -759,7 +755,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number && $.totalStorage('call') === 'In') {
+                        if (getNumber === external_phone_number && $.totalStorage('call') === 'In') {
                             var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
@@ -768,7 +764,7 @@
                              }, 5000);
                         }
 
-                        if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
+                        if (getNumber === external_phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
@@ -785,7 +781,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number) {
+                        if (getNumber === external_phone_number) {
                             var text = "Ошибка вызова";
                             var type = "error";
                             msg_system(text, type);
@@ -802,7 +798,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number) {
+                        if (getNumber === external_phone_number) {
                             var text = "Несуществующий номер";
                             var type = "error";
                             msg_system(text, type);
@@ -819,7 +815,7 @@
 
                         var getNumber = channel.replace(re, "$2");
 
-                        if (getNumber === phone_number) {
+                        if (getNumber === external_phone_number) {
                             var text = "Вызов отклонен";
                             var type = "error";
                             msg_system(text, type);

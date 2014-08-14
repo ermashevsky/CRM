@@ -44,6 +44,6 @@
         <ul class="nav nav-list" >
             <?php
             $this->load->module('core');
-            $this->core->viewCallEvent($user->phone);
+            $this->core->viewCallEvent($user->phone, $user->external_phone);
             ?>
         </ul>
