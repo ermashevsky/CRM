@@ -89,7 +89,7 @@ class Core extends MX_Controller {
                 echo '<address style="background: #FFDB58;">
                     <small><strong>Исходящий <i class="icon-arrow-right"></i></strong></small><br/>
                     <small>' . $formatted_date . '</small><br/>
-                    <small>Номер:' . $dst . '</small><br/>
+                    <small>На номер:' . $dst . '</small><br/>
                     <small>Длительность:'. $this->format_seconds($item->billsec) .'</small><br/>';
                 switch ($item->disposition){
                     case "ANSWERED":
@@ -120,7 +120,7 @@ class Core extends MX_Controller {
                 echo '<address style="background:#98FF98;">
                     <small><strong>Входящий <i class="icon-arrow-left"></i></strong></small><br/>
                     <small>' . $formatted_date . '</small><br/>
-                    <small>Номер:' . $item->src . '</small><br/>
+                    <small>С номера:' . $item->src . '</small><br/>
                     <small>Длительность:' . $this->format_seconds($item->billsec) . '</small><br/>';
                 switch ($item->disposition){
                     case "ANSWERED":
