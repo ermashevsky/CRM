@@ -474,7 +474,7 @@ class Auth extends CI_Controller {
 		$this -> form_validation -> set_rules('last_name', 'Last Name', 'required|xss_clean');
 		$this -> form_validation -> set_rules('email', 'Email', 'required|valid_email');
 		$this -> form_validation -> set_rules('phone', 'Телефон', 'required|xss_clean|min_length[2]|max_length[15]');
-                $this -> form_validation -> set_rules('external_phone', 'Телефон', 'required|xss_clean|min_length[11]|max_length[15]');
+                $this -> form_validation -> set_rules('external_phone', 'Телефон', 'xss_clean|min_length[11]|max_length[15]');
 		$this -> form_validation -> set_rules('company', 'Company', 'required|xss_clean');
 		$this -> form_validation -> set_rules('groups', 'Группа', 'xss_clean');
 

@@ -275,7 +275,7 @@
                 }
 
                 $("button#submit").click(function() {
-
+                    //Тута
                     $.post('<?php echo site_url('/allcalls/getFilteredCalls'); ?>', $('#form_filter_call').serialize(),
                             function(data) {
                                 $('#table_all_calls').empty();
@@ -284,16 +284,23 @@
                                 $.each(data, function() {
                                     // this = object in array
                                     // access attributes: this.Id, this.Name, etc
+                                    if($('#hidden_usergroup').val()  === 'admin'){
+                                        console.info("Вы админ");
+                                    }
+                                    if($('#hidden_usergroup').val()  !== 'admin'){
                                     if (this.src === $('#hidden_phone_number').val()) {
+                                        alert('1');
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                     if (this.dst === $('#hidden_phone_number').val()) {
+                                        alert('2');
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
-                                    if($('#hidden_usergroup').val()  === 'admin'){
-                                        
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
+//                                    if($('#hidden_usergroup').val()  === 'admin'){
+//                                        
+//                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
+//                                    }
                                 });
                                 $('#allcalls').dataTable({
                                     "sPaginationType": "full_numbers",
@@ -306,7 +313,7 @@
                                     "sWrapper": "dataTables_wrapper form-inline"
                                 });
                                 $('#form-content').modal('hide');
-                            }, "json");
+                            }, "json"); //Тута
                 });
 
                 $('#allcalls').dataTable({

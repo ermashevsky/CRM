@@ -364,6 +364,8 @@ class AddressBook extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
 
             $details['organizationDetail'] = $this->getOrganizationDetails($id);
@@ -382,6 +384,8 @@ class AddressBook extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
 
             $details['contactDetail'] = $this->getContactDetails($id);
@@ -495,6 +499,8 @@ class AddressBook extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             $menu = array('menu' => $this->menu->render('header'));
             $this->load->view('header', $menu);
@@ -509,6 +515,8 @@ class AddressBook extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             $menu = array('menu' => $this->menu->render('header'));
             $this->load->view('header', $menu);
