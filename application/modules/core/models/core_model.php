@@ -41,11 +41,12 @@ class Core_model extends CI_Model {
     function getCallEvent($phone_number, $external_phone) {
         $results = array();
         
-        $this->db->select("id, src, dst, start,end, billsec,disposition, uniqueid, cause", false);
+        $this->db->select('id, src, dst, start,end, billsec,disposition, uniqueid, cause', false);
         $this->db->from('cdr');
-        $this->db->where_in('disposition', '16, 17, 19');
-        $this->db->or_like('src', $phone_number);
-        $this->db->or_like('dst', $phone_number);
+        $this->db->where_in('disposition', array('ANSWERED', 'BUSY', 'NO ANSWER'));
+        $this->db->where('src', $phone_number);
+        $this->db->or_where('dst', $phone_number);
+        $this->db->like('dst', $external_phone);
         $this->db->or_like('dst', $external_phone);
         $this->db->order_by('start','desc');
         $this->db->limit(10);

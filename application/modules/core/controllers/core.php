@@ -67,7 +67,7 @@ class Core extends MX_Controller {
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $this->load->model('core_model');
-            $data = $this->core_model->getCallEvent($data['user']->phone,$data['user']->external_phone);
+            $data = $this->core_model->getCallEvent($data['user']->phone, $data['user']->external_phone);
         }
         //return $data;
         echo '<li class="nav-header" style="color:#3a87ad;">История звонков</li>'
@@ -159,7 +159,7 @@ class Core extends MX_Controller {
                 echo '<address style="background:#98FF98;">
                     <small><strong>Входящий <i class="icon-arrow-left"></i></strong></small><br/>
                     <small>' . $formatted_date . '</small><br/>
-                    <small>Номер:' . $item->src . '</small><br/>
+                    <small>С номера:' . $item->src . '</small><br/>
                     <small>Длительность:' . $this->format_seconds($item->billsec) . '</small><br/>';
                 switch ($item->disposition){
                     case "ANSWERED":
