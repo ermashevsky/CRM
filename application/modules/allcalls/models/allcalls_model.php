@@ -37,15 +37,15 @@ class Allcalls_model extends CI_Model {
         parent::__construct();
         $this->load->library('ion_auth');
     }
-    
+
     function format_seconds($seconds) {
         $t = round($seconds);
         return sprintf('%02d:%02d:%02d', ($t / 3600), ($t / 60 % 60), $t % 60);
     }
-    
+
     function getAllCall($phone_number, $external_phone) {
         $results = array();
-        
+
 //        $this->db->select("id, src, dst, start, answe, end, billsec,disposition, uniqueid, cause", false);
 //        $this->db->from('cdr');
 ////        $this->db->or_where('src', $phone_number);
@@ -53,17 +53,17 @@ class Allcalls_model extends CI_Model {
 //        $this->db->where("start BETWEEN " .date("Y-m-d 00:00:00"). " AND ". date("Y-m-d 23:59:59"));
 //        $this->db->where()
 //        $this->db->order_by('end','asc');
-      $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+        $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d 00:00:00')."'
-            AND  '".date('Y-m-d 23:59:59')."'
+            BETWEEN  '" . date('Y-m-d 00:00:00') . "'
+            AND  '" . date('Y-m-d 23:59:59') . "'
             AND (
-             `channel` like  '%/".$phone_number."%'
-            OR  `dstchannel` like  '%/".$phone_number."%'
+             `channel` like  '%/" . $phone_number . "%'
+            OR  `dstchannel` like  '%/" . $phone_number . "%'
             )
             order by `end` asc");
-      
+
         //$res = $this->db->get();
         if (0 < $res->num_rows) {
             foreach ($res->result() as $row) {
@@ -77,125 +77,124 @@ class Allcalls_model extends CI_Model {
                 $tmp->billsec = $row->billsec;
                 $tmp->disposition = $row->disposition;
                 $tmp->cause = $row->cause;
-                
+
                 $pos = strripos($row->dst, "#");
-                
-                if($pos !== false){
+
+                if ($pos !== false) {
                     list($str, $shlak) = explode("#", $row->dst);
                     $tmp->dst = $shlak;
-                }else{
+                } else {
                     $tmp->dst = $row->dst;
                 }
-                
+
                 $results[$tmp->id] = $tmp;
             }
-        }else{
-           $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+        } else {
+            $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d 00:00:00')."'
-            AND  '".date('Y-m-d 23:59:59')."'
+            BETWEEN  '" . date('Y-m-d 00:00:00') . "'
+            AND  '" . date('Y-m-d 23:59:59') . "'
             AND (
-             `src` like  '%".$external_phone."%'
-            OR  `dst` like  '%".$external_phone."%'
+             `src` like  '%" . $external_phone . "%'
+            OR  `dst` like  '%" . $external_phone . "%'
             )
             order by `end` asc");
-      
-        //$res = $this->db->get();
-        if (0 < $res->num_rows) {
-            foreach ($res->result() as $row) {
-                $tmp = new Allcalls_model();
-                $tmp->id = $row->id;
-                $tmp->uniqueid = $row->uniqueid;
-                $tmp->src = $row->src;
-                $tmp->start = $row->start;
-                $tmp->answer = $row->answer;
-                $tmp->end = $row->end;
-                $tmp->billsec = $row->billsec;
-                $tmp->disposition = $row->disposition;
-                $tmp->cause = $row->cause;
-                
-                $pos = strripos($row->dst, "#");
-                
-                if($pos !== false){
-                    list($str, $shlak) = explode("#", $row->dst);
-                    $tmp->dst = $shlak;
-                }else{
-                    $tmp->dst = $row->dst;
+
+            //$res = $this->db->get();
+            if (0 < $res->num_rows) {
+                foreach ($res->result() as $row) {
+                    $tmp = new Allcalls_model();
+                    $tmp->id = $row->id;
+                    $tmp->uniqueid = $row->uniqueid;
+                    $tmp->src = $row->src;
+                    $tmp->start = $row->start;
+                    $tmp->answer = $row->answer;
+                    $tmp->end = $row->end;
+                    $tmp->billsec = $row->billsec;
+                    $tmp->disposition = $row->disposition;
+                    $tmp->cause = $row->cause;
+
+                    $pos = strripos($row->dst, "#");
+
+                    if ($pos !== false) {
+                        list($str, $shlak) = explode("#", $row->dst);
+                        $tmp->dst = $shlak;
+                    } else {
+                        $tmp->dst = $row->dst;
+                    }
+
+                    $results[$tmp->id] = $tmp;
                 }
-                
-                $results[$tmp->id] = $tmp;
             }
-        } 
         }
         return $results;
     }
 
-    function getFilteredCalls($date_time, $date_time2, $src, $dst, $status_call,$type_call,$user_phone_number,$phone_number){
+    function getFilteredCalls($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number) {
         $results = array();
-        
-        if($type_call === 'allcall' && $status_call === 'all_status'){
+
+        if ($type_call === 'allcall' && $status_call === 'all_status') {
 
             $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
-            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
             AND (
-             `src` =  '".$user_phone_number."'
-            OR  `dst` =  '".$user_phone_number."'
+             `src` =  '" . $user_phone_number . "'
+            OR  `dst` =  '" . $user_phone_number . "'
             )
             AND (
-             `src` like  '%".$phone_number."%'
-            OR  `dst` like  '%".$phone_number."%'
+             `src` like  '%" . $phone_number . "%'
+            OR  `dst` like  '%" . $phone_number . "%'
             )
             order by `end` asc");
+        }
+        if ($status_call !== 'all_status' && $type_call === 'allcall') {
 
-        }
-        if($status_call !== 'all_status' && $type_call === 'allcall'){
-            
             $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
-            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
             AND (
-             `src` =  '".$user_phone_number."'
-            OR  `dst` =  '".$user_phone_number."'
+             `src` =  '" . $user_phone_number . "'
+            OR  `dst` =  '" . $user_phone_number . "'
             )
             AND (
-             `src` like  '%".$phone_number."%'
-            OR  `dst` like  '%".$phone_number."%'
+             `src` like  '%" . $phone_number . "%'
+            OR  `dst` like  '%" . $phone_number . "%'
             )
-            AND `disposition` = '".$status_call."'
+            AND `disposition` = '" . $status_call . "'
             order by `end` asc");
         }
-        
-        if($status_call !== 'all_status' && $type_call !== 'allcall'){
-            
+
+        if ($status_call !== 'all_status' && $type_call !== 'allcall') {
+
             $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
-            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
-            AND `src` like  '%".$src."%'
-            AND `dst` like  '%".$dst."%'
-            AND `disposition` = '".$status_call."'
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $src . "%'
+            AND `dst` like  '%" . $dst . "%'
+            AND `disposition` = '" . $status_call . "'
             order by `end` asc");
         }
-        if($status_call === 'all_status' && $type_call !== 'allcall'){
-            
+        if ($status_call === 'all_status' && $type_call !== 'allcall') {
+
             $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
-            BETWEEN  '".date('Y-m-d H:i:s', strtotime($date_time))."'
-            AND  '".date('Y-m-d H:i:s', strtotime($date_time2))."'
-            AND `src` like  '%".$src."%'
-            AND `dst` like  '%".$dst."%'
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $src . "%'
+            AND `dst` like  '%" . $dst . "%'
             order by `end` asc");
         }
         //$res = $this->db->get();
-        
+
         if (0 < $res->num_rows) {
             foreach ($res->result() as $row) {
                 $tmp = new Allcalls_model();
@@ -210,22 +209,422 @@ class Allcalls_model extends CI_Model {
                 $tmp->cause = $row->cause;
                 $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem('.$row->id.','.$row->src.');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask('.$row->id.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                 $pos = strripos($row->dst, "#");
-                if($pos === false){
+                if ($pos === false) {
                     $tmp->dst = $row->dst;
-                }else{
-                list($str, $shlak) = explode("#", $row->dst);
+                } else {
+                    list($str, $shlak) = explode("#", $row->dst);
                     $tmp->dst = $shlak;
                 }
-                
+
                 $results[$tmp->id] = $tmp;
             }
         }
         return $results;
     }
+
+    function getFilteredCalls2($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number, $phone_number2, $condition) {
+
+        $results = array();
+
+        if ($status_call !== 'all_status') {
+            $disposition = "AND `disposition` = '" . $status_call . "'";
+        } else {
+            $disposition = "";
+        }
+
+        switch ($condition) {
+            case "1-3":
+
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+            FROM  cdr 
+            WHERE  end
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND src like '%" . $src . "%'
+            AND dst like '%" . $dst . "%'
+            " . $disposition . "
+            order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "2-4":
+
+                if (!empty($src)) {
+
+                    $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                FROM  cdr 
+                WHERE  end
+                BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                AND src like '%" . $src . "%'
+                " . $disposition . "
+                order by end asc");
+                } else {
+
+                    $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                FROM  cdr 
+                WHERE  end
+                BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                AND dst like '%" . $dst . "%'
+                " . $disposition . "
+                order by end asc");
+                }
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "5":
+                
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+            FROM  cdr 
+            WHERE  end
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $phone_number . "%'
+            AND  `dst` like  '%" . $phone_number2 . "%'
+            OR
+            (
+            end BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $phone_number2 . "%'
+            AND  `dst` like  '%" . $phone_number . "%' 
+            )
+            order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "6":
+
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                    FROM  cdr 
+                    WHERE  end
+                    BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                    AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                    AND (
+                    `src` like  '%" . $phone_number . "%'
+                    OR  `dst` like  '%" . $phone_number . "%'
+                    )
+                    " . $disposition . "
+                    order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+        }
+        return $results;
+    }
+    
+    function getFilteredCalls3($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number, $phone_number2, $condition) {
+
+        $results = array();
+
+        if ($status_call !== 'all_status') {
+            $disposition = "AND `disposition` = '" . $status_call . "'";
+        } else {
+            $disposition = "";
+        }
+
+        switch ($condition) {
+            case "1-3":
+
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+            FROM  cdr 
+            WHERE  end
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND src like '%" . $src . "%'
+            AND dst like '%" . $dst . "%'
+            " . $disposition . "
+            order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "2-4":
+
+                if (!empty($src)) {
+
+                    $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                FROM  cdr 
+                WHERE  end
+                BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                AND src like '%" . $src . "%'
+                " . $disposition . "
+                order by end asc");
+                } else {
+
+                    $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                FROM  cdr 
+                WHERE  end
+                BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                AND dst like '%" . $dst . "%'
+                " . $disposition . "
+                order by end asc");
+                }
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "5":
+                
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+            FROM  cdr 
+            WHERE  end
+            BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $phone_number . "%'
+            AND  `dst` like  '%" . $phone_number2 . "%'
+            OR
+            (
+            end BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+            AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+            AND `src` like  '%" . $phone_number2 . "%'
+            AND  `dst` like  '%" . $phone_number . "%'
+            )
+            
+            order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+            case "6":
+
+                $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
+                    FROM  cdr 
+                    WHERE  end
+                    BETWEEN  '" . date('Y-m-d H:i:s', strtotime($date_time)) . "'
+                    AND  '" . date('Y-m-d H:i:s', strtotime($date_time2)) . "'
+                    AND (
+                    `src` like  '%" . $phone_number . "%'
+                    OR  `dst` like  '%" . $phone_number . "%'
+                    )
+                    " . $disposition . "
+                    order by end asc");
+
+                if (0 < $res->num_rows) {
+                    foreach ($res->result() as $row) {
+                        $tmp = new Allcalls_model();
+                        $tmp->id = $row->id;
+                        $tmp->uniqueid = $row->uniqueid;
+                        $tmp->src = $row->src;
+                        $tmp->start = $row->start;
+                        $tmp->answer = $row->answer;
+                        $tmp->end = $row->end;
+                        $tmp->billsec = $this->format_seconds($row->billsec);
+                        $tmp->disposition = $row->disposition;
+                        $tmp->cause = $row->cause;
+                        $tmp->btn_group = '<div class="btn-group">
+                        <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                    </div>';
+                        $pos = strripos($row->dst, "#");
+                        if ($pos === false) {
+                            $tmp->dst = $row->dst;
+                        } else {
+                            list($str, $shlak) = explode("#", $row->dst);
+                            $tmp->dst = $shlak;
+                        }
+
+                        $results[$tmp->id] = $tmp;
+                    }
+                }
+                break;
+        }
+        return $results;
+    }
+
 }
 
 //End of file core_model.php

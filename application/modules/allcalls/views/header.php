@@ -188,6 +188,10 @@
                 $("#dst_block").css('display', 'none');
                 $("#src_block").css('display', 'none');
                 $("#number_block").css('display', 'block');
+                $("#number_block2").css('display', 'block');
+                $("#src").val('');
+                $("#dst").val('');
+                $("input#phone_number").val($('#hidden_phone_number').val());
                 if($('#hidden_usergroup').val()  === 'admin'){
                    $('#type_call').on('change', function() {
                     if (this.value === 'allcall') {
@@ -197,6 +201,10 @@
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
                         $("#number_block").css('display', 'block');
+                        $("#number_block2").css('display', 'block');
+                        $("input#phone_number").val($('#hidden_phone_number').val());
+                        $("#src").val('');
+                        $("#dst").val('');
                     }
                     if (this.value === 'outcall') {
                         $("#src").val($('#hidden_phone_number').val());
@@ -206,6 +214,9 @@
                         $("#dst_block").css('display', 'block');
                         $("#src_block").css('display', 'block');
                         $("#number_block").css('display', 'none');
+                        $("#number_block2").css('display', 'none');
+                        $("input#phone_number").val('');
+                        $("input#phone_number2").val('');
                     }
                     if (this.value === 'incall') {
                         $("#dst").val($('#hidden_phone_number').val());
@@ -215,6 +226,9 @@
                         $("#dst_block").css('display', 'block');
                         $("#src_block").css('display', 'block');
                         $("#number_block").css('display', 'none');
+                        $("#number_block2").css('display', 'none');
+                        $("input#phone_number").val('');
+                        $("input#phone_number2").val('');
                     }
                 });  
                 }else{
@@ -222,10 +236,14 @@
                     if (this.value === 'allcall') {
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
-
+                        $("input#phone_number").attr('readonly', true);
+                        $("input#phone_number").val($('#hidden_phone_number').val());
                         $("#dst_block").css('display', 'none');
                         $("#src_block").css('display', 'none');
                         $("#number_block").css('display', 'block');
+                        $("#number_block2").css('display', 'block');
+                        $("#src").val('');
+                        $("#dst").val('');
                     }
                     if (this.value === 'outcall') {
                         $("#src").val($('#hidden_phone_number').val());
@@ -235,6 +253,9 @@
                         $("#dst_block").css('display', 'block');
                         $("#src_block").css('display', 'block');
                         $("#number_block").css('display', 'none');
+                        $("#number_block2").css('display', 'none');
+                        $("input#phone_number").val('');
+                        $("input#phone_number2").val('');
                     }
                     if (this.value === 'incall') {
                         $("#dst").val($('#hidden_phone_number').val());
@@ -244,6 +265,9 @@
                         $("#dst_block").css('display', 'block');
                         $("#src_block").css('display', 'block');
                         $("#number_block").css('display', 'none');
+                        $("#number_block2").css('display', 'none');
+                        $("input#phone_number").val('');
+                        $("input#phone_number2").val('');
                     }
                 }); 
                 }
@@ -286,14 +310,17 @@
                                     // access attributes: this.Id, this.Name, etc
                                     if($('#hidden_usergroup').val()  === 'admin'){
                                         console.info("Вы админ");
-                                    }
-                                    if($('#hidden_usergroup').val()  !== 'admin'){
-                                    if (this.src === $('#hidden_phone_number').val()) {
-                                        alert('1');
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
-                                    if (this.dst === $('#hidden_phone_number').val()) {
-                                        alert('2');
+                                    
+                                    if($('#hidden_usergroup').val()  !== 'admin'){
+
+                                    if (this.src === $('#hidden_phone_number').val() || this.src === $('#hidden_external_phone_number').val()) {
+                                        
+                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
+                                    }
+                                    if (this.dst === $('#hidden_phone_number').val() || this.dst === $('#hidden_external_phone_number').val()) {
+                                        
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                     }

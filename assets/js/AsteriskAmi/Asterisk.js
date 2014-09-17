@@ -1,19 +1,50 @@
-
+//91.196.5.133 - office
 function start() {
     var AsteriskAmi = require('./lib/AsteriskAmi'),
-            AMI = new AsteriskAmi({host: '91.196.5.148', port: '5038', username: 'admin2', password: 'admin2'}),
+            AMI = new AsteriskAmi({host: '91.196.5.133', port: '5038', username: 'admin2', password: 'admin2'}),
     express = require('express');
     var storage = require('node-persist');
     var mysql = require('mysql');
+
     
-    var connection = mysql.createConnection({
+
+//    var db_config = {
+//        host: 'localhost',
+//        user: 'root',
+//        password: '11235813',
+//        database: 'DialogWebCRM'
+//    };
+//    //connection.connect();
+//    var connection;
+
+    function handleDisconnect() {
+        //connection = mysql.createConnection(db_config); // Recreate the connection, since
+        connection = mysql.createConnection({
         host: 'localhost',
         user: 'root',
         password: '11235813',
         database: 'DialogWebCRM'
     });
+        // the old one cannot be reused.
 
-    connection.connect();
+        connection.connect(function(err) {              // The server is either down
+            if (err) {                                     // or restarting (takes a while sometimes).
+                console.log('error when connecting to db:', err);
+                setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+            }                                     // to avoid a hot loop, and to allow our node script to
+        });                                     // process asynchronous requests in the meantime.
+        // If you're also serving http, display a 503 error.
+        connection.on('error', function(err) {
+            console.log('db error', err);
+            if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
+                handleDisconnect();                         // lost due to either server restart, or a
+            } else {                                      // connnection idle timeout (the wait_timeout
+                throw err;                                  // server variable configures this)
+            }
+        });
+    }
+
+    handleDisconnect();
 
     AMI.connect(function() {
     });
@@ -43,23 +74,23 @@ function start() {
                         'VALUES("' + data.calleridnum + '", "' + data.calleridname + '", "' + data.dialstring + '", "' + data.channel + '", "' + data.destination + '", "' + data.uniqueid + '")';
                 connection.query(sql);
             }
-            
+
             var checkBegin;
             if (data.event === 'Newchannel' && data.exten === "*8") {
-               console.info('Перехват вызова !!!');
-               storage.setItem('interception','call_interception');
+                console.info('Перехват вызова !!!');
+                storage.setItem('interception', 'call_interception');
             }
-            
+
             if (data.event === 'Bridge' && data.bridgestate === "Link") {
                 var answer = getDateTime();
-                
-                if(storage.getItem("interception") === 'call_interception'){
+
+                if (storage.getItem("interception") === 'call_interception') {
                     var insertBeginRecord = 'INSERT INTO cdr (src,clid,dst,channel,dstchannel,uniqueid,answer) ' +
-                            'VALUES("' + data.callerid1 + '", "' + data.callerid1 + '", "' + data.callerid2 + '", "' + data.channel1 + '", "' + data.channel2 + '", "' + data.uniqueid2 + '","'+answer+'")';
+                            'VALUES("' + data.callerid1 + '", "' + data.callerid1 + '", "' + data.callerid2 + '", "' + data.channel1 + '", "' + data.channel2 + '", "' + data.uniqueid2 + '","' + answer + '")';
                     connection.query(insertBeginRecord);
                     console.info(insertBeginRecord);
                 }
-                
+
                 var updateLinkCall = 'UPDATE cdr SET answer="' + answer + '" where uniqueid="' + data.uniqueid1 + '" and dstchannel="' + data.channel2 + '"';
                 connection.query(updateLinkCall);
                 console.info(updateLinkCall);
@@ -76,21 +107,21 @@ function start() {
                 var updateEndCall_26 = 'UPDATE cdr SET disposition="ANSWER_BY", answerext="' + getNumber + '" where billsec="0" and cause="26" and uniqueid="' + data.uniqueid1 + '"';
                 connection.query(updateEndCall_26);
                 console.info(updateEndCall_26);
-                
+
                 var regXfer = new RegExp('xfer', 'ig');
                 var result_xfer = channel.match(regXfer);  // поиск шаблона в юрл
-                
-                if(result_xfer){
+
+                if (result_xfer) {
 
                     var channel_xfer = data.channel2;
-                    
+
                     var re = /(.*\/)(\d*)(@.*)/;
                     var re2 = /(.*\/)(\d*)(@[a-z]*)(-[a-z]*)(-[a-z]*)(-[a-zA-Z0-9_]*)(;\d)/;
-                    
+
                     var getNumber = channel_xfer.replace(re, "$2");
                     var getChannel = channel_xfer.replace(re2, "$1$2$3$4$5$6");
-                    
-                    var updateEndCall_xfer = 'UPDATE cdr SET src="'+data.callerid1+'", dst="' +getNumber+ '" where channel like "' + getChannel + '%"';
+
+                    var updateEndCall_xfer = 'UPDATE cdr SET src="' + data.callerid1 + '", dst="' + getNumber + '" where channel like "' + getChannel + '%"';
                     connection.query(updateEndCall_xfer);
                     console.info(updateEndCall_xfer);
                 }
@@ -100,39 +131,39 @@ function start() {
             if (data.event === 'Hangup' && data.cause === "16") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
-                
+
                 var channel = data.channel;
                 var template = /(.*\/)(\d*)(-.*)(<ZOMBIE>)/;
                 var getChannelWithoutZombie = channel.replace(template, "$1$2$3");
                 var checkZombie = channel.replace(template, "$4");
                 //Проверка перехвата и наличия в канале <ZOMBIE>
-                if(checkZombie ==='<ZOMBIE>'){
+                if (checkZombie === '<ZOMBIE>') {
                     console.info("Тута Зомбаки!!!!!!");
-                    
+
                     connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + getChannelWithoutZombie + '"', function(err, rows, fields) {
-                    if (err)
-                        throw err;
+                        if (err)
+                            throw err;
 
-                    for (var i in rows) {
-                        var end = getDateTime();
-                        var duration_seconds = duration(rows[i].start);
+                        for (var i in rows) {
+                            var end = getDateTime();
+                            var duration_seconds = duration(rows[i].start);
 
-                        if (rows[i].answer !== "0000-00-00 00:00:00") {
+                            if (rows[i].answer !== "0000-00-00 00:00:00") {
 
 //                            var billsec_seconds = billsec(rows[i].answer);
 //
 //                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="ANSWERED", cause="16" , duration="' + duration_seconds + '", billsec="' + billsec_seconds + '" where dstchannel="' + data.channel + '"';
 //                            connection.query(updateEndCall);
 //                            console.info(updateEndCall);
-                        } else {
-                            var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="CALL INTERCEPTION", cause="16" , duration="' + duration_seconds + '", billsec="0" where dstchannel="' + getChannelWithoutZombie + '"';
-                            connection.query(updateEndCall);
-                            console.info(updateEndCall);
+                            } else {
+                                var updateEndCall = 'UPDATE cdr SET end="' + end + '", disposition="CALL INTERCEPTION", cause="16" , duration="' + duration_seconds + '", billsec="0" where dstchannel="' + getChannelWithoutZombie + '"';
+                                connection.query(updateEndCall);
+                                console.info(updateEndCall);
+                            }
                         }
-                    }
-                });
+                    });
                 }
-                
+
                 connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, rows, fields) {
                     if (err)
                         throw err;
@@ -181,7 +212,7 @@ function start() {
                     }
                 });
             }
-            
+
             if (data.event === 'Hangup' && data.cause === "18") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
@@ -206,7 +237,7 @@ function start() {
                     }
                 });
             }
-            
+
             if (data.event === 'Hangup' && data.cause === "19") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.

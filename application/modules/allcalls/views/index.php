@@ -41,9 +41,15 @@
                         </div>
                         </div>
                         <div class="control-group" id="number_block">
-                        <label class="control-label" for="phone_number">Номер:</label>
+                        <label class="control-label" for="phone_number">Номер1:</label>
                         <div class="controls">
                         <input type="text" class="input-medium" name="phone_number" id="phone_number"/>
+                        </div>
+                        </div>
+                        <div class="control-group" id="number_block2">
+                        <label class="control-label" for="phone_number2">Номер2:</label>
+                        <div class="controls">
+                        <input type="text" class="input-medium" name="phone_number2" id="phone_number2"/>
                         </div>
                         </div>
                         <div class="control-group">
