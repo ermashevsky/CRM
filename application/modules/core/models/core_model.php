@@ -41,17 +41,38 @@ class Core_model extends CI_Model {
     function getCallEvent($phone_number, $external_phone) {
         $results = array();
         
-        $this->db->select('id, src, dst, start,end, billsec,disposition, uniqueid, cause', false);
-        $this->db->from('cdr');
-        $this->db->where_in('disposition', array('ANSWERED', 'BUSY', 'NO ANSWER'));
-        $this->db->where('src', $phone_number);
-        $this->db->or_where('dst', $phone_number);
-        $this->db->like('dst', $external_phone);
-        $this->db->or_like('dst', $external_phone);
-        $this->db->order_by('start','desc');
-        $this->db->limit(10);
-
-        $res = $this->db->get();
+//        $this->db->select('id, src, dst, start,end, billsec,disposition, uniqueid, cause', false);
+//        $this->db->from('cdr');
+//        $this->db->where_in('disposition', array('ANSWERED', 'BUSY', 'NO ANSWER'));
+//        $this->db->where('src', $phone_number);
+//        $this->db->or_where('dst', $phone_number);
+//        $this->db->like('dst', $external_phone);
+//        $this->db->or_like('dst', $external_phone);
+//        $this->db->order_by('start','desc');
+//        $this->db->limit(10);
+        $res = $this->db->query("SELECT id, src, dst, 
+            start , end, billsec, disposition, uniqueid, cause, channel
+            FROM (
+             `cdr`
+            )
+            WHERE  `disposition` 
+            IN (
+             'ANSWERED',  'BUSY',  'NO ANSWER'
+            )
+            AND (
+             `src` =  '".$phone_number."'
+            OR  `dst` =  '".$phone_number."'
+            OR  `channel` LIKE  '%".$phone_number."%'
+            )
+            OR (
+             `dst` LIKE  '%".$external_phone."%'
+            OR  `dst` LIKE  '%".$external_phone."%'
+            OR  `channel` LIKE  '%".$phone_number."%'
+            )
+            ORDER BY  `start` DESC
+            limit 18
+            ");
+        //$res = $this->db->get();
         if (0 < $res->num_rows) {
             foreach ($res->result() as $row) {
                 $tmp = new Core_model();

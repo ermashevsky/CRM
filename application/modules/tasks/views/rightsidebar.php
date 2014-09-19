@@ -14,6 +14,8 @@
                     <td><i class="icon-phone"></i></td>
                     <td>
                         <input type="hidden" id="hidden_phone_number" name="hidden_phone_number" value="<?php echo $user->phone; ?>" />
+                        <input type="hidden" id="hidden_external_phone_number" name="hidden_external_phone_number" value="<?php echo $user->external_phone; ?>" />
+                        <input type="hidden" id="hidden_usergroup" name="hidden_usergroup" value="<?php echo $user->group; ?>" />
                         <?php
                         echo $user->phone;
                         ?>
@@ -42,6 +44,6 @@
         <ul class="nav nav-list" >
             <?php
             $this->load->module('core');
-            $this->core->viewCallEvent($user->phone);
+            $this->core->viewCallEvent($user->phone, $user->external_phone);
             ?>
         </ul>

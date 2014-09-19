@@ -36,8 +36,9 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
 
-        <script src="http://localhost:8580/socket.io/socket.io.js"></script>
+        <script src="http://dialog.crm64.ru:8580/socket.io/socket.io.js"></script>
         <script type="text/javascript">
+            var address = "dialog.crm64.ru";
             function getContactDetail(phone_number) {
                   $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
                     function(data) {
@@ -268,7 +269,7 @@
                     dayOfWeekStart: 1
                 });
 
-                var socket = io.connect('http://localhost:8580');
+                var socket = io.connect('http://'+address+':8580');
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -628,6 +629,11 @@
             }
             #myNewContactForm .modal-body{
                 max-height: 650px;
+            }
+            .nav-list {
+                padding-right: 15px;
+                padding-left: 0px !important;
+                margin-bottom: 0;
             }
 
         </style>

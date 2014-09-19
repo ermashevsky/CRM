@@ -309,7 +309,6 @@
                                     // this = object in array
                                     // access attributes: this.Id, this.Name, etc
                                     if($('#hidden_usergroup').val()  === 'admin'){
-                                        console.info("Вы админ");
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
                                     
@@ -963,6 +962,12 @@
             #form-content{
                 width: 550px!important;
             }
+            .nav-list {
+                padding-right: 15px;
+                padding-left: 0px !important;
+                margin-bottom: 0;
+            }
+            
         </style>
     </head>
 
