@@ -118,6 +118,8 @@ class Tasks extends MX_Controller {
             
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             
             $menu = array('menu' => $this->menu->render('header'));
@@ -135,6 +137,8 @@ class Tasks extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             $this->load->model('tasks_model');
             $dataTask['task'] = $this->tasks_model->getTaskByID($id);
@@ -152,6 +156,8 @@ class Tasks extends MX_Controller {
             redirect('auth/login', 'refresh');
         } else {
             $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
             $this->load->module('menu');
             $this->load->model('tasks_model');
             $dataTask['task'] = $this->tasks_model->editTaskByID($id);
