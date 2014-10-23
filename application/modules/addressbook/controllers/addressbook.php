@@ -560,5 +560,12 @@ class AddressBook extends MX_Controller {
         $data = $this->addressbook_model->deleteOrganizationWithContacts($id);
         echo json_encode($data);
     }
+    
+    function deleteContactDetails($id){
+        //$id = $this->input->get('id');
+        $this->load->model('addressbook_model');
+        $this->addressbook_model->deleteContactDetails($id);
+        redirect('/addressbook/allContacts');
+    }
 
 }

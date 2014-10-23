@@ -354,6 +354,12 @@ class Addressbook_model extends CI_Model {
         $this->db->update('contacts',$data);
         
     }
+    
+    function deleteContactDetails($id){
+        
+        $this->db->where('id', $id);
+        $this->db->delete('contacts');
+    }
 }
 
 //End of file core_model.php
