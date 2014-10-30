@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="span10">
-                <h3>Задачи</h3>
+                <h3 style="color:#08c;">Задачи</h3>
                 <?php
                 echo anchor("tasks/addTask/", "Создать задачу", "class='btn btn-mini btn-info pull-left'");
                 echo "<span>".anchor("tasks/filterTask/", "Фильтр задач", "class='btn btn-mini btn-info pull-left'")."</span>";

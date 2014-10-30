@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="span10">
-                <h3>Адресная книга</h3>
+                <h3 style="color:#08c;">Адресная книга</h3>
                 <?php
                 $groupButton = new AddressBook();
                 $groupButton->createGroupButton();

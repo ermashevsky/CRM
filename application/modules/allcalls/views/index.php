@@ -2,6 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="span10">
+                <h3 style="color:#08c;">История звонков</h3>
 <div id="thanks"><p><a data-toggle="modal" href="#form-content" class="btn btn-info btn-mini">Фильтр звонков</a></p></div>
     <!-- model content -->    
     <div id="form-content" class="modal hide fade in" style="display: none; ">
