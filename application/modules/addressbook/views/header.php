@@ -270,7 +270,7 @@
                     dayOfWeekStart: 1
                 });
 
-                var socket = io.connect('http://'+address+':'+port');
+                var socket = io.connect('http://'+address+':'+port);
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
