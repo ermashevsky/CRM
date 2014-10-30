@@ -1,4 +1,0 @@
-CRM
-===
-
-CRM (Asterisk)
