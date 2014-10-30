@@ -35,10 +35,11 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
-
-        <script src="http://dialog.crm64.ru:8580/socket.io/socket.io.js"></script>
+        
+        <script src="http://gtm.crm64.ru:8582/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-            var address = "dialog.crm64.ru";
+            var address = "gtm.crm64.ru";
+            var port = "8582";
             function getContactDetail(phone_number) {
                   $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
                     function(data) {
@@ -269,7 +270,7 @@
                     dayOfWeekStart: 1
                 });
 
-                var socket = io.connect('http://'+address+':8580');
+                var socket = io.connect('http://'+address+':'+port');
                 var messages = $("#messages");
 
                 function msg_system(message, type) {

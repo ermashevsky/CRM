@@ -1,7 +1,7 @@
 //91.196.5.133 - office
 function start() {
     var AsteriskAmi = require('./lib/AsteriskAmi'),
-            AMI = new AsteriskAmi({host: '91.196.5.133', port: '5038', username: 'admin2', password: 'admin2'}),
+            AMI = new AsteriskAmi({host: '159.253.121.30', port: '5038', username: 'gazteh', password: '14QVl9zC'}),
     express = require('express');
     var storage = require('node-persist');
     var mysql = require('mysql');
@@ -23,7 +23,7 @@ function start() {
         host: 'localhost',
         user: 'root',
         password: '11235813',
-        database: 'DialogWebCRM'
+        database: 'gaztehWebCRM'
     });
         // the old one cannot be reused.
 
@@ -53,7 +53,7 @@ function start() {
     var app = express();
     // Создаем HTTP-сервер с помощью модуля HTTP, входящего в Node.js. 
     // Связываем его с Express и отслеживаем подключения к порту 8580. 
-    var server = require('http').createServer(app).listen(8580);
+    var server = require('http').createServer(app).listen(8582);
     // Инициализируем Socket.IO так, чтобы им обрабатывались подключения 
     // к серверу Express/HTTP
     var io = require('socket.io').listen(server, {log: false});
