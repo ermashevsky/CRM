@@ -10,6 +10,9 @@
                   <a class="close" data-dismiss="modal">×</a>
                   <h4>Фильтр звонков</h4>
             </div>
+        <?php
+        echo $_SERVER['HTTP_HOST'];
+        ?>
         <div>
                 
                 <form class="form-horizontal" id="form_filter_call">
