@@ -37,6 +37,7 @@ if (defined('ENVIRONMENT'))
 		break;
 	
 		case 'testing':
+                case $_SERVER['HTTP_HOST']:
 		case 'production':
 			error_reporting(0);
 		break;
