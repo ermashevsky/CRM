@@ -32,7 +32,7 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
 
-        <script src="http://"<?php $this->config->item('base_url'); ?>":"<?php $this->config->item('base_url');?>"/socket.io/socket.io.js"></script>
+        <script src="http://"<?php echo $this->config->item('base_url'); ?>":"<?php echo $this->config->item('base_url');?>"/socket.io/socket.io.js"></script>
         <script type="text/javascript">
             var address = "gtm.crm64.ru";
             var port = "8582";
