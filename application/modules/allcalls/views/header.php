@@ -32,10 +32,9 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
 
-        <script src=<?php echo $this->config->item('listner_address');?>></script>
+        <script src=<?php echo $this->config->item('listner_socket_address');?>></script>
         <script type="text/javascript">
-            var address = "gtm.crm64.ru";
-            var port = "8582";
+
             // javascript code
             function setTask(id_call) {
                 $('input#id_call').val(id_call);
@@ -354,7 +353,7 @@
                     "sWrapper": "dataTables_wrapper form-inline"
                 });
 
-                var socket = io.connect('http://'+address+':'+port);
+                var socket = io.connect(<?php echo $this->config->item('listner_address');?>);
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
