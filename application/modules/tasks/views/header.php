@@ -286,7 +286,7 @@
                     dayOfWeekStart: 1
                 });
 
-                var socket = io.connect(<?php echo $this->config->item('listner_address');?>);
+                var socket = io.connect('<?php echo $this->config->item('listner_address');?>');
 
                 var messages = $("#messages");
 

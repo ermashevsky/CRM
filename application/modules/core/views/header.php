@@ -41,7 +41,7 @@
                 }
             // /project_dir/index.html
             $(document).ready(function() {
-                var socket = io.connect(<?php echo $this->config->item('listner_address');?>);
+                var socket = io.connect('<?php echo $this->config->item('listner_address');?>');
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
