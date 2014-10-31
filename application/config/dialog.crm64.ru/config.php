@@ -14,9 +14,9 @@
 | path to your installation.
 |
 */
-$config['base_url'] = 'http://gtm.crm64.ru';
-$config['listner_socket_address'] = 'http://gtm.crm64.ru:8582/socket.io/socket.io.js';
-$config['listner_address'] = 'http://gtm.crm64.ru:8582';
+$config['base_url'] = 'http://dialog.crm64.ru';
+$config['listner_socket_address'] = 'http://dialog.crm64.ru:8580/socket.io/socket.io.js';
+$config['listner_address'] = 'http://dialog.crm64.ru:8580';
 /*
 |--------------------------------------------------------------------------
 | Index File
