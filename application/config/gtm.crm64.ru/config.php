@@ -15,7 +15,7 @@
 |
 */
 $config['base_url'] = 'http://gtm.crm64.ru';
-$config['listner_port'] = '8582';
+$config['listner_address'] = 'http://gtm.crm64.ru:8582/socket.io/socket.io.js';
 /*
 |--------------------------------------------------------------------------
 | Index File
