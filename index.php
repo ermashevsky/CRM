@@ -18,7 +18,7 @@
  * NOTE: If you change these, also change the error_reporting() code below
  *
  */
-	define('ENVIRONMENT', 'test');
+	define('ENVIRONMENT', $_SERVER['HTTP_HOST']);
 /*
  *---------------------------------------------------------------
  * ERROR REPORTING
