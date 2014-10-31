@@ -11,7 +11,7 @@
                   <h4>Фильтр звонков</h4>
             </div>
         <?php
-        echo $_SERVER['HTTP_HOST'];
+        echo "===>".$_SERVER['HTTP_HOST'];
         ?>
         <div>
                 
