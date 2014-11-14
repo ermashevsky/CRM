@@ -73,7 +73,7 @@
   <label class="control-label" for="login">Логин</label>
   <div class="controls">
     <input id="login" name="login" type="text" placeholder="Введите логин" class="input-xlarge" required="">
-    <span class="required"><i class="glyphicon glyphicon-certificate"> </i></span>
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -82,7 +82,7 @@
   <label class="control-label" for="last_name">Фамилия</label>
   <div class="controls">
     <input id="last_name" name="last_name" type="text" placeholder="Введите фамилию" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -91,7 +91,7 @@
   <label class="control-label" for="first_name">Имя</label>
   <div class="controls">
     <input id="first_name" name="first_name" type="text" placeholder="Введите имя" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -123,7 +123,7 @@
   <label class="control-label" for="email">Email</label>
   <div class="controls">
       <input id="email" name="email" type="text" placeholder="Введите email" class="input-xlarge" required="">
-    
+      <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -132,7 +132,7 @@
   <label class="control-label" for="phone">Телефон (внутр.)</label>
   <div class="controls">
     <input id="phone" name="phone" type="text" placeholder="Введите внутренний телефон" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -141,7 +141,7 @@
   <label class="control-label" for="phone">Телефон (внешн.)</label>
   <div class="controls">
     <input id="external_phone" name="external_phone" type="text" placeholder="Введите внешний телефон" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 <!-- Select Basic -->
@@ -160,7 +160,7 @@
   <label class="control-label" for="password">Пароль</label>
   <div class="controls">
     <input id="password" name="password" type="password" placeholder="Введите пароль" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 
@@ -169,7 +169,7 @@
   <label class="control-label" for="password_confirm">Повтор пароля</label>
   <div class="controls">
     <input id="password_confirm" name="password_confirm" type="password" placeholder="Повторите пароль" class="input-xlarge" required="">
-    
+    <span class="required"><i class="icon-warning-sign"> </i></span>
   </div>
 </div>
 </fieldset>
