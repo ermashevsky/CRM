@@ -365,7 +365,7 @@ class Auth extends CI_Controller {
 		$this->form_validation->set_rules('last_name', 'Фамилия', 'required|xss_clean');
 		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 		$this->form_validation->set_rules('phone', 'First Part of Phone', 'required|xss_clean');
-		$this->form_validation->set_rules('work_dept', 'Company Name', 'required|xss_clean');
+		#$this->form_validation->set_rules('work_dept', 'Company Name', 'required|xss_clean');
 		$this->form_validation->set_rules('password', 'Password', 'required|min_length[' . $this->config->item('min_password_length', 'ion_auth') . ']|max_length[' . $this->config->item('max_password_length', 'ion_auth') . ']|matches[password_confirm]');
 		$this->form_validation->set_rules('password_confirm', 'Password Confirmation', 'required');
 
