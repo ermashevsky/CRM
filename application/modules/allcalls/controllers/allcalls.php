@@ -72,6 +72,16 @@ class Allcalls extends MX_Controller {
                     </div>
                 </div>';
     }
+    
+    function stripChars($text='peer/74#78452744140') {
+        $res = '';
+        for ($i = 0; $i < strlen($text); $i++) {
+             if (intval($text[$i]) > 1 || $text[$i] === '0') {
+                 $res .= $text[$i];
+             }
+        }
+        return $res;
+    }
 
     function getAllCalls() {
         if (!$this->ion_auth->logged_in()) {
