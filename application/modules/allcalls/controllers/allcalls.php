@@ -73,14 +73,14 @@ class Allcalls extends MX_Controller {
                 </div>';
     }
     
-    function stripChars($text='mera/78452920820') {
+    function stripChars($text) {
         $res = '';
         for ($i = 0; $i < strlen($text); $i++) {
              if (intval($text[$i]) > 1 || $text[$i] === '0') {
                  $res .= $text[$i];
              }
         }
-        echo $res;
+        return $res;
     }
 
     function getAllCalls() {
