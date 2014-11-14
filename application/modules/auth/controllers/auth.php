@@ -377,6 +377,7 @@ class Auth extends CI_Controller {
 
 			$additional_data = array('first_name' => $this->input->post('first_name'),
 				'last_name' => $this->input->post('last_name'),
+				'company' => $this->input->post('work_dept'),
 				'phone' => $this->input->post('phone'),
                                 'external_phone' => $this->input->post('external_phone'),
                                 'work_position' => $this->input->post('work_position'),
