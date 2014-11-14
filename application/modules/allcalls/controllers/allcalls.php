@@ -80,7 +80,7 @@ class Allcalls extends MX_Controller {
                  $res .= $text[$i];
              }
         }
-        return $res;
+        echo $res;
     }
 
     function getAllCalls() {
