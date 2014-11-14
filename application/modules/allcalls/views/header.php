@@ -232,6 +232,7 @@
                     }
                 });  
                 }else{
+                    $("input#phone_number").attr('readonly', true);
                    $('#type_call').on('change', function() {
                     if (this.value === 'allcall') {
                         $("#dst_block").css('display', 'none');
