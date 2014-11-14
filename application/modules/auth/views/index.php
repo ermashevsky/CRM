@@ -109,6 +109,7 @@
   <label class="control-label" for="work_dept">Подразделение</label>
   <div class="controls">
     <select id="work_dept" name="work_dept" class="input-xlarge">
+      <option></option>
       <option>Администрация</option>
       <option>Бухгалтерия</option>
       <option>Абонентский отдел</option>
@@ -149,8 +150,8 @@
   <label class="control-label" for="group">Группа (Роль)</label>
   <div class="controls">
     <select id="group" name="group" class="input-xlarge">
-      <option>Администратор</option>
       <option>Менеджер</option>
+      <option>Администратор</option>
     </select>
   </div>
 </div>
