@@ -95,14 +95,15 @@ class Allcalls extends MX_Controller {
             . '<thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>';
 
             foreach ($call_data as $calls) {
-                $pos = strripos($calls->dst, "mera/");
-
-                if ($pos !== false) {
-                    list($str, $shlak) = explode("mera/", $calls->dst);
-                    $dst = $shlak;
-                } else {
-                    $dst = $calls->dst;
-                }
+                $dst = $this->stripChars($calls->dst);
+//                $pos = strripos($calls->dst, "mera/");
+//
+//                if ($pos !== false) {
+//                    list($str, $shlak) = explode("mera/", $calls->dst);
+//                    $dst = $shlak;
+//                } else {
+//                    $dst = $calls->dst;
+//                }
 
                 $date = new DateTime($calls->end);
 
