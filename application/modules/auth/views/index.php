@@ -73,7 +73,7 @@
   <label class="control-label" for="login">Логин</label>
   <div class="controls">
     <input id="login" name="login" type="text" placeholder="Введите логин" class="input-xlarge" required="">
-    
+    <span class="required">*</span>
   </div>
 </div>
 
@@ -99,7 +99,7 @@
 <div class="control-group">
   <label class="control-label" for="work_position">Должность</label>
   <div class="controls">
-    <input id="work_position" name="work_position" type="text" placeholder="Введите должность" class="input-xlarge" required="">
+    <input id="work_position" name="work_position" type="text" placeholder="Введите должность" class="input-xlarge" >
     
   </div>
 </div>
@@ -122,7 +122,7 @@
 <div class="control-group">
   <label class="control-label" for="email">Email</label>
   <div class="controls">
-    <input id="email" name="email" type="text" placeholder="Введите email" class="input-xlarge">
+      <input id="email" name="email" type="text" placeholder="Введите email" class="input-xlarge" required="">
     
   </div>
 </div>
