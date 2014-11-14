@@ -73,7 +73,7 @@
   <label class="control-label" for="login">Логин</label>
   <div class="controls">
     <input id="login" name="login" type="text" placeholder="Введите логин" class="input-xlarge" required="">
-    <span class="required">*</span>
+    <span class="required"><i class="glyphicon glyphicon-certificate"> </i></span>
   </div>
 </div>
 
