@@ -180,8 +180,8 @@
                             </table>
 
                             <?php
-                            echo form_button('deleteFromOrganization', 'Удалить', 'class="btn btn-danger btn-mini pull-right" onclick="deleteOrganization(' . $row->id . '); return false;"');
-                            echo anchor("addressbook/editOrganizationDetails/" . $row->id, 'Редактировать', 'class="btn btn-success btn-mini pull-right"');
+                            echo form_button('deleteFromOrganization', '<i class="icon-trash"> </i>Удалить', 'class="btn btn-danger btn-small pull-right" onclick="deleteOrganization(' . $row->id . '); return false;"');
+                            echo anchor("addressbook/editOrganizationDetails/" . $row->id, '<i class="icon-pencil"> </i>Редактировать', 'class="btn btn-success btn-small pull-right"');
                         endforeach;
                         ?>
 
@@ -190,7 +190,7 @@
                         echo form_hidden('organization_id', $row->id);
                         echo form_hidden('organization_name', $row->organization_name);
 
-                        echo form_button('newContactRefererForm', 'Новый контакт', 'class="btn btn-info btn-mini pull-left" onclick=newContactRefererModalForm(); return false;');
+                        echo form_button('newContactRefererForm', '<i class="icon-plus"> </i>Новый контакт', 'class="btn btn-info btn-small pull-left" onclick=newContactRefererModalForm(); return false;');
                         ?>
                         <table class="table table-striped table-bordered table-condensed" summary="" id="contactList">
                             <thead>
@@ -235,7 +235,7 @@
                                     . '<td>' . $rows->address
                                     . '</td>',
                                     '<td>'
-                                    . form_button('deleteFromOrganization', 'Удалить', 'class="btn btn-danger btn-mini pull-right" onclick="deleteFromOrganization(' . $rows->id . '); return false;"')
+                                    . form_button('deleteFromOrganization', '<i class="icon-trash"> </i>Удалить', 'class="btn btn-danger btn-mini pull-right" onclick="deleteFromOrganization(' . $rows->id . '); return false;"')
                                     . '</td>'
                                     . '</tr>';
                                 endforeach;

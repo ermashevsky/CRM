@@ -120,7 +120,7 @@
                                             $data = $organizationDetails->getOrganizationDetails($row->organization_id);
                                             foreach($data as $organizationRow):
                                                 echo anchor("addressbook/viewOrganizationDetails/".$row->organization_id, $organizationRow->organization_name);
-                                                echo form_button('deleteFromOrganization','Удалить из организации','class="btn btn-danger btn-mini pull-right" onclick="deleteFromOrganization('.$row->id.'); return false;"');
+                                                echo form_button('deleteFromOrganization','<i class="icon-trash"> </i>Удалить из организации','class="btn btn-danger btn-mini pull-right" onclick="deleteFromOrganization('.$row->id.'); return false;"');
                                             endforeach;
                                             ?>
                                         </td>
@@ -145,8 +145,8 @@
                         </table>
                         <br/>
                         <?php
-                        echo anchor("addressbook/deleteContactDetails/".$row->id, 'Удалить','class="btn btn-danger btn-mini pull-right"');
-                        echo anchor("addressbook/editContactDetails/".$row->id,'Редактировать','class="btn btn-success btn-mini pull-right"');
+                        echo anchor("addressbook/deleteContactDetails/".$row->id, '<i class="icon-trash"> </i> Удалить','class="btn btn-danger btn-small pull-right"');
+                        echo anchor("addressbook/editContactDetails/".$row->id,'<i class="icon-pencil"> </i>Редактировать','class="btn btn-success btn-small pull-right"');
                         ?>
                     </div><!--/span-->
                 </div><!--/row-->

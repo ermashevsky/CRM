@@ -45,7 +45,7 @@
                                             <?php endforeach ?>
                                         </td>
                                         <td><?php echo ($user->active) ? anchor("auth/deactivate/" . $user->id, 'Активен', array('class' => 'btn btn-info btn-mini')) : anchor("auth/activate/" . $user->id, 'Заблокирован', array('class' => 'btn btn-danger btn-mini')); ?></td>
-                                        <td><?php echo anchor("auth/edit_user/" . $user->id, '<i class="icon-pencil"></i>', array('class' => 'btn btn-success btn-mini'));?> | <?php echo anchor("auth/delete_user/" . $user->id, '<i class="icon-trash"></i>', array('class' => 'btn btn-danger btn-mini'));?></td>
+                                        <td><?php echo anchor("auth/edit_user/" . $user->id, '<i class="icon-pencil"></i>', array('class' => 'btn btn-success btn-mini'));?>   <?php echo anchor("auth/delete_user/" . $user->id, '<i class="icon-trash"></i>', array('class' => 'btn btn-danger btn-mini'));?></td>
                                     </tr>
                                 <?php
                                 }

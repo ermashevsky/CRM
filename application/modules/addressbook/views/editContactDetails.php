@@ -227,14 +227,14 @@
                                         $submit_btn = array(
                                             'name' => 'submit',
                                             'id' => 'submit',
-                                            'class' => 'btn btn-success',
+                                            'class' => 'btn btn-success btn-small',
                                             'value' => 'Сохранить',
                                             'type' => 'submit'
                                         );
                                         $reset_btn = array(
                                             'name' => 'reset',
                                             'id' => 'reset',
-                                            'class' => 'btn btn-danger',
+                                            'class' => 'btn btn-danger btn-small',
                                             'value' => 'Отменить',
                                             'type' => 'reset'
                                         );
