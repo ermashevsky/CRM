@@ -4,8 +4,8 @@
             <div class="span10">
                 <h3 style="color:#08c;">Задачи</h3>
                 <?php
-                echo anchor("tasks/addTask/", "Создать задачу", "class='btn btn-mini btn-info pull-left'");
-                echo "<span>".anchor("tasks/filterTask/", "Фильтр задач", "class='btn btn-mini btn-info pull-left'")."</span>";
+                echo anchor("tasks/addTask/", "<i class='icon-tasks'> </i>Создать задачу", "class='btn btn-small btn-info pull-left'");
+                echo "<span>".anchor("tasks/filterTask/", "<i class='icon-filter'> </i>Фильтр задач", "class='btn btn-small btn-info pull-left'")."</span>";
                 ?>
 <!--
                 <div class="span4">

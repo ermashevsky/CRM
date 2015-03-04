@@ -20,8 +20,8 @@ class Menu extends CI_Controller {
 
     var $target = NULL;
     var $output = NULL;
-    var $full_tag_open = '<ul class="nav nav-pills">';
-    var $full_tag_close = '</ul>';
+    var $full_tag_open = '<div class="navbar navbar-fixed-top"><div class="navbar-inner"><div class="container"><a class="brand" href="#"><i class="icon-cog"></i> Office WebCRM 0.1</a><ul class="nav">';
+    var $full_tag_close = '</ul></div></div></div>';
     var $item_tag_open = '<li>';
     var $item_tag_close = '</li>';
     var $cur_page = '';
@@ -64,7 +64,7 @@ class Menu extends CI_Controller {
                         'class' => ''),
                     array('name' => 'Выход',
                         'slug' => 'auth/logout',
-                        'class' => 'nav pull-right')
+                        'class' => 'pull-right')
                 ),
                 'footer' => array(
                     array('name' => 'About Us',
@@ -92,7 +92,7 @@ class Menu extends CI_Controller {
                         'class' => ''),
                     array('name' => 'Выход',
                         'slug' => 'auth/logout',
-                        'class' => 'nav pull-right')
+                        'class' => 'pull-right')
                 ),
                 'footer' => array(
                     array('name' => 'About Us',

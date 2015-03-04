@@ -70,7 +70,7 @@ class Core extends MX_Controller {
             $data = $this->core_model->getCallEvent($data['user']->phone, $data['user']->external_phone);
         }
         //return $data;
-        echo '<li class="nav-header" style="color:#3a87ad;">История звонков</li>'
+        echo '<div class="nav-header" style="color:#3a87ad;">История звонков</div>'
         . '<div style = "width: 200px; height: 370px; overflow: auto;" id = "scrollCall">';
 
         foreach ($data as $item) {

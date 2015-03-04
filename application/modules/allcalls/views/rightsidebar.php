@@ -36,14 +36,15 @@
             </tbody></table>
     </div>
 
-    <div class="sidebar-nav">
+<!--    <div class="sidebar-nav">
         <div class="messages" id="messages"></div>
-    </div><!--/.well -->
+    </div>/.well -->
 
     <div class="sidebar-nav">
-        <ul class="nav nav-list" >
+        <div class="nav nav-list" >
             <?php
             $this->load->module('core');
             $this->core->viewCallEvent($user->phone, $user->external_phone);
             ?>
-        </ul>
+        </div>
+        

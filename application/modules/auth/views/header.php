@@ -34,8 +34,12 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
+        <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
         <style>
-
+            body,html{
+                font-family: 'Ubuntu', sans-serif;
+                padding-top: 30px;
+            }
             div.dataTables_length label {
                 float: left;
                 text-align: left;

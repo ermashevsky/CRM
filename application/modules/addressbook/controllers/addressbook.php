@@ -223,17 +223,17 @@ class AddressBook extends MX_Controller {
 
     function createGroupButton() {
         $groupButton = array(
-            array('name' => 'Организация',
+            array('name' => '<i class="icon-home"> </i>Организация',
                 'slug' => 'addOrganization',
                 'class' => 'addressbook'),
-            array('name' => 'Контакт',
+            array('name' => '<i class="icon-user"> </i>Контакт',
                 'slug' => 'addContact',
                 'class' => 'addressbook'));
 
         echo '<div class="btn-toolbar pull-left">
                     <div class="btn-group">
                         <button class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown">
-                            Добавить
+                            <i class="icon-plus"> </i>Добавить
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">';

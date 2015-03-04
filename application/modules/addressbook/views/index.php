@@ -10,8 +10,8 @@
                 <div class="span4">
                     <div class="btn-toolbar pull-left">
                     <ul class="nav nav-pills">
-                        <?php echo anchor("addressbook/", "Организации", array('class' => 'btn btn-small')); ?>
-                        <?php echo anchor("addressbook/allContacts", "Контакты", array('class' => 'btn btn-small')); ?>
+                        <?php echo anchor("addressbook/", "<i class='icon-home'> </i>Организации", array('class' => 'btn btn-small')); ?>
+                        <?php echo anchor("addressbook/allContacts", "<i class='icon-user'> </i>Контакты", array('class' => 'btn btn-small')); ?>
                     </ul>
                 </div>
                 </div>
