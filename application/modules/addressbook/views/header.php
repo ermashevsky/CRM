@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
-        <title></title>
+        <title>Office WebCRM </title>
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="/assets/js/bootstrap.min.js"></script>
         <script src="/assets/js/bootstrap-button.js"></script>
@@ -36,7 +36,7 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
         <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-        <script src=<?php echo $this->config->item('listner_socket_address');?>></script>
+        <script src="<?php echo $this->config->item('listner_socket_address');?>"></script>
         <script type="text/javascript">
 
             function getContactDetail(phone_number) {
@@ -173,6 +173,16 @@
 
 // /project_dir/index.html
             $(document).ready(function() {
+            var url = window.location.href; 
+
+    // passes on every "a" tag 
+    $(".navbar  a").each(function() {
+            // checks if its the same on the address bar
+        if(url === (this.href)) { 
+            $(this).closest("li").addClass("active");
+        }
+    });
+    
             $.extend(true, $.fn.dataTable.defaults, {
                 "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
                 "sPaginationType": "bootstrap",

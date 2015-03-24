@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <asteriskHost>91.196.5.133</asteriskHost>
+  <asteriskPort>5038</asteriskPort>
+  <asteriskUsername>admin2</asteriskUsername>
+  <asteriskPassword>admin2</asteriskPassword>
+  <dbHost>localhost</dbHost>
+  <dbUsername>root</dbUsername>
+  <dbPassword>11235813</dbPassword>
+  <dbName>DialogWebCRM</dbName>
+  <httpPort>8580</httpPort>
+</root>

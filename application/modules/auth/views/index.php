@@ -52,7 +52,7 @@
                                 endforeach; ?>
                             </tbody>
                         </table>
-                        <p><a class="btn btn-info btn-small" href="#" data-toggle="modal" data-target=".bs-example-modal-sm">Добавить пользователя</a></p>
+                        <p><a class="btn btn-info btn-small" href="#" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="icon-plus"> </i> Добавить пользователя</a></p>
                     
                 </div><!--/row-->
             </div><!--/span-->

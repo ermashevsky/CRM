@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
-        <title></title>
+        <title>Office WebCRM </title>
         <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="/assets/js/bootstrap.min.js"></script>
         <script src="/assets/js/bootstrap-button.js"></script>
@@ -32,7 +32,7 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-        <script src=<?php echo $this->config->item('listner_socket_address');?>></script>
+        <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
         <script type="text/javascript">
 
             // javascript code
@@ -58,18 +58,18 @@
 
                 $('#modalContactItem').modal('show');
 
-                $("button#setOrganizationItem").click(function() {
+                $("button#setOrganizationItem").click(function () {
 
                     $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': dst},
-                    function(data) {
+                    function (data) {
 
                         if (data !== "") {
                             $('#modalContactItem').modal('hide');
-                            
-                            var message = "Контакт с номером "+dst+" существует.";
+
+                            var message = "Контакт с номером " + dst + " существует.";
                             var type = "success";
                             notify(message, type);
-                            
+
                         } else {
                             $("input#phone_number").val(dst);
 
@@ -81,17 +81,17 @@
                     });
                 });
 
-                $("button#setContactItem").click(function() {
+                $("button#setContactItem").click(function () {
 
                     $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': dst},
-                    function(data) {
+                    function (data) {
                         if (data !== "") {
                             $('#modalContactItem').modal('hide');
-                            
+
                             var message = "Контакт существует.";
                             var type = "success";
                             notify(message, type);
-                            
+
                         } else {
                             $("input#private_phone_number").val(dst);
 
@@ -105,164 +105,174 @@
 
             function getCRMUsers() {
                 $.post('<?php echo site_url('/tasks/getCRMUsers'); ?>',
-                        function(data) {
-                            $.each(data, function(i, val) {
+                        function (data) {
+                            $.each(data, function (i, val) {
                                 $("#selectAssigned").append('<option value="' + data[i].id + '">' + data[i].first_name + ' ' + data[i].last_name + '</option>');
                             });
                         }, 'json');
             }
             ;
             // /project_dir/index.html
-            $(document).ready(function() {
+            $(document).ready(function () {
+                var url = window.location.href;
+
+                // passes on every "a" tag 
+                $(".navbar  a").each(function () {
+                    // checks if its the same on the address bar
+                    if (url === (this.href)) {
+                        $(this).closest("li").addClass("active");
+                    }
+                });
+
                 $.extend(true, $.fn.dataTable.defaults, {
-                "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-                "sPaginationType": "bootstrap",
-                "oLanguage": {
-                    "sUrl": "http://www.sprymedia.co.uk/dataTables/lang.txt"
-                }
-            });
+                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                    "sPaginationType": "bootstrap",
+                    "oLanguage": {
+                        "sUrl": "http://www.sprymedia.co.uk/dataTables/lang.txt"
+                    }
+                });
 
 
-            /* Default class modification */
-            $.extend($.fn.dataTableExt.oStdClasses, {
-                "sWrapper": "dataTables_wrapper form-inline"
-            });
+                /* Default class modification */
+                $.extend($.fn.dataTableExt.oStdClasses, {
+                    "sWrapper": "dataTables_wrapper form-inline"
+                });
 
 
-            /* API method to get paging information */
-            $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings)
-            {
-                return {
-                    "iStart": oSettings._iDisplayStart,
-                    "iEnd": oSettings.fnDisplayEnd(),
-                    "iLength": oSettings._iDisplayLength,
-                    "iTotal": oSettings.fnRecordsTotal(),
-                    "iFilteredTotal": oSettings.fnRecordsDisplay(),
-                    "iPage": oSettings._iDisplayLength === -1 ?
-                            0 : Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-                    "iTotalPages": oSettings._iDisplayLength === -1 ?
-                            0 : Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+                /* API method to get paging information */
+                $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+                {
+                    return {
+                        "iStart": oSettings._iDisplayStart,
+                        "iEnd": oSettings.fnDisplayEnd(),
+                        "iLength": oSettings._iDisplayLength,
+                        "iTotal": oSettings.fnRecordsTotal(),
+                        "iFilteredTotal": oSettings.fnRecordsDisplay(),
+                        "iPage": oSettings._iDisplayLength === -1 ?
+                                0 : Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+                        "iTotalPages": oSettings._iDisplayLength === -1 ?
+                                0 : Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+                    };
                 };
-            };
 
 
-            /* Bootstrap style pagination control */
-            $.extend($.fn.dataTableExt.oPagination, {
-                "bootstrap": {
-                    "fnInit": function(oSettings, nPaging, fnDraw) {
-                        var oLang = oSettings.oLanguage.oPaginate;
-                        var fnClickHandler = function(e) {
-                            e.preventDefault();
-                            if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
-                                fnDraw(oSettings);
+                /* Bootstrap style pagination control */
+                $.extend($.fn.dataTableExt.oPagination, {
+                    "bootstrap": {
+                        "fnInit": function (oSettings, nPaging, fnDraw) {
+                            var oLang = oSettings.oLanguage.oPaginate;
+                            var fnClickHandler = function (e) {
+                                e.preventDefault();
+                                if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
+                                    fnDraw(oSettings);
+                                }
+                            };
+
+                            $(nPaging).addClass('pagination').append(
+                                    '<ul>' +
+                                    '<li class="prev disabled"><a href="#">&larr; ' + oLang.sPrevious + '</a></li>' +
+                                    '<li class="next disabled"><a href="#">' + oLang.sNext + ' &rarr; </a></li>' +
+                                    '</ul>'
+                                    );
+                            var els = $('a', nPaging);
+                            $(els[0]).bind('click.DT', {action: "previous"}, fnClickHandler);
+                            $(els[1]).bind('click.DT', {action: "next"}, fnClickHandler);
+                        },
+                        "fnUpdate": function (oSettings, fnDraw) {
+                            var iListLength = 5;
+                            var oPaging = oSettings.oInstance.fnPagingInfo();
+                            var an = oSettings.aanFeatures.p;
+                            var i, ien, j, sClass, iStart, iEnd, iHalf = Math.floor(iListLength / 2);
+
+                            if (oPaging.iTotalPages < iListLength) {
+                                iStart = 1;
+                                iEnd = oPaging.iTotalPages;
                             }
-                        };
-
-                        $(nPaging).addClass('pagination').append(
-                                '<ul>' +
-                                '<li class="prev disabled"><a href="#">&larr; ' + oLang.sPrevious + '</a></li>' +
-                                '<li class="next disabled"><a href="#">' + oLang.sNext + ' &rarr; </a></li>' +
-                                '</ul>'
-                                );
-                        var els = $('a', nPaging);
-                        $(els[0]).bind('click.DT', {action: "previous"}, fnClickHandler);
-                        $(els[1]).bind('click.DT', {action: "next"}, fnClickHandler);
-                    },
-                    "fnUpdate": function(oSettings, fnDraw) {
-                        var iListLength = 5;
-                        var oPaging = oSettings.oInstance.fnPagingInfo();
-                        var an = oSettings.aanFeatures.p;
-                        var i, ien, j, sClass, iStart, iEnd, iHalf = Math.floor(iListLength / 2);
-
-                        if (oPaging.iTotalPages < iListLength) {
-                            iStart = 1;
-                            iEnd = oPaging.iTotalPages;
-                        }
-                        else if (oPaging.iPage <= iHalf) {
-                            iStart = 1;
-                            iEnd = iListLength;
-                        } else if (oPaging.iPage >= (oPaging.iTotalPages - iHalf)) {
-                            iStart = oPaging.iTotalPages - iListLength + 1;
-                            iEnd = oPaging.iTotalPages;
-                        } else {
-                            iStart = oPaging.iPage - iHalf + 1;
-                            iEnd = iStart + iListLength - 1;
-                        }
-
-                        for (i = 0, ien = an.length; i < ien; i++) {
-                            // Remove the middle elements
-                            $('li:gt(0)', an[i]).filter(':not(:last)').remove();
-
-                            // Add the new list items and their event handlers
-                            for (j = iStart; j <= iEnd; j++) {
-                                sClass = (j == oPaging.iPage + 1) ? 'class="active"' : '';
-                                $('<li ' + sClass + '><a href="#">' + j + '</a></li>')
-                                        .insertBefore($('li:last', an[i])[0])
-                                        .bind('click', function(e) {
-                                            e.preventDefault();
-                                            oSettings._iDisplayStart = (parseInt($('a', this).text(), 10) - 1) * oPaging.iLength;
-                                            fnDraw(oSettings);
-                                        });
-                            }
-
-                            // Add / remove disabled classes from the static elements
-                            if (oPaging.iPage === 0) {
-                                $('li:first', an[i]).addClass('disabled');
+                            else if (oPaging.iPage <= iHalf) {
+                                iStart = 1;
+                                iEnd = iListLength;
+                            } else if (oPaging.iPage >= (oPaging.iTotalPages - iHalf)) {
+                                iStart = oPaging.iTotalPages - iListLength + 1;
+                                iEnd = oPaging.iTotalPages;
                             } else {
-                                $('li:first', an[i]).removeClass('disabled');
+                                iStart = oPaging.iPage - iHalf + 1;
+                                iEnd = iStart + iListLength - 1;
                             }
 
-                            if (oPaging.iPage === oPaging.iTotalPages - 1 || oPaging.iTotalPages === 0) {
-                                $('li:last', an[i]).addClass('disabled');
-                            } else {
-                                $('li:last', an[i]).removeClass('disabled');
+                            for (i = 0, ien = an.length; i < ien; i++) {
+                                // Remove the middle elements
+                                $('li:gt(0)', an[i]).filter(':not(:last)').remove();
+
+                                // Add the new list items and their event handlers
+                                for (j = iStart; j <= iEnd; j++) {
+                                    sClass = (j == oPaging.iPage + 1) ? 'class="active"' : '';
+                                    $('<li ' + sClass + '><a href="#">' + j + '</a></li>')
+                                            .insertBefore($('li:last', an[i])[0])
+                                            .bind('click', function (e) {
+                                                e.preventDefault();
+                                                oSettings._iDisplayStart = (parseInt($('a', this).text(), 10) - 1) * oPaging.iLength;
+                                                fnDraw(oSettings);
+                                            });
+                                }
+
+                                // Add / remove disabled classes from the static elements
+                                if (oPaging.iPage === 0) {
+                                    $('li:first', an[i]).addClass('disabled');
+                                } else {
+                                    $('li:first', an[i]).removeClass('disabled');
+                                }
+
+                                if (oPaging.iPage === oPaging.iTotalPages - 1 || oPaging.iTotalPages === 0) {
+                                    $('li:last', an[i]).addClass('disabled');
+                                } else {
+                                    $('li:last', an[i]).removeClass('disabled');
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
 
 
-            /*
-             * TableTools Bootstrap compatibility
-             * Required TableTools 2.1+
-             */
-            if ($.fn.DataTable.TableTools) {
-                // Set the classes that TableTools uses to something suitable for Bootstrap
-                $.extend(true, $.fn.DataTable.TableTools.classes, {
-                    "container": "DTTT btn-group",
-                    "buttons": {
-                        "normal": "btn",
-                        "disabled": "disabled"
-                    },
-                    "collection": {
-                        "container": "DTTT_dropdown dropdown-menu",
+                /*
+                 * TableTools Bootstrap compatibility
+                 * Required TableTools 2.1+
+                 */
+                if ($.fn.DataTable.TableTools) {
+                    // Set the classes that TableTools uses to something suitable for Bootstrap
+                    $.extend(true, $.fn.DataTable.TableTools.classes, {
+                        "container": "DTTT btn-group",
                         "buttons": {
-                            "normal": "",
+                            "normal": "btn",
                             "disabled": "disabled"
+                        },
+                        "collection": {
+                            "container": "DTTT_dropdown dropdown-menu",
+                            "buttons": {
+                                "normal": "",
+                                "disabled": "disabled"
+                            }
+                        },
+                        "print": {
+                            "info": "DTTT_print_info modal"
+                        },
+                        "select": {
+                            "row": "active"
                         }
-                    },
-                    "print": {
-                        "info": "DTTT_print_info modal"
-                    },
-                    "select": {
-                        "row": "active"
-                    }
-                });
+                    });
 
-                // Have the collection use a bootstrap compatible dropdown
-                $.extend(true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-                    "collection": {
-                        "container": "ul",
-                        "button": "li",
-                        "liner": "a"
-                    }
-                });
-            } 
-                $("button#button1id_saveOrganization").click(function() {
+                    // Have the collection use a bootstrap compatible dropdown
+                    $.extend(true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
+                        "collection": {
+                            "container": "ul",
+                            "button": "li",
+                            "liner": "a"
+                        }
+                    });
+                }
+                $("button#button1id_saveOrganization").click(function () {
 
                     $.post('<?php echo site_url('addressbook/addOrganizationData'); ?>', $('form#organizationData').serialize(),
-                            function(data) {
+                            function (data) {
                                 $('#modalOrganizationContactItem').modal("hide");
                                 var type = "success";
                                 var message = "Новая организация добавлена";
@@ -272,10 +282,10 @@
 
                 });
 
-                $("button#button1id_saveContact").click(function() {
+                $("button#button1id_saveContact").click(function () {
 
                     $.post('<?php echo site_url('/addressbook/insertNewContactRow'); ?>', $('form#contactData').serialize(),
-                            function(data) {
+                            function (data) {
                                 $('#modalContactItemForm').modal("hide");
                                 var type = "success";
                                 var message = "Новый контакт добавлен";
@@ -286,10 +296,10 @@
                 });
 
                 getCRMUsers();
-                $("button#button1id").click(function() {
+                $("button#button1id").click(function () {
 
                     $.post('<?php echo site_url('/tasks/addTask'); ?>', $('form#formTask').serialize(),
-                            function(data) {
+                            function (data) {
                                 $('#taskWindow').modal("hide");
                                 var type = "success";
                                 var message = "Задача создана";
@@ -299,7 +309,7 @@
 
                 });
 
-                $('#checkboxes-reminder').change(function() {
+                $('#checkboxes-reminder').change(function () {
                     if (this.checked)
                         $('#reminder_block').fadeIn('fast');
 
@@ -320,7 +330,7 @@
 
                 function getContactDetail(phone_number) {
                     $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
-                    function(data) {
+                    function (data) {
                         if (data !== "") {
 
                             $("div#ui_notifIt").append("Звонит " + data);
@@ -336,87 +346,87 @@
                 $("#src").val('');
                 $("#dst").val('');
                 $("input#phone_number").val($('#hidden_phone_number').val());
-                if($('#hidden_usergroup').val()  === 'admin'){
-                   $('#type_call').on('change', function() {
-                    if (this.value === 'allcall') {
-                        $("#dst_block").css('display', 'none');
-                        $("#src_block").css('display', 'none');
+                if ($('#hidden_usergroup').val() === 'admin') {
+                    $('#type_call').on('change', function () {
+                        if (this.value === 'allcall') {
+                            $("#dst_block").css('display', 'none');
+                            $("#src_block").css('display', 'none');
 
-                        $("#dst_block").css('display', 'none');
-                        $("#src_block").css('display', 'none');
-                        $("#number_block").css('display', 'block');
-                        $("#number_block2").css('display', 'block');
-                        $("input#phone_number").val($('#hidden_phone_number').val());
-                        $("#src").val('');
-                        $("#dst").val('');
-                    }
-                    if (this.value === 'outcall') {
-                        $("#src").val($('#hidden_phone_number').val());
-                        $("#src").attr('readonly', false);
-                        $("#dst").val('');
-                        $("#dst").attr('readonly', false);
-                        $("#dst_block").css('display', 'block');
-                        $("#src_block").css('display', 'block');
-                        $("#number_block").css('display', 'none');
-                        $("#number_block2").css('display', 'none');
-                        $("input#phone_number").val('');
-                        $("input#phone_number2").val('');
-                    }
-                    if (this.value === 'incall') {
-                        $("#dst").val($('#hidden_phone_number').val());
-                        $("#dst").attr('readonly', false);
-                        $("#src").val('');
-                        $("#src").attr('readonly', false);
-                        $("#dst_block").css('display', 'block');
-                        $("#src_block").css('display', 'block');
-                        $("#number_block").css('display', 'none');
-                        $("#number_block2").css('display', 'none');
-                        $("input#phone_number").val('');
-                        $("input#phone_number2").val('');
-                    }
-                });  
-                }else{
+                            $("#dst_block").css('display', 'none');
+                            $("#src_block").css('display', 'none');
+                            $("#number_block").css('display', 'block');
+                            $("#number_block2").css('display', 'block');
+                            $("input#phone_number").val($('#hidden_phone_number').val());
+                            $("#src").val('');
+                            $("#dst").val('');
+                        }
+                        if (this.value === 'outcall') {
+                            $("#src").val($('#hidden_phone_number').val());
+                            $("#src").attr('readonly', false);
+                            $("#dst").val('');
+                            $("#dst").attr('readonly', false);
+                            $("#dst_block").css('display', 'block');
+                            $("#src_block").css('display', 'block');
+                            $("#number_block").css('display', 'none');
+                            $("#number_block2").css('display', 'none');
+                            $("input#phone_number").val('');
+                            $("input#phone_number2").val('');
+                        }
+                        if (this.value === 'incall') {
+                            $("#dst").val($('#hidden_phone_number').val());
+                            $("#dst").attr('readonly', false);
+                            $("#src").val('');
+                            $("#src").attr('readonly', false);
+                            $("#dst_block").css('display', 'block');
+                            $("#src_block").css('display', 'block');
+                            $("#number_block").css('display', 'none');
+                            $("#number_block2").css('display', 'none');
+                            $("input#phone_number").val('');
+                            $("input#phone_number2").val('');
+                        }
+                    });
+                } else {
                     $("input#phone_number").attr('readonly', true);
-                   $('#type_call').on('change', function() {
-                    if (this.value === 'allcall') {
-                        $("#dst_block").css('display', 'none');
-                        $("#src_block").css('display', 'none');
-                        $("input#phone_number").attr('readonly', true);
-                        $("input#phone_number").val($('#hidden_phone_number').val());
-                        $("#dst_block").css('display', 'none');
-                        $("#src_block").css('display', 'none');
-                        $("#number_block").css('display', 'block');
-                        $("#number_block2").css('display', 'block');
-                        $("#src").val('');
-                        $("#dst").val('');
-                    }
-                    if (this.value === 'outcall') {
-                        $("#src").val($('#hidden_phone_number').val());
-                        $("#src").attr('readonly', true);
-                        $("#dst").val('');
-                        $("#dst").attr('readonly', false);
-                        $("#dst_block").css('display', 'block');
-                        $("#src_block").css('display', 'block');
-                        $("#number_block").css('display', 'none');
-                        $("#number_block2").css('display', 'none');
-                        $("input#phone_number").val('');
-                        $("input#phone_number2").val('');
-                    }
-                    if (this.value === 'incall') {
-                        $("#dst").val($('#hidden_phone_number').val());
-                        $("#dst").attr('readonly', true);
-                        $("#src").val('');
-                        $("#src").attr('readonly', false);
-                        $("#dst_block").css('display', 'block');
-                        $("#src_block").css('display', 'block');
-                        $("#number_block").css('display', 'none');
-                        $("#number_block2").css('display', 'none');
-                        $("input#phone_number").val('');
-                        $("input#phone_number2").val('');
-                    }
-                }); 
+                    $('#type_call').on('change', function () {
+                        if (this.value === 'allcall') {
+                            $("#dst_block").css('display', 'none');
+                            $("#src_block").css('display', 'none');
+                            $("input#phone_number").attr('readonly', true);
+                            $("input#phone_number").val($('#hidden_phone_number').val());
+                            $("#dst_block").css('display', 'none');
+                            $("#src_block").css('display', 'none');
+                            $("#number_block").css('display', 'block');
+                            $("#number_block2").css('display', 'block');
+                            $("#src").val('');
+                            $("#dst").val('');
+                        }
+                        if (this.value === 'outcall') {
+                            $("#src").val($('#hidden_phone_number').val());
+                            $("#src").attr('readonly', true);
+                            $("#dst").val('');
+                            $("#dst").attr('readonly', false);
+                            $("#dst_block").css('display', 'block');
+                            $("#src_block").css('display', 'block');
+                            $("#number_block").css('display', 'none');
+                            $("#number_block2").css('display', 'none');
+                            $("input#phone_number").val('');
+                            $("input#phone_number2").val('');
+                        }
+                        if (this.value === 'incall') {
+                            $("#dst").val($('#hidden_phone_number').val());
+                            $("#dst").attr('readonly', true);
+                            $("#src").val('');
+                            $("#src").attr('readonly', false);
+                            $("#dst_block").css('display', 'block');
+                            $("#src_block").css('display', 'block');
+                            $("#number_block").css('display', 'none');
+                            $("#number_block2").css('display', 'none');
+                            $("input#phone_number").val('');
+                            $("input#phone_number2").val('');
+                        }
+                    });
                 }
-                
+
 
                 $("#date_time").datetimepicker({
                     format: 'd.m.Y H:i:s',
@@ -438,35 +448,35 @@
                 });
                 function getListAction() {
                     // Print hello on the console.
-                    $.post('<?php echo site_url('/allcalls/actionList'); ?>', function(data) {
+                    $.post('<?php echo site_url('/allcalls/actionList'); ?>', function (data) {
                         console.info(data);
-                    },'json');
+                    }, 'json');
                 }
 
-                $("button#submit").click(function() {
+                $("button#submit").click(function () {
                     //Тута
                     $.post('<?php echo site_url('/allcalls/getFilteredCalls'); ?>', $('#form_filter_call').serialize(),
-                            function(data) {
+                            function (data) {
                                 $('#table_all_calls').empty();
                                 $('#table_all_calls').append('<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="allcalls"><thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>');
                                 console.log(data); //  2pm
-                                $.each(data, function() {
+                                $.each(data, function () {
                                     // this = object in array
                                     // access attributes: this.Id, this.Name, etc
-                                    if($('#hidden_usergroup').val()  === 'admin'){
+                                    if ($('#hidden_usergroup').val() === 'admin') {
                                         $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
                                     }
-                                    
-                                    if($('#hidden_usergroup').val()  !== 'admin'){
 
-                                    if (this.src === $('#hidden_phone_number').val() || this.src === $('#hidden_external_phone_number').val()) {
-                                        
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
-                                    }
-                                    if (this.dst === $('#hidden_phone_number').val() || this.dst === $('#hidden_external_phone_number').val()) {
-                                        
-                                        $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
-                                    }
+                                    if ($('#hidden_usergroup').val() !== 'admin') {
+
+                                        if (this.src === $('#hidden_phone_number').val() || this.src === $('#hidden_external_phone_number').val()) {
+
+                                            $('#allcalls').append('<tr><td>' + this.end + '</td><td>Исходящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
+                                        }
+                                        if (this.dst === $('#hidden_phone_number').val() || this.dst === $('#hidden_external_phone_number').val()) {
+
+                                            $('#allcalls').append('<tr><td>' + this.end + '</td><td>Входящий</td><td>' + this.src + '</td><td>' + this.dst + '</td><td>' + this.billsec + '</td><td>' + this.disposition + '</td><td>' + this.btn_group + '</td></tr>');
+                                        }
                                     }
 //                                    if($('#hidden_usergroup').val()  === 'admin'){
 //                                        
@@ -497,8 +507,8 @@
                 $.extend($.fn.dataTableExt.oStdClasses, {
                     "sWrapper": "dataTables_wrapper form-inline"
                 });
-
-                var socket = io.connect('<?php echo $this->config->item('listner_address');?>');
+                
+                var socket = io.connect('<?php echo $this->config->item('listner_address'); ?>');
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -520,19 +530,19 @@
                             .scrollTop(messages[0].scrollHeight);
                 }
 
-                socket.on('connecting', function() {
+                socket.on('connecting', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение ...");
                     $('#server_status').removeClass("label label-important").addClass("label label-success");
                 });
 
-                socket.on('connect', function() {
+                socket.on('connect', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение установлено");
                     $('#server_status').removeClass("label label-important").addClass("label label-success");
                 });
 
-                socket.on('disconnect', function() {
+                socket.on('disconnect', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение разорвано");
                     $('#server_status').removeClass("label label-success").addClass("label label-important");
@@ -540,13 +550,13 @@
 
                 $('#scrollCall').scrollpanel();
 
-                socket.on('event', function(data) {
+                socket.on('event', function (data) {
 
                     console.info(data);
                     $('.msg system').empty();
 
                     var phone_number = $('#hidden_phone_number').val();
-                    
+
 
                     if (data.event === "Dial" && data.subevent === "Begin") {
 
@@ -636,9 +646,9 @@
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -655,9 +665,9 @@
                             var text = "Ответил другой абонент";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -672,9 +682,9 @@
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -689,9 +699,9 @@
                             var text = "Нет адресата.";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -707,18 +717,18 @@
                             var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
 
                         if (getNumber === phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "34") {
@@ -733,9 +743,9 @@
                             var text = "Ошибка вызова";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "1") {
@@ -750,9 +760,9 @@
                             var text = "Несуществующий номер";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "21") {
@@ -767,13 +777,13 @@
                             var text = "Вызов отклонен";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
-                    
-           /**
+
+                    /**
                      * 
                      * 
                      * 
@@ -782,9 +792,9 @@
                      * 
                      * */       var trunk_name = "mera_dynamic_ANI/74#";
                     var external_phone_number = trunk_name + $('#hidden_external_phone_number').val();
-                    
+
                     if (data.event === "Dial" && data.subevent === "Begin") {
-                        
+
                         var calleridnum = data.calleridnum;
                         var dialstring = data.dialstring;
                         var string = data.channel; // юрл в котором происходит поиск
@@ -818,9 +828,9 @@
                             $.totalStorage('call', 'In');
 
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
 
                         if (dialstring === external_phone_number && result_xfer) {
@@ -866,9 +876,9 @@
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -885,9 +895,9 @@
                             var text = "Ответил другой абонент";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -902,9 +912,9 @@
                             var text = "Номер занят.";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -919,9 +929,9 @@
                             var text = "Нет адресата.";
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -937,18 +947,18 @@
                             var text = "Пропущенный вызов с номера: " + $.totalStorage('calleridnum');
                             var type = "error";
                             msg_system(text, type);
-                            setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
 
                         if (getNumber === external_phone_number && $.totalStorage('call') === 'Out') {
                             var text = "Не берут трубку";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "34") {
@@ -963,9 +973,9 @@
                             var text = "Ошибка вызова";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "1") {
@@ -980,9 +990,9 @@
                             var text = "Несуществующий номер";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
                     if (data.event === "Hangup" && data.cause === "21") {
@@ -997,9 +1007,9 @@
                             var text = "Вызов отклонен";
                             var type = "error";
                             msg_system(text, type);
-                             setTimeout(function(){
-                               window.location.reload();
-                             }, 5000);
+                            setTimeout(function () {
+                                window.location.reload();
+                            }, 5000);
                         }
                     }
 
@@ -1016,7 +1026,7 @@
                         url: '<?php echo site_url('/core/insertCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });
@@ -1027,7 +1037,7 @@
                         url: '<?php echo site_url('/core/updateLinkCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });
@@ -1038,7 +1048,7 @@
                         url: '<?php echo site_url('/core/updateEndCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });

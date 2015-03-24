@@ -14,9 +14,13 @@
 | path to your installation.
 |
 */
-$config['base_url'] = 'http://dialog.crm64.ru';
-$config['listner_socket_address'] = 'http://dialog.crm64.ru:8580/socket.io/socket.io.js';
-$config['listner_address'] = 'http://dialog.crm64.ru:8580';
+
+$confCRM = simplexml_load_file('/home/denic/server/'.$_SERVER['SERVER_NAME'].'/application/config/'.$_SERVER['SERVER_NAME'].'/configCRM.xml');
+//$confCRM->xml_baseUrl;
+
+$config['base_url'] = $confCRM->xml_baseUrl;
+$config['listner_socket_address'] = $confCRM->xml_listnerSocketAddress;
+$config['listner_address'] = $confCRM->xml_listnerAddress;
 /*
 |--------------------------------------------------------------------------
 | Index File

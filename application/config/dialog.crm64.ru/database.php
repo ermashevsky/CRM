@@ -47,11 +47,14 @@
 
 $active_group = 'default';
 $active_record = TRUE;
+$confCRM = simplexml_load_file('/home/denic/server/'.$_SERVER['SERVER_NAME'].'/application/config/'.$_SERVER['SERVER_NAME'].'/configCRM.xml');
+//$confCRM->xml_baseUrl;
 
-$db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'root';
-$db['default']['password'] = '11235813';
-$db['default']['database'] = 'DialogWebCRM';
+
+$db['default']['hostname'] = $confCRM->dbHost;
+$db['default']['username'] = $confCRM->dbUsername;
+$db['default']['password'] = $confCRM->dbPassword;
+$db['default']['database'] = $confCRM->dbName;
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
 $db['default']['pconnect'] = TRUE;

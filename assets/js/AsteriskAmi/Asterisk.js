@@ -1,12 +1,50 @@
 //91.196.5.133 - office
 function start() {
-    var AsteriskAmi = require('./lib/AsteriskAmi'),
-            AMI = new AsteriskAmi({host: '159.253.121.30', port: '5038', username: 'gazteh', password: '14QVl9zC'}),
-    express = require('express');
+
+    if (typeof localStorage === "undefined" || localStorage === null) {
+        var LocalStorage = require('node-localstorage').LocalStorage;
+        localStorage = new LocalStorage('./scratch');
+    }
+
+    var fs = require('fs');
+    xml2js = require('xml2js');
+
+    var parser = new xml2js.Parser();
+
+    fs.readFile('asteriskSettings.xml', function (err, data) {
+        parser.parseString(data, function (err, result) {
+
+            localStorage.setItem('asteriskHost', result['root']['asteriskHost'][0]);
+            localStorage.setItem('asteriskPort', result['root']['asteriskPort'][0]);
+            localStorage.setItem('asteriskUsername', result['root']['asteriskUsername'][0]);
+            localStorage.setItem('asteriskPassword', result['root']['asteriskPassword'][0]);
+            localStorage.setItem('dbHost', result['root']['dbHost'][0]);
+            localStorage.setItem('dbName', result['root']['dbName'][0]);
+            localStorage.setItem('dbUsername', result['root']['dbUsername'][0]);
+            localStorage.setItem('dbPassword', result['root']['dbPassword'][0]);
+            localStorage.setItem('httpPort', result['root']['httpPort'][0]);
+
+        });
+    });
+
+//    fs.readFile('foo.txt', function (err, logData) {
+//
+//        // Если произошла ошибка, то мы генерируем исключение,
+//        // и работа приложения завершается
+//        if (err)
+//            throw err;
+//
+//        // logData имеет тип Buffer, переводим в string
+//        localStorage.setItem('asteriskHost', logData.toString());
+//    });
+
+    var AsteriskAmi = require('./lib/AsteriskAmi');
+    var AMI = new AsteriskAmi({host: localStorage.getItem('asteriskHost'), port: localStorage.getItem('asteriskPort'), username: localStorage.getItem('asteriskUsername'), password: localStorage.getItem('asteriskPassword')});
+    var express = require('express');
     var storage = require('node-persist');
     var mysql = require('mysql');
 
-    
+
 
 //    var db_config = {
 //        host: 'localhost',
@@ -20,21 +58,21 @@ function start() {
     function handleDisconnect() {
         //connection = mysql.createConnection(db_config); // Recreate the connection, since
         connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '11235813',
-        database: 'gaztehWebCRM'
-    });
+            host: localStorage.getItem('dbHost'),
+            user: localStorage.getItem('dbUsername'),
+            password: localStorage.getItem('dbPassword'),
+            database: localStorage.getItem('dbName')
+        });
         // the old one cannot be reused.
 
-        connection.connect(function(err) {              // The server is either down
+        connection.connect(function (err) {              // The server is either down
             if (err) {                                     // or restarting (takes a while sometimes).
                 console.log('error when connecting to db:', err);
                 setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
             }                                     // to avoid a hot loop, and to allow our node script to
         });                                     // process asynchronous requests in the meantime.
         // If you're also serving http, display a 503 error.
-        connection.on('error', function(err) {
+        connection.on('error', function (err) {
             console.log('db error', err);
             if (err.code === 'PROTOCOL_CONNECTION_LOST') { // Connection to the MySQL server is usually
                 handleDisconnect();                         // lost due to either server restart, or a
@@ -46,14 +84,14 @@ function start() {
 
     handleDisconnect();
 
-    AMI.connect(function() {
+    AMI.connect(function () {
     });
     //var event = new (require('events').EventEmitter);
 
     var app = express();
     // Создаем HTTP-сервер с помощью модуля HTTP, входящего в Node.js. 
     // Связываем его с Express и отслеживаем подключения к порту 8580. 
-    var server = require('http').createServer(app).listen(8582);
+    var server = require('http').createServer(app).listen(localStorage.getItem('httpPort'));
     // Инициализируем Socket.IO так, чтобы им обрабатывались подключения 
     // к серверу Express/HTTP
     var io = require('socket.io').listen(server, {log: false});
@@ -63,7 +101,7 @@ function start() {
 //        res.sendfile(__dirname + '/index.html');
 //    });
 
-    AMI.on('ami_data', function(data) {
+    AMI.on('ami_data', function (data) {
         if (data.event) {
             console.info(data); //All Data
 
@@ -140,7 +178,7 @@ function start() {
                 if (checkZombie === '<ZOMBIE>') {
                     console.info("Тута Зомбаки!!!!!!");
 
-                    connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + getChannelWithoutZombie + '"', function(err, rows, fields) {
+                    connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + getChannelWithoutZombie + '"', function (err, rows, fields) {
                         if (err)
                             throw err;
 
@@ -164,7 +202,7 @@ function start() {
                     });
                 }
 
-                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, rows, fields) {
+                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function (err, rows, fields) {
                     if (err)
                         throw err;
 
@@ -191,7 +229,7 @@ function start() {
             if (data.event === 'Hangup' && data.cause === "17") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
-                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, row, fields) {
+                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function (err, row, fields) {
                     if (err)
                         throw err;
 
@@ -216,7 +254,7 @@ function start() {
             if (data.event === 'Hangup' && data.cause === "18") {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
-                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, row, fields) {
+                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function (err, row, fields) {
                     if (err)
                         throw err;
 
@@ -242,7 +280,7 @@ function start() {
                 // Create row, using the insert id of the first query
                 // as the exhibit_id foreign key.
 
-                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function(err, row, fields) {
+                connection.query('SELECT start as start, answer as answer from cdr where dstchannel="' + data.channel + '"', function (err, row, fields) {
                     if (err)
                         throw err;
 
@@ -317,11 +355,11 @@ function start() {
         }
     });
     //подписываемся на событие соединения нового клиента
-    io.sockets.on('connection', function(client) {
+    io.sockets.on('connection', function (client) {
         //подписываемся на событие message от клиента
 
 
-        AMI.on('ami_data', function(data) {
+        AMI.on('ami_data', function (data) {
             if (data.event) {
                 //console.info(data); //All Data
                 //event.emit(data.event.toLowerCase(), data);

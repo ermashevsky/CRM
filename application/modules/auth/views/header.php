@@ -3,8 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
-        <title></title>
-               <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <title>Office WebCRM </title>
+        <script src="http://code.jquery.com/jquery-latest.js"></script>
         <script src="/assets/js/bootstrap.min.js"></script>
         <script src="/assets/js/bootstrap-button.js"></script>
         <script src="/assets/js/bootstrap-fileupload.js"></script>
@@ -117,9 +117,9 @@
                 border-top: none;
             }
             #user_list{
-              font-size: 12px;  
+                font-size: 12px;  
             }
-#user_list_info, #user_list_paginate, #user_list_info, #user_list_paginate{
+            #user_list_info, #user_list_paginate, #user_list_info, #user_list_paginate{
                 margin-top: 10px;
                 font-size: 12px;
             }
@@ -268,7 +268,7 @@
 
 
             /* API method to get paging information */
-            $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings)
+            $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
             {
                 return {
                     "iStart": oSettings._iDisplayStart,
@@ -287,9 +287,9 @@
             /* Bootstrap style pagination control */
             $.extend($.fn.dataTableExt.oPagination, {
                 "bootstrap": {
-                    "fnInit": function(oSettings, nPaging, fnDraw) {
+                    "fnInit": function (oSettings, nPaging, fnDraw) {
                         var oLang = oSettings.oLanguage.oPaginate;
-                        var fnClickHandler = function(e) {
+                        var fnClickHandler = function (e) {
                             e.preventDefault();
                             if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
                                 fnDraw(oSettings);
@@ -306,7 +306,7 @@
                         $(els[0]).bind('click.DT', {action: "previous"}, fnClickHandler);
                         $(els[1]).bind('click.DT', {action: "next"}, fnClickHandler);
                     },
-                    "fnUpdate": function(oSettings, fnDraw) {
+                    "fnUpdate": function (oSettings, fnDraw) {
                         var iListLength = 5;
                         var oPaging = oSettings.oInstance.fnPagingInfo();
                         var an = oSettings.aanFeatures.p;
@@ -336,7 +336,7 @@
                                 sClass = (j == oPaging.iPage + 1) ? 'class="active"' : '';
                                 $('<li ' + sClass + '><a href="#">' + j + '</a></li>')
                                         .insertBefore($('li:last', an[i])[0])
-                                        .bind('click', function(e) {
+                                        .bind('click', function (e) {
                                             e.preventDefault();
                                             oSettings._iDisplayStart = (parseInt($('a', this).text(), 10) - 1) * oPaging.iLength;
                                             fnDraw(oSettings);
@@ -400,7 +400,17 @@
 
 
             /* Table initialisation */
-            $(document).ready(function() {
+            $(document).ready(function () {
+                var url = window.location.href;
+
+                // passes on every "a" tag 
+                $(".navbar  a").each(function () {
+                    // checks if its the same on the address bar
+                    if (url === (this.href)) {
+                        $(this).closest("li").addClass("active");
+                    }
+                });
+
                 $('#user_list').dataTable({
                     "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
                     "sPaginationType": "bootstrap",
@@ -417,7 +427,7 @@
                     type: "POST",
                     url: "<?php echo site_url('auth/create_user'); ?>",
                     data: form,
-                    success: function(data) {
+                    success: function (data) {
                         $(".modal.fade.bs-example-modal-sm").modal('hide');
                     }
 
@@ -428,9 +438,9 @@
         </script>
 
     </head>
-    
-<div class="container-fluid">
-            <?php
-            echo $menu;
-            ?>
-        </div>
+
+    <div class="container-fluid">
+        <?php
+        echo $menu;
+        ?>
+    </div>

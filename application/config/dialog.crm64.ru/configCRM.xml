@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <xml_baseUrl>http://dialog.crm64.ru</xml_baseUrl>
+  <xml_listnerSocketAddress>http://dialog.crm64.ru:8580/socket.io/socket.io.js</xml_listnerSocketAddress>
+  <xml_listnerAddress>http://dialog.crm64.ru:8580</xml_listnerAddress>
+  <dbHost>localhost</dbHost>
+  <dbUsername>root</dbUsername>
+  <dbPassword>11235813</dbPassword>
+  <dbName>DialogWebCRM</dbName>
+</root>

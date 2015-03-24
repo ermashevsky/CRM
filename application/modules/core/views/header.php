@@ -27,7 +27,7 @@
         <link rel="stylesheet" href="/assets/css/bootstrap-tagsinput.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
 
-        <script src=<?php echo $this->config->item('listner_socket_address');?>></script>
+        <script src="<?php echo $this->config->item('listner_socket_address');?>"></script>
         <script type="text/javascript">
             // javascript code
             function getContactDetail(phone_number) {
