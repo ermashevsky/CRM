@@ -5,16 +5,17 @@
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
         <title>Office WebCRM </title>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
-        <script src="/assets/js/bootstrap.min.js"></script>
-        <script src="/assets/js/bootstrap-button.js"></script>
-        <script src="/assets/js/bootstrap-fileupload.js"></script>
-        <script src="/assets/js/bootstrap-notify.js"></script>
-        <script src="/assets/js/jquery.uploadify.min.js"></script>
-        <script src="/assets/js/bootbox.min.js"></script>
-        <script src="/assets/js/jquery.dataTables.js"></script>
-        <script src="/assets/js/bootstrap-progressbar.js"></script>
-        <script src="/assets/js/bootstrap-tagsinput.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-button.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-fileupload.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-notify.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-wysiwyg.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.uploadify.min.js"></script>
+        <script type="text/javascript" src="/assets/js/bootbox.min.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.dataTables.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-progressbar.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.scrollpanel.js"></script>
@@ -36,10 +37,10 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
         <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
-        <script src="<?php echo $this->config->item('listner_socket_address');?>"></script>
+
+        <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
         <script type="text/javascript">
-            
-            function addRecord(phone_num) {
+             function addRecord(phone_num) {
 
                 var phone_number = $('#phone_num_hide'+phone_num).val();
                 var id_call = $('#id_call'+phone_num).val();
@@ -54,16 +55,15 @@
 
                 $('#taskWindow').modal('show');
             }
-
             function getContactDetail(phone_number) {
-                  $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
-                    function(data) {
-                        if(data !== ""){
+                $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
+                function (data) {
+                    if (data !== "") {
                         $("div#ui_notifIt").append("Звонит " + data);
-                        $('div#ui_notifIt').css('text-align','center');
+                        $('div#ui_notifIt').css('text-align', 'center');
                     }
-                  });
-                }
+                });
+            }
             function insertDataOrganization() {
 
                 var MyRows = $('table#contact_list').find('tbody').find('tr');
@@ -74,10 +74,10 @@
             }
 
             function deleteFromOrganization(id) {
-                bootbox.confirm("Действительно хотите исключить из организации?", function(result) {
+                bootbox.confirm("Действительно хотите исключить из организации?", function (result) {
                     if (result) {
                         $.post('<?php echo site_url('/addressbook/deleteFromOrganization'); ?>', {'id': id},
-                        function(data) {
+                        function (data) {
                             location.reload();
                         }, 'json');
                     } else {
@@ -95,9 +95,9 @@
                                 .text(organization_name));
                 $('#myNewContactForm').modal();
             }
-            
-            function saveNewContact(){
-                
+
+            function saveNewContact() {
+
                 var organization_id = $("#organization_name").val();
                 var contact_name = $("#contact_name").val();
                 var job_position = $("#job_position").val();
@@ -107,36 +107,36 @@
                 var address = $("#address").val();
                 var birthday = $("#birthday").val();
                 var comment = $("#comment").val();
-                
+
                 $.post('<?php echo site_url('/addressbook/insertNewContactRow'); ?>',
-                {'organization_id': organization_id, 'contact_name':contact_name, 'job_position':job_position,
-                'private_phone_number':private_phone_number, 'mobile_number':mobile_number, 'email':email, 'address':address,
-                'birthday':birthday, 'comment':comment},
-                function(data) {
+                        {'organization_id': organization_id, 'contact_name': contact_name, 'job_position': job_position,
+                            'private_phone_number': private_phone_number, 'mobile_number': mobile_number, 'email': email, 'address': address,
+                            'birthday': birthday, 'comment': comment},
+                function (data) {
                     location.reload();
                 });
-                
+
             }
 
             function deleteOrganization(id) {
                 $.post('<?php echo site_url('/addressbook/getContactsOrganization'); ?>', {'id': id},
-                function(data) {
+                function (data) {
                     if (data > 0) {
                         bootbox.dialog("В организации существуют контакты.<br/>Удалить организацию вместе с контактами?", [{
                                 "label": "Да",
                                 "class": "btn-default",
-                                "callback": function() {
+                                "callback": function () {
                                     $.post('<?php echo site_url('/addressbook/deleteOrganizationWithContacts'); ?>', {'id': id},
-                                    function(data) {
+                                    function (data) {
                                         window.location.replace("/");
                                     }, 'json');
                                 }
                             }, {
                                 "label": "Нет",
                                 "class": "btn-default",
-                                "callback": function() {
+                                "callback": function () {
                                     $.post('<?php echo site_url('/addressbook/deleteOrganizationWithoutContacts'); ?>', {'id': id},
-                                    function(data) {
+                                    function (data) {
                                         window.location.replace("/");
                                     }, 'json');
                                 }
@@ -146,16 +146,16 @@
                         bootbox.dialog("Удалить организацию ?", [{
                                 "label": "Да",
                                 "class": "btn-default",
-                                "callback": function() {
+                                "callback": function () {
                                     $.post('<?php echo site_url('/addressbook/deleteOrganization'); ?>', {'id': id},
-                                    function(data) {
+                                    function (data) {
 
                                     });
                                 }
                             }, {
                                 "label": "Нет",
                                 "class": "btn-default",
-                                "callback": function() {
+                                "callback": function () {
 
                                 }
                             }]);
@@ -168,10 +168,10 @@
             // javascript code
             function getval(sel) {
                 if (sel.value !== '') {
-                    $.post('<?php echo site_url('/addressbook/getContactById'); ?>', {'id': sel.value}, function(data) {
+                    $.post('<?php echo site_url('/addressbook/getContactById'); ?>', {'id': sel.value}, function (data) {
                         console.info(data);
                         var counter = 0;
-                        $.each(data, function(i, val) {
+                        $.each(data, function (i, val) {
                             $('#contact_list').append('<tr><td class="nr">' + data[i].contact_name +
                                     '</td><td>' + data[i].job_position +
                                     '</td><td>' + data[i].private_phone_number +
@@ -198,8 +198,8 @@
             ;
 
 // /project_dir/index.html
-            $(document).ready(function() {
-            getCRMUsers();
+            $(document).ready(function () {
+                getCRMUsers();
             $("button#button1id").click(function () {
 
                     $.post('<?php echo site_url('/records/addTask'); ?>', $('form#formTask').serialize(),
@@ -241,163 +241,171 @@
                     todayButton: true,
                     dayOfWeekStart: 1
                 });
-            
-            
-            var url = window.location.href; 
+                
+                var url = window.location.href;
 
-    // passes on every "a" tag 
-    $(".navbar  a").each(function() {
-            // checks if its the same on the address bar
-        if(url === (this.href)) { 
-            $(this).closest("li").addClass("active");
-        }
-    });
-    
-            $.extend(true, $.fn.dataTable.defaults, {
-                "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-                "sPaginationType": "bootstrap",
-                "oLanguage": {
-                    "sUrl": "http://www.sprymedia.co.uk/dataTables/lang.txt"
-                }
-            });
+                // passes on every "a" tag 
+                $(".navbar  a").each(function () {
+                    // checks if its the same on the address bar
+                    if (url === (this.href)) {
+                        $(this).closest("li").addClass("active");
+                    }
+                });
 
-
-            /* Default class modification */
-            $.extend($.fn.dataTableExt.oStdClasses, {
-                "sWrapper": "dataTables_wrapper form-inline"
-            });
+                $.extend(true, $.fn.dataTable.defaults, {
+                    "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                    "sPaginationType": "bootstrap",
+                    "oLanguage": {
+                        "sUrl": "http://www.sprymedia.co.uk/dataTables/lang.txt"
+                    }
+                });
 
 
-            /* API method to get paging information */
-            $.fn.dataTableExt.oApi.fnPagingInfo = function(oSettings)
-            {
-                return {
-                    "iStart": oSettings._iDisplayStart,
-                    "iEnd": oSettings.fnDisplayEnd(),
-                    "iLength": oSettings._iDisplayLength,
-                    "iTotal": oSettings.fnRecordsTotal(),
-                    "iFilteredTotal": oSettings.fnRecordsDisplay(),
-                    "iPage": oSettings._iDisplayLength === -1 ?
-                            0 : Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
-                    "iTotalPages": oSettings._iDisplayLength === -1 ?
-                            0 : Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+                /* Default class modification */
+                $.extend($.fn.dataTableExt.oStdClasses, {
+                    "sWrapper": "dataTables_wrapper form-inline"
+                });
+
+
+                /* API method to get paging information */
+                $.fn.dataTableExt.oApi.fnPagingInfo = function (oSettings)
+                {
+                    return {
+                        "iStart": oSettings._iDisplayStart,
+                        "iEnd": oSettings.fnDisplayEnd(),
+                        "iLength": oSettings._iDisplayLength,
+                        "iTotal": oSettings.fnRecordsTotal(),
+                        "iFilteredTotal": oSettings.fnRecordsDisplay(),
+                        "iPage": oSettings._iDisplayLength === -1 ?
+                                0 : Math.ceil(oSettings._iDisplayStart / oSettings._iDisplayLength),
+                        "iTotalPages": oSettings._iDisplayLength === -1 ?
+                                0 : Math.ceil(oSettings.fnRecordsDisplay() / oSettings._iDisplayLength)
+                    };
                 };
-            };
 
 
-            /* Bootstrap style pagination control */
-            $.extend($.fn.dataTableExt.oPagination, {
-                "bootstrap": {
-                    "fnInit": function(oSettings, nPaging, fnDraw) {
-                        var oLang = oSettings.oLanguage.oPaginate;
-                        var fnClickHandler = function(e) {
-                            e.preventDefault();
-                            if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
-                                fnDraw(oSettings);
+                /* Bootstrap style pagination control */
+                $.extend($.fn.dataTableExt.oPagination, {
+                    "bootstrap": {
+                        "fnInit": function (oSettings, nPaging, fnDraw) {
+                            var oLang = oSettings.oLanguage.oPaginate;
+                            var fnClickHandler = function (e) {
+                                e.preventDefault();
+                                if (oSettings.oApi._fnPageChange(oSettings, e.data.action)) {
+                                    fnDraw(oSettings);
+                                }
+                            };
+
+                            $(nPaging).addClass('pagination').append(
+                                    '<ul>' +
+                                    '<li class="prev disabled"><a href="#">&larr; ' + oLang.sPrevious + '</a></li>' +
+                                    '<li class="next disabled"><a href="#">' + oLang.sNext + ' &rarr; </a></li>' +
+                                    '</ul>'
+                                    );
+                            var els = $('a', nPaging);
+                            $(els[0]).bind('click.DT', {action: "previous"}, fnClickHandler);
+                            $(els[1]).bind('click.DT', {action: "next"}, fnClickHandler);
+                        },
+                        "fnUpdate": function (oSettings, fnDraw) {
+                            var iListLength = 5;
+                            var oPaging = oSettings.oInstance.fnPagingInfo();
+                            var an = oSettings.aanFeatures.p;
+                            var i, ien, j, sClass, iStart, iEnd, iHalf = Math.floor(iListLength / 2);
+
+                            if (oPaging.iTotalPages < iListLength) {
+                                iStart = 1;
+                                iEnd = oPaging.iTotalPages;
                             }
-                        };
-
-                        $(nPaging).addClass('pagination').append(
-                                '<ul>' +
-                                '<li class="prev disabled"><a href="#">&larr; ' + oLang.sPrevious + '</a></li>' +
-                                '<li class="next disabled"><a href="#">' + oLang.sNext + ' &rarr; </a></li>' +
-                                '</ul>'
-                                );
-                        var els = $('a', nPaging);
-                        $(els[0]).bind('click.DT', {action: "previous"}, fnClickHandler);
-                        $(els[1]).bind('click.DT', {action: "next"}, fnClickHandler);
-                    },
-                    "fnUpdate": function(oSettings, fnDraw) {
-                        var iListLength = 5;
-                        var oPaging = oSettings.oInstance.fnPagingInfo();
-                        var an = oSettings.aanFeatures.p;
-                        var i, ien, j, sClass, iStart, iEnd, iHalf = Math.floor(iListLength / 2);
-
-                        if (oPaging.iTotalPages < iListLength) {
-                            iStart = 1;
-                            iEnd = oPaging.iTotalPages;
-                        }
-                        else if (oPaging.iPage <= iHalf) {
-                            iStart = 1;
-                            iEnd = iListLength;
-                        } else if (oPaging.iPage >= (oPaging.iTotalPages - iHalf)) {
-                            iStart = oPaging.iTotalPages - iListLength + 1;
-                            iEnd = oPaging.iTotalPages;
-                        } else {
-                            iStart = oPaging.iPage - iHalf + 1;
-                            iEnd = iStart + iListLength - 1;
-                        }
-
-                        for (i = 0, ien = an.length; i < ien; i++) {
-                            // Remove the middle elements
-                            $('li:gt(0)', an[i]).filter(':not(:last)').remove();
-
-                            // Add the new list items and their event handlers
-                            for (j = iStart; j <= iEnd; j++) {
-                                sClass = (j == oPaging.iPage + 1) ? 'class="active"' : '';
-                                $('<li ' + sClass + '><a href="#">' + j + '</a></li>')
-                                        .insertBefore($('li:last', an[i])[0])
-                                        .bind('click', function(e) {
-                                            e.preventDefault();
-                                            oSettings._iDisplayStart = (parseInt($('a', this).text(), 10) - 1) * oPaging.iLength;
-                                            fnDraw(oSettings);
-                                        });
-                            }
-
-                            // Add / remove disabled classes from the static elements
-                            if (oPaging.iPage === 0) {
-                                $('li:first', an[i]).addClass('disabled');
+                            else if (oPaging.iPage <= iHalf) {
+                                iStart = 1;
+                                iEnd = iListLength;
+                            } else if (oPaging.iPage >= (oPaging.iTotalPages - iHalf)) {
+                                iStart = oPaging.iTotalPages - iListLength + 1;
+                                iEnd = oPaging.iTotalPages;
                             } else {
-                                $('li:first', an[i]).removeClass('disabled');
+                                iStart = oPaging.iPage - iHalf + 1;
+                                iEnd = iStart + iListLength - 1;
                             }
 
-                            if (oPaging.iPage === oPaging.iTotalPages - 1 || oPaging.iTotalPages === 0) {
-                                $('li:last', an[i]).addClass('disabled');
-                            } else {
-                                $('li:last', an[i]).removeClass('disabled');
+                            for (i = 0, ien = an.length; i < ien; i++) {
+                                // Remove the middle elements
+                                $('li:gt(0)', an[i]).filter(':not(:last)').remove();
+
+                                // Add the new list items and their event handlers
+                                for (j = iStart; j <= iEnd; j++) {
+                                    sClass = (j == oPaging.iPage + 1) ? 'class="active"' : '';
+                                    $('<li ' + sClass + '><a href="#">' + j + '</a></li>')
+                                            .insertBefore($('li:last', an[i])[0])
+                                            .bind('click', function (e) {
+                                                e.preventDefault();
+                                                oSettings._iDisplayStart = (parseInt($('a', this).text(), 10) - 1) * oPaging.iLength;
+                                                fnDraw(oSettings);
+                                            });
+                                }
+
+                                // Add / remove disabled classes from the static elements
+                                if (oPaging.iPage === 0) {
+                                    $('li:first', an[i]).addClass('disabled');
+                                } else {
+                                    $('li:first', an[i]).removeClass('disabled');
+                                }
+
+                                if (oPaging.iPage === oPaging.iTotalPages - 1 || oPaging.iTotalPages === 0) {
+                                    $('li:last', an[i]).addClass('disabled');
+                                } else {
+                                    $('li:last', an[i]).removeClass('disabled');
+                                }
                             }
                         }
                     }
-                }
-            });
+                });
 
 
-            /*
-             * TableTools Bootstrap compatibility
-             * Required TableTools 2.1+
-             */
-            if ($.fn.DataTable.TableTools) {
-                // Set the classes that TableTools uses to something suitable for Bootstrap
-                $.extend(true, $.fn.DataTable.TableTools.classes, {
-                    "container": "DTTT btn-group",
-                    "buttons": {
-                        "normal": "btn",
-                        "disabled": "disabled"
-                    },
-                    "collection": {
-                        "container": "DTTT_dropdown dropdown-menu",
+                /*
+                 * TableTools Bootstrap compatibility
+                 * Required TableTools 2.1+
+                 */
+                if ($.fn.DataTable.TableTools) {
+                    // Set the classes that TableTools uses to something suitable for Bootstrap
+                    $.extend(true, $.fn.DataTable.TableTools.classes, {
+                        "container": "DTTT btn-group",
                         "buttons": {
-                            "normal": "",
+                            "normal": "btn",
                             "disabled": "disabled"
+                        },
+                        "collection": {
+                            "container": "DTTT_dropdown dropdown-menu",
+                            "buttons": {
+                                "normal": "",
+                                "disabled": "disabled"
+                            }
+                        },
+                        "print": {
+                            "info": "DTTT_print_info modal"
+                        },
+                        "select": {
+                            "row": "active"
                         }
-                    },
-                    "print": {
-                        "info": "DTTT_print_info modal"
-                    },
-                    "select": {
-                        "row": "active"
-                    }
-                });
+                    });
 
-                // Have the collection use a bootstrap compatible dropdown
-                $.extend(true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
-                    "collection": {
-                        "container": "ul",
-                        "button": "li",
-                        "liner": "a"
-                    }
+                    // Have the collection use a bootstrap compatible dropdown
+                    $.extend(true, $.fn.DataTable.TableTools.DEFAULTS.oTags, {
+                        "collection": {
+                            "container": "ul",
+                            "button": "li",
+                            "liner": "a"
+                        }
+                    });
+                }
+                $('#checkboxes-reminder').change(function () {
+                    if (this.checked)
+                        $('#reminder_block').fadeIn('fast');
+
+                    else
+                        $('#reminder_block').fadeOut('fast');
+                    $('#reminder_date').val('');
+
                 });
-            }
                 $('#contactList').dataTable({
                     "sPaginationType": "bootstrap",
                     "oLanguage": {
@@ -420,10 +428,10 @@
                     "sWrapper": "dataTables_wrapper form-inline"
                 });
 
-                $.post('<?php echo site_url('/addressbook/getAllContacts'); ?>', function(data) {
+                $.post('<?php echo site_url('/addressbook/getAllContacts'); ?>', function (data) {
                     console.info(data);
                     var select = $('#selectContact');
-                    $.each(data, function(i, val) {
+                    $.each(data, function (i, val) {
                         select.append('<option value="' + data[i].id + '">' + data[i].contact_name + '</option>');
 
                     });
@@ -431,9 +439,9 @@
 
                 var datas = [];
 
-                $.post('<?php echo site_url('/addressbook/getAllOrganizations'); ?>', function(data) {
+                $.post('<?php echo site_url('/addressbook/getAllOrganizations'); ?>', function (data) {
                     console.info(data);
-                    $.each(data, function(i, value) {
+                    $.each(data, function (i, value) {
                         datas.push({id: data[i].id, text: data[i].organization_name});
                     });//Тут запихиваю в data то что приходит с аякса.
                     $('.select2field').select2({
@@ -441,8 +449,8 @@
                         minimumInputLength: 3,
                         allowClear: true,
                         width: 280,
-                        createSearchChoice: function(term, data) {
-                            if ($(data).filter(function() {
+                        createSearchChoice: function (term, data) {
+                            if ($(data).filter(function () {
                                 return this.text.localeCompare(term) === 0;
                             }).length === 0) {
                                 return {
@@ -459,6 +467,16 @@
                     });
                 }, 'json');
 
+                $('#selectAssigned').on('change', function () {
+                    if (this.value !== ''){
+                        console.info('Not Empty');
+                        $('#checkboxes_report_block').css('display','block');
+                    }else{
+                        $('#checkboxes_report_block').css('display','none');
+                    }
+                });
+
+
                 $("#selectContact").select2({
                     placeholder: "Поиск контакта",
                     minimumInputLength: 3,
@@ -472,7 +490,32 @@
 //                    allowClear: true
 //                });
 
+                $("#create_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
 
+                $("#end_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("#report_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
 
                 $("#date_time").datetimepicker({
                     format: 'd.m.Y H:i:s',
@@ -493,7 +536,8 @@
                     dayOfWeekStart: 1
                 });
 
-                var socket = io.connect('<?php echo $this->config->item('listner_address');?>');
+                var socket = io.connect('<?php echo $this->config->item('listner_address'); ?>');
+
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -515,19 +559,19 @@
                             .scrollTop(messages[0].scrollHeight);
                 }
 
-                socket.on('connecting', function() {
+                socket.on('connecting', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение ...");
                     $('#server_status').removeClass("label label-important").addClass("label label-success");
                 });
 
-                socket.on('connect', function() {
+                socket.on('connect', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение установлено");
                     $('#server_status').removeClass("label label-important").addClass("label label-success");
                 });
 
-                socket.on('disconnect', function() {
+                socket.on('disconnect', function () {
                     $('#server_status').empty();
                     $('#server_status').append("Соединение разорвано");
                     $('#server_status').removeClass("label label-success").addClass("label label-important");
@@ -535,7 +579,7 @@
 
                 $('#scrollCall').scrollpanel();
 
-                socket.on('event', function(data) {
+                socket.on('event', function (data) {
 
                     console.info(data);
                     $('.msg system').empty();
@@ -577,9 +621,9 @@
 
                         if (dialstring === phone_number) {
                             //client.emit('event', "Входящий звонок с номера: " + calleridnum);
-                            
+
                             getContactDetail(calleridnum);
-                            
+
                             var text = "Входящий звонок с номера: " + calleridnum;
                             var type = 'success';
                             $.totalStorage('call', 'In');
@@ -753,7 +797,7 @@
                         url: '<?php echo site_url('/core/insertCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });
@@ -764,7 +808,7 @@
                         url: '<?php echo site_url('/core/updateLinkCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });
@@ -775,7 +819,7 @@
                         url: '<?php echo site_url('/core/updateEndCallData'); ?>',
                         type: "POST",
                         data: {data: data},
-                        success: function(data) {
+                        success: function (data) {
                             console.info(data);
                         }
                     });
@@ -858,23 +902,17 @@
             #myNewContactForm .modal-body{
                 max-height: 650px;
             }
-            .nav-list {
-                padding-right: 15px;
-                padding-left: 0px !important;
-                margin-bottom: 0;
-            }
 
         </style>
     </head>
     <body>
-        
+
         <div class="container-fluid">
             <?php
             echo $menu;
             ?>
         </div><!--/.nav-collapse -->
-        
-        <!-- Task Modal Form -->
+<!-- Task Modal Form -->
         <div class="modal hide fade" id="taskWindow" style="width:600px; ">
             <div class="modal-header">
                 <a href="#" class="pull-right" data-dismiss="modal">×</a>

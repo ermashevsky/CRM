@@ -116,6 +116,19 @@
                                         ?>
                                     </div>
                                 </div>
+                                <div class="control-group">
+                                     <?php
+                                        $label = array(
+                                           'class' => 'control-label',
+                                       );
+                                       echo form_label('Приватный контакт', 'private', $label);
+                                   ?>
+                                    <div class="controls">
+                                        <?php
+                                            echo form_checkbox('private', 'accept', FALSE);
+                                        ?>
+                                    </div>
+                                </div>
                                 <div class="accordion" id="accordion2">
                                     <div class="accordion-group">
                                         <div class="accordion-heading">

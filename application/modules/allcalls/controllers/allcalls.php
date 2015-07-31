@@ -57,6 +57,16 @@ class Allcalls extends MX_Controller {
             $this->load->view('footer');
         }
     }
+    
+    function getContactDetail($phone_number) {
+
+        //$phone_number = $this->input->post('phone_number');
+
+        $this->load->model('allcalls_model');
+        $contactDetail = $this->allcalls_model->getContactDetail($phone_number);
+
+        return $contactDetail;
+    }
 
     function format_seconds($seconds) {
         $t = round($seconds);
@@ -72,15 +82,15 @@ class Allcalls extends MX_Controller {
                     </div>
                 </div>';
     }
-    
-    function stripChars($text) {
-        $res = '';
-        for ($i = 0; $i < strlen($text); $i++) {
-             if (intval($text[$i]) > 1 || $text[$i] === '0') {
-                 $res .= $text[$i];
-             }
+
+    function findNumber($text) {
+        $pos = strrpos($text, '/'); // поиск позиции точки с конца строки
+        if (!$pos) {
+            return $text; // если точка не найдена - возвращаем строку
         }
-        return $res;
+        return substr($text, $pos, 20); // обрезаем строку используя количество 
+        // символов до точки + 1 (сама точка, 
+        // если она не нужна "+1" нужно убрать) 
     }
 
     function getAllCalls() {
@@ -95,42 +105,39 @@ class Allcalls extends MX_Controller {
             . '<thead><tr><th>Дата/Время</th><th>Тип звонка</th><th>Вызывающая сторона</th><th>Принимающая сторона</th><th>Длительность</th><th>Статус</th><th>Действия по звонку</th></tr></thead>';
 
             foreach ($call_data as $calls) {
-                $dst = $this->stripChars($calls->dst);
-//                $pos = strripos($calls->dst, "mera/");
-//
-//                if ($pos !== false) {
-//                    list($str, $shlak) = explode("mera/", $calls->dst);
-//                    $dst = $shlak;
-//                } else {
-//                    $dst = $calls->dst;
-//                }
+                //$dst = $this->stripChars($calls->dst);
+                $dst = $this->findNumber($calls->dst);
 
                 $date = new DateTime($calls->end);
 
                 if ($calls->dst === $data['user']->phone) {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '<br/><span style="color:#2f96b4;">'.$this->getContactDetail($calls->src).'</span></td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
                     <div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setContactItem(' . $calls->id . ',' . $calls->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $calls->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $calls->id . ','.$calls->src.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>
                 </div></td></tr>';
                 }
-
-                if ($calls->src === $data['user']->phone) {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
+                
+                $position = strripos($calls->channel, 'SIP/'.$data['user']->phone);
+                
+                if ($calls->src === $data['user']->phone || $position !== false) {
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Исходящий</td><td>' . $calls->src . '</td><td>' . $dst . '<br/><span style="color:#2f96b4;">'.$this->getContactDetail($dst).'</span></td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" class="btn btn-info btn-mini" disabled="true" data-role="button"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $calls->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $calls->id . ','.$dst.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div></td></tr>';
                 }
+                
+                
 
                 if ($calls->dst === $data['user']->external_phone) {
-                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '</td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
+                    echo '<tr><td>' . $date->format('d.m.Y H:i:s') . '</td><td>Входящий</td><td>' . $calls->src . '<br/><span style="color:#2f96b4;">'.$this->getContactDetail($calls->src).'</span></td><td>' . $dst . '</td><td>' . $this->format_seconds($calls->billsec) . '</td><td>' . $calls->disposition . '</td><td><div class="btn-toolbar">
                     <div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
                         <a href="#" onclick="setContactItem(' . $calls->id . ',' . $calls->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $calls->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $calls->id . ','.$calls->src.'); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>
                 </div></td></tr>';
                 }
@@ -151,7 +158,7 @@ class Allcalls extends MX_Controller {
         $status_call = $this->input->post('status_call');
         $phone_number = $this->input->post('phone_number');
         $phone_number2 = $this->input->post('phone_number2');
-        
+
         $user_phone_number = $data['user']->phone;
 
         $this->load->model('allcalls_model');
@@ -164,18 +171,18 @@ class Allcalls extends MX_Controller {
                 $condition = "6";
             }
 
-            if ($src>0 && $dst>0 && $phone_number2  === "" && $phone_number === "") {
+            if ($src > 0 && $dst > 0 && $phone_number2 === "" && $phone_number === "") {
                 $condition = "1-3";
             }
-            
-            if($dst>0 && $src === "" && $phone_number2  === "" && $phone_number === ""){
+
+            if ($dst > 0 && $src === "" && $phone_number2 === "" && $phone_number === "") {
                 $condition = "2-4";
             }
-            
-            if($dst === "" && $src>0 && $phone_number2  === "" && $phone_number === ""){
+
+            if ($dst === "" && $src > 0 && $phone_number2 === "" && $phone_number === "") {
                 $condition = "2-4";
             }
-            
+
             $filtered_call_data = $this->allcalls_model->getFilteredCalls2($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number, $phone_number2, $condition);
         } else {
             if ($phone_number2 > 0 && $phone_number > 0) {
@@ -185,15 +192,15 @@ class Allcalls extends MX_Controller {
                 $condition = "6";
             }
 
-            if ($src>0 && $dst>0 && $phone_number2  === "" && $phone_number === "") {
+            if ($src > 0 && $dst > 0 && $phone_number2 === "" && $phone_number === "") {
                 $condition = "1-3";
             }
-            
-            if($dst>0 && $src === "" && $phone_number2  === "" && $phone_number === ""){
+
+            if ($dst > 0 && $src === "" && $phone_number2 === "" && $phone_number === "") {
                 $condition = "2-4";
             }
-            
-            if($dst === "" && $src>0 && $phone_number2  === "" && $phone_number === ""){
+
+            if ($dst === "" && $src > 0 && $phone_number2 === "" && $phone_number === "") {
                 $condition = "2-4";
             }
 
@@ -201,6 +208,18 @@ class Allcalls extends MX_Controller {
         }
 
         echo json_encode($filtered_call_data);
+    }
+    
+    function checkModuleStatus($moduleName) {
+        $this->load->model('core_model');
+        return $this->core_model->checkModuleStatus($moduleName);
+    }
+    
+    function moduleButton($moduleName) {
+        
+        if ($this->checkModuleStatus($moduleName) === 'YES') {
+            return '<a class="btn btn-default btn-mini pull-right" href="#" onclick="addRecord(); return false;" role="button"><i class="icon-plus-sign"></i></a>';
+        }
     }
 
 }

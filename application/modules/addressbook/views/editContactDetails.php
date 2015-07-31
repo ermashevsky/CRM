@@ -181,6 +181,20 @@
                                     </div>
                                 </div>
                                 <div class="control-group">
+                                    <?php
+                                    echo form_label('Приватный контакт', 'private', $attributes_label);
+                                    ?>
+                                    <div class="controls">
+                                        <?php
+                                        if (!is_null($rows->initiator)) {
+                                            echo form_checkbox('private', 'accept', TRUE);
+                                        } else {
+                                            echo form_checkbox('private', 'accept', FALSE);
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
                                     <label class="control-label" for="selectOrganization">Организация</label>
                                     <div class="controls">
                                         <?php 

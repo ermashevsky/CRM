@@ -183,7 +183,19 @@
                                         <input type="text" name="organization_id" class="select2field" id="select2field"/>
                                     </div>
                                 </div>
- 
+                                <div class="control-group">
+                                     <?php
+                                        $label = array(
+                                           'class' => 'control-label',
+                                       );
+                                       echo form_label('Приватный контакт', 'private', $label);
+                                   ?>
+                                    <div class="controls">
+                                        <?php
+                                            echo form_checkbox('private', 'accept', FALSE);
+                                        ?>
+                                    </div>
+                                </div>
                                 <!-- Button (Double) -->
                                 <div class="control-group">
                                     <label class="control-label" for="submit"></label>

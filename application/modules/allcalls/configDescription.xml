@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <plugin_name>AllCalls Module</plugin_name>
+    <plugin_description>
+        Модуль "История звонков" расширяет возможности CRM
+        и позволяет отслеживать поступающие пользователю системы звонки.
+    </plugin_description>
+    <plugin_version>2.0.6</plugin_version>
+    <plugin_system_name>allcalls</plugin_system_name>
+    <plugin_menu_visible>true</plugin_menu_visible>
+    <plugin_menu_name>Все звонки</plugin_menu_name>
+    <plugin_menu_item_order>1</plugin_menu_item_order>
+    <plugin_uri>allcalls</plugin_uri>
+    <plugin_author>Ермашевский Денис</plugin_author>
+    <plugin_state>checked</plugin_state>
+    <plugin_type>system</plugin_type>
+    <plugin_sql_file>backup.sql</plugin_sql_file>
+    <plugin_sql_database>sprint_db</plugin_sql_database>
+    <plugin_sql_user>root</plugin_sql_user>
+    <plugin_sql_user>11235813</plugin_sql_user>
+</root>

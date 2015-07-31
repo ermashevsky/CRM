@@ -13,9 +13,15 @@
     -o-border-radius: 5px;
     border-radius: 5px;
 }
+
+#ui_notifIt{
+    top: 50px !important;
+}
+
 #ui_notifIt:hover{
     opacity: 1 !important;
 }
+
 #ui_notifIt p{
     text-align: center;
     font-family: sans-serif;

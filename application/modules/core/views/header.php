@@ -367,5 +367,7 @@
 <div class="container-fluid">
             <?php
             echo $menu;
+//            $enhanced_menu = new Menu();
+//            echo $enhanced_menu->build_menu('1');
             ?>
         </div><!--/.nav-collapse -->

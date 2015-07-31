@@ -35,9 +35,31 @@
         <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
         <script type="text/javascript">
 
+            function addRecord(phone_num) {
+
+                var phone_number = $('#phone_num_hide' + phone_num).val();
+                var id_call = $('#id_call' + phone_num).val();
+
+                $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
+                function (data) {
+                    $('#phone_num').val(phone_number);
+                    $('#selectContact').val(data);
+                    $('#id_call').val(id_call);
+                    $('#source_records').val('Модуль - История звонков');
+                });
+
+                $('#taskWindow').modal('show');
+            }
+
             // javascript code
-            function setTask(id_call) {
+            function setTask(id_call, phone_num) {
                 $('input#id_call').val(id_call);
+                console.info(phone_num);
+                $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_num},
+                function (data) {
+                    $('#phone_num').val(phone_num);
+                    $('#selectContact').val(data);
+                });
             }
 
             function notify(message, type) {
@@ -104,7 +126,7 @@
             }
 
             function getCRMUsers() {
-                $.post('<?php echo site_url('/tasks/getCRMUsers'); ?>',
+                $.post('<?php echo site_url('/records/getCRMUsers'); ?>',
                         function (data) {
                             $.each(data, function (i, val) {
                                 $("#selectAssigned").append('<option value="' + data[i].id + '">' + data[i].first_name + ' ' + data[i].last_name + '</option>');
@@ -298,28 +320,38 @@
                 getCRMUsers();
                 $("button#button1id").click(function () {
 
-                    $.post('<?php echo site_url('/tasks/addTask'); ?>', $('form#formTask').serialize(),
+                    $.post('<?php echo site_url('/records/addTask'); ?>', $('form#formTask').serialize(),
                             function (data) {
                                 $('#taskWindow').modal("hide");
                                 var type = "success";
-                                var message = "Задача создана";
+                                var message = "Запись создана";
                                 msg_system(message, type);
                             });
 
 
                 });
 
-                $('#checkboxes-reminder').change(function () {
-                    if (this.checked)
+                $('#selectAssigned').on('change', function () {
+
+                    if (this.value)
                         $('#reminder_block').fadeIn('fast');
 
                     else
                         $('#reminder_block').fadeOut('fast');
-                    $('#reminder_date').val('');
 
                 });
 
-                $("#reminder_date").datetimepicker({
+
+                $("#create_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("#end_date").datetimepicker({
                     format: 'd.m.Y H:i:s',
                     lang: 'ru',
                     step: 5,
@@ -454,7 +486,7 @@
                 }
 
                 $("button#submit").click(function () {
-                    //Тута
+                    //Тута надо пилить про контакт инфу
                     $.post('<?php echo site_url('/allcalls/getFilteredCalls'); ?>', $('#form_filter_call').serialize(),
                             function (data) {
                                 $('#table_all_calls').empty();
@@ -507,7 +539,7 @@
                 $.extend($.fn.dataTableExt.oStdClasses, {
                     "sWrapper": "dataTables_wrapper form-inline"
                 });
-                
+
                 var socket = io.connect('<?php echo $this->config->item('listner_address'); ?>');
                 var messages = $("#messages");
 
@@ -1135,60 +1167,26 @@
         <div class="modal hide fade" id="taskWindow" style="width:600px; ">
             <div class="modal-header">
                 <a href="#" class="pull-right" data-dismiss="modal">×</a>
-                <h4>Новая задача</h4>
+                <h4>Новая запись</h4>
             </div>
             <div class="modal-body" style="max-height: 600px;">
                 <form action="task/addTask" class="form-horizontal" id="formTask">
                     <fieldset>
                         <!-- Form Name -->
                         <input type="hidden" name="id_call" id="id_call" value=""/>
+                        <input id="source_records" name="source_records" type="hidden" value="Модуль - Все звонки" />
                         <!-- Text input-->
                         <div class="control-group">
-                            <label class="control-label" for="selectStatus">Статус</label>
+                            <label class="control-label" for="phone_num">Номер телефона</label>
                             <div class="controls">
-                                <select id="selectStatus" name="selectStatus" class="input-medium">
-                                    <option>В работе</option>
-                                    <option>Завершена</option>
-                                </select>
+                                <input id="phone_num" name="phone_num" type="text" placeholder="" class="input-medium" value="">
                             </div>
                         </div>
                         <!-- Select Basic -->
                         <div class="control-group">
-                            <label class="control-label" for="selectPriority">Приоритет</label>
+                            <label class="control-label" for="selectContact">Контакт</label>
                             <div class="controls">
-                                <select id="selectPriority" name="selectPriority" class="input-medium">
-                                    <option>Низкий</option>
-                                    <option>Нормальный</option>
-                                    <option>Высокий</option>
-                                    <option>Срочный</option>
-                                    <option>Немедленный</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Select Basic -->
-                        <div class="control-group">
-                            <label class="control-label" for="selectAssigned">Назначена</label>
-                            <div class="controls">
-                                <select id="selectAssigned" name="selectAssigned" class="input-medium">
-                                    <option></option>
-                                    <?php
-//                                    foreach ($users as $value) {
-//                                        echo "<option value='" . $value->id . "'>" . $value->first_name . " " . $value->last_name . "</option>";
-//                                    }
-                                    ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Select Basic -->
-                        <div class="control-group">
-                            <label class="control-label" for="selectCategory">Категория</label>
-                            <div class="controls">
-                                <select id="selectCategory" name="selectCategory" class="input-medium">
-                                    <option>Личные</option>
-                                    <option>Работа</option>
-                                </select>
+                                <input id="selectContact" name="selectContact" type="text" placeholder="" class="input-xlarge" value="">
                             </div>
                         </div>
 
@@ -1208,39 +1206,49 @@
                                 <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="10"></textarea>
                             </div>
                         </div>
-                        <!-- Multiple Checkboxes -->
-                        <div class="control-group">
 
+                        <!-- Select Basic -->
+                        <div class="control-group">
+                            <label class="control-label" for="selectAssigned">Назначена</label>
                             <div class="controls">
-                                <label class="checkbox" for="checkboxes-reminder">
-                                    <input type="checkbox" name="checkboxes-reminder" id="checkboxes-reminder" >
-                                    Напомнить
-                                </label>
+                                <select id="selectAssigned" name="selectAssigned" class="input-medium">
+                                    <option></option>
+                                    <?php
+                                    foreach ($users as $value) {
+                                        echo "<option value='" . $value->id . "'>" . $value->first_name . " " . $value->last_name . "</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
                         </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="create_date">Дата начала</label>
+                            <div class="controls">
+                                <input id="create_date" name="create_date" type="text" class="input-medium" value="">
+
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="end_date">Дата окончания</label>
+                            <div class="controls">
+                                <input id="end_date" name="end_date" type="text" class="input-medium" value="">
+
+                            </div>
+                        </div>
+                        <!-- Multiple Checkboxes -->
+
                         <div id="reminder_block" style="display:none;">
                             <!-- Text input-->
                             <div class="control-group">
-                                <label class="control-label" for="reminder_date">Дата/время</label>
-                                <div class="controls">
-                                    <input id="reminder_date" name="reminder_date" type="text" class="input-medium" value="">
 
+                                <div class="controls">
+                                    <label class="checkbox" for="checkboxes-report">
+                                        <input type="checkbox" name="checkboxes-report" id="checkboxes-report" >
+                                        Отчет
+                                    </label>
                                 </div>
                             </div>
-                            <!--                                 Select Basic 
-                                                            <div class="control-group">
-                                                                <label class="control-label" for="selectReminder">Напомнить за</label>
-                                                                <div class="controls">
-                                                                    <select id="selectReminder" name="selectReminder" class="input-medium">
-                                                                        <option></option>
-                                                                        <option>5 минут</option>
-                                                                        <option>10 минут</option>
-                                                                        <option>15 минут</option>
-                                                                        <option>30 минут</option>
-                                                                        <option>60 минут</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>-->
                         </div>
 
 
@@ -1321,6 +1329,12 @@
                             <label for="comment" class="control-label">Комментарий</label>                                    <div class="controls">
                                 <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
                         </div>
+                        <div class="control-group">
+                            <label for="private" class="control-label">Приватный контакт</label>
+                            <div class="controls">
+                                <input type="checkbox" name="private" value="" id="private">
+                            </div>
+                        </div>
                         <div class="accordion" id="accordion2">
                             <div class="accordion-group">
                                 <div class="accordion-heading">
@@ -1366,6 +1380,7 @@
                                             <label for="web_url" class="control-label">Web</label>                                                    <div class="controls">
                                                 <input type="text" name="web_url" value="" id="web_url" placeholder="" class="input-xlarge">                                                    </div>
                                         </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -1440,6 +1455,12 @@
                         <div class="control-group">
                             <label for="comment" class="control-label">Дополнительно</label>                                    <div class="controls">
                                 <textarea name="comment" cols="40" rows="10" id="comment" placeholder="" class="input-xlarge"></textarea>                                    </div>
+                        </div>
+                        <div class="control-group">
+                            <label for="private" class="control-label">Приватный контакт</label>
+                            <div class="controls">
+                                <input type="checkbox" name="private" value="" id="private">
+                            </div>
                         </div>
                     </fieldset>
                 </form>

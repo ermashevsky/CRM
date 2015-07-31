@@ -37,6 +37,16 @@ class Core_model extends CI_Model {
         parent::__construct();
         $this->load->library('ion_auth');
     }
+    
+    function findNumber($text) {
+        $pos = strrpos($text, '/'); // поиск позиции точки с конца строки
+        if (!$pos) {
+            return $text; // если точка не найдена - возвращаем строку
+        }
+        return substr($text, $pos+1, 20); // обрезаем строку используя количество 
+        // символов до точки + 1 (сама точка, 
+        // если она не нужна "+1" нужно убрать) 
+    }
 
     function getCallEvent($phone_number, $external_phone) {
         $results = array();
@@ -50,8 +60,12 @@ class Core_model extends CI_Model {
 //        $this->db->or_like('dst', $external_phone);
 //        $this->db->order_by('start','desc');
 //        $this->db->limit(10);
+        if(empty($external_phone)){
+            $external_phone = '000';
+        }
+        
         $res = $this->db->query("SELECT id, src, dst, 
-            start , end, billsec, disposition, uniqueid, cause, channel
+            start , end, billsec, disposition, uniqueid, cause, channel, dstchannel
             FROM (
              `cdr`
             )
@@ -62,15 +76,20 @@ class Core_model extends CI_Model {
             AND (
              `src` =  '".$phone_number."'
             OR  `dst` =  '".$phone_number."'
-            OR  `channel` LIKE  '%".$phone_number."%'
+            
             )
             OR (
              `dst` LIKE  '%".$external_phone."%'
             OR  `dst` LIKE  '%".$external_phone."%'
-            OR  `channel` LIKE  '%".$phone_number."%'
+            
+            )
+            OR (
+             `channel` like  'SIP/".$phone_number."%'
+            OR  `dstchannel` =  'SIP/".$phone_number."%'
+            
             )
             ORDER BY  `start` DESC
-            limit 18
+            limit 10
             ");
         //$res = $this->db->get();
         if (0 < $res->num_rows) {
@@ -79,11 +98,13 @@ class Core_model extends CI_Model {
                 $tmp->id = $row->id;
                 $tmp->uniqueid = $row->uniqueid;
                 $tmp->src = $row->src;
-                $tmp->dst = $row->dst;
+                $tmp->dst = $this->findNumber($row->dst);
                 $tmp->start = $row->start;
                 $tmp->end = $row->end;
                 $tmp->billsec = $row->billsec;
                 $tmp->disposition = $row->disposition;
+                $tmp->channel = $row->channel;
+                $tmp->dstchannel = $row->dstchannel;
                 $tmp->cause = $row->cause;
                 
                 $results[$tmp->id] = $tmp;
@@ -124,10 +145,41 @@ class Core_model extends CI_Model {
         $res = $this->db->get();
         if (0 < $res->num_rows) {
             $ret = $res->row();
-            echo $ret->first_name." ".$ret->last_name ." (внутр.)";
+            echo $ret->first_name." ".$ret->last_name;
         } 
         }
     }
+    }
+    
+    function checkModuleInstallBefore($system_name){
+        
+        $this->db->select("*");
+        $this->db->from('system_plugins');
+        $this->db->where('plugin_system_name', "$system_name");
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            return "NO";
+        }else{
+            return "YES";
+        }
+    }
+    
+    function installModule($confModule){
+        $this->db->insert('system_plugins', $confModule); 
+    }
+    
+    function checkModuleStatus($moduleName){
+      
+    $this->db->select('*');
+    $this->db->from('system_plugins');
+    $this->db->where('plugin_state', "checked");
+    $this->db->where('plugin_system_name', "$moduleName");
+    $res = $this->db->get();
+    if (0 < $res->num_rows) {
+            return "YES";
+        }else{
+            return "NO";
+        }
     }
 
 }

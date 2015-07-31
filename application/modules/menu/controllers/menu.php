@@ -16,7 +16,7 @@ error_reporting(E_ALL);
   | {menu}
  */
 
-class Menu extends CI_Controller {
+class Menu extends MX_Controller {
 
     var $target = NULL;
     var $output = NULL;
@@ -28,43 +28,29 @@ class Menu extends CI_Controller {
     var $cur_class = 'active';
     var $cur_display = TRUE;
     private $_ci;
-    
+
     public function __construct() {
-        $this->_ci =& get_instance();
-        log_message('debug', "Menu Library Initialized");
-        $this->_ci->load->library('ion_auth');
-        $this->_ci->load->library('session');
-        $this->_ci->load->database();
-        
-        
+        //log_message('debug', "Menu Library Initialized");
+        parent::__construct();
+        $this->load->library('ion_auth');
+        $this->load->library('session');
+        $this->load->database();
     }
 
     private function _data() {
-    
-        if ($this->_ci->load->ion_auth->is_admin()) {
+
+        if ($this->load->ion_auth->is_admin()) {
+
+            $this->load->model('menu_model');
+            $getMenuData = $this->menu_model->getAllMenuItemData();
+
+
+
             $menu_data = array(
                 'header' => array(
                     array('name' => 'Главная',
                         'slug' => '',
-                        'class' => ''),
-                    array('name' => 'Все звонки',
-                        'slug' => 'allcalls',
-                        'class' => ''),
-                    array('name' => 'Адресная книга',
-                        'slug' => 'addressbook',
-                        'class' => ''),
-//                    array('name' => 'Календарь',
-//                        'slug' => 'calendar',
-//                        'class' => ''),
-                    array('name' => 'Задачи',
-                        'slug' => 'tasks',
-                        'class' => ''),
-                    array('name' => 'Админка',
-                        'slug' => 'auth',
-                        'class' => ''),
-                    array('name' => 'Выход',
-                        'slug' => 'auth/logout',
-                        'class' => 'pull-right')
+                        'class' => '')
                 ),
                 'footer' => array(
                     array('name' => 'About Us',
@@ -72,27 +58,30 @@ class Menu extends CI_Controller {
                         'class' => '')
                 )
             );
+
+            foreach ($getMenuData as $menuRow) {
+
+
+                array_push($menu_data['header'], array('name' => $menuRow->plugin_menu_name,
+                    'slug' => $menuRow->plugin_uri,
+                    'class' => ''));
+            }
+            array_push($menu_data['header'], array('name' => 'Выход',
+                'slug' => 'auth/logout',
+                'class' => 'pull-right'));
+
+            //print_r($data);
         } else {
+            $this->load->model('menu_model');
+            $getMenuData = $this->menu_model->getAllMenuItemData();
+
+
+
             $menu_data = array(
                 'header' => array(
                     array('name' => 'Главная',
                         'slug' => '',
-                        'class' => ''),
-                    array('name' => 'Все звонки',
-                        'slug' => 'allcalls',
-                        'class' => ''),
-                    array('name' => 'Адресная книга',
-                        'slug' => 'addressbook',
-                        'class' => ''),
-//                    array('name' => 'Календарь',
-//                        'slug' => 'calendar',
-//                        'class' => ''),
-                    array('name' => 'Задачи',
-                        'slug' => 'tasks',
-                        'class' => ''),
-                    array('name' => 'Выход',
-                        'slug' => 'auth/logout',
-                        'class' => 'pull-right')
+                        'class' => '')
                 ),
                 'footer' => array(
                     array('name' => 'About Us',
@@ -100,6 +89,20 @@ class Menu extends CI_Controller {
                         'class' => '')
                 )
             );
+
+            foreach ($getMenuData as $menuRow) {
+
+                if ($menuRow->plugin_uri !== 'auth') {
+                    array_push($menu_data['header'], array('name' => $menuRow->plugin_menu_name,
+                        'slug' => $menuRow->plugin_uri,
+                        'class' => ''));
+                }
+            }
+            array_push($menu_data['header'], array('name' => 'Выход',
+                'slug' => 'auth/logout',
+                'class' => 'pull-right'));
+
+            //print_r($data);
         }
 
         if (!empty($menu_data)) {

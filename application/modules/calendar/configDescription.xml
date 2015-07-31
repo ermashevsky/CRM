@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <plugin_name>Calendar Module</plugin_name>
+    <plugin_description>Модуль "Календарь" отражает все типы записей в CRM.</plugin_description>
+    <plugin_version>2.0.5</plugin_version>
+    <plugin_system_name>calendar</plugin_system_name>
+    <plugin_menu_visible>true</plugin_menu_visible>
+    <plugin_menu_name>Календарь</plugin_menu_name>
+    <plugin_menu_item_order>4</plugin_menu_item_order>
+    <plugin_uri>calendar</plugin_uri>
+    <plugin_author>Ермашевский Денис</plugin_author>
+    <plugin_state>enable</plugin_state>
+    <plugin_type>extension</plugin_type>
+    <plugin_sql_file>backup.sql</plugin_sql_file>
+    <plugin_sql_database>sprint_db</plugin_sql_database>
+    <plugin_sql_user>root</plugin_sql_user>
+    <plugin_sql_password>11235813</plugin_sql_password>
+</root>

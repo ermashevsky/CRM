@@ -24,6 +24,9 @@
         <script type="text/javascript" src="/assets/js/select2.js"></script>
         <script type="text/javascript" src="/assets/js/select2_locale_ru.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.form-validator.min.js"></script>
+        <script type="text/javascript" src="/assets/js/moment.min.js"></script>
+        <script type="text/javascript" src="/assets/js/fullcalendar.min.js"></script>
+        <script type="text/javascript" src="/assets/js/lang-all.js"></script>
 
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -36,10 +39,28 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
+        <link rel="stylesheet" type="text/css" href="/assets/css/fullcalendar.min.css">
+        <!--        <link rel="stylesheet" type="text/css" href="/assets/css/fullcalendar.print.css">-->
         <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
         <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
         <script type="text/javascript">
+            
+            function addRecord(phone_num) {
+
+                var phone_number = $('#phone_num_hide'+phone_num).val();
+                var id_call = $('#id_call'+phone_num).val();
+
+                $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
+                function (data) {
+                    $('#phone_num').val(phone_number);
+                    $('#contact').val(data);
+                    $('#id_call').val(id_call);
+                    $('#source_records').val('Модуль - История звонков');
+                });
+
+                $('#taskWindow').modal('show');
+            }
 
             function getContactDetail(phone_number) {
                 $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
@@ -172,10 +193,121 @@
 
                 }
             }
+            
+            function goViewRecord(id){
+                window.location.href = "/records/viewTask/"+id;
+            }
+            
+            function closeRecords(id){
+                $.post('<?php echo site_url('/calendar/closeRecords'); ?>', {'id': id},
+                function (data) {
+                        console.info(data);
+                        
+                    });
+            }
+            
+            function getCRMUsers() {
+                $.post('<?php echo site_url('/records/getCRMUsers'); ?>',
+                        function (data) {
+                            $.each(data, function (i, val) {
+                                $("#selectAssigned").append('<option value="' + data[i].id + '">' + data[i].first_name + ' ' + data[i].last_name + '</option>');
+                            });
+                        }, 'json');
+            }
+            ;
 
 // /project_dir/index.html
             $(document).ready(function () {
+                
+                getCRMUsers();
+            $("button#button1id").click(function () {
 
+                    $.post('<?php echo site_url('/records/addTask'); ?>', $('form#formTask').serialize(),
+                            function (data) {
+                                $('#taskWindow').modal("hide");
+                                var type = "success";
+                                var message = "Запись создана";
+                                msg_system(message, type);
+                            });
+
+
+                });
+
+                $('#selectAssigned').on('change', function () {
+
+                    if (this.value)
+                        $('#reminder_block').fadeIn('fast');
+
+                    else
+                        $('#reminder_block').fadeOut('fast');
+
+                });
+            
+            
+            $("#create_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("#end_date").datetimepicker({
+                    format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+                
+                $('#calendar').fullCalendar({
+                    // put your options and callbacks here
+                    lang: 'ru',
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,basicWeek,basicDay'
+                    }, events: "calendar/getTasksWithDates",
+                    editable: true,
+                    displayEventEnd: true,
+                    eventClick: function (event) {
+                        console.info(event.start);
+                        window.location = "records/viewTask/" + event.id;
+
+                    },
+                    dayClick: function (date, jsEvent, view) {
+
+                        $('#calendar').fullCalendar('changeView', 'basicDay'/* or 'basicDay' */);
+                        $('#calendar').fullCalendar('gotoDate', date.format());
+                    }, eventMouseover: function (calEvent, jsEvent) {
+                        var tooltip = '<div class="tooltipevent tooltip" style="width:auto;height:auto;background:#F3E2A9;position:absolute;z-index:10001;">' + calEvent.title + '</div>';
+                        $("body").append(tooltip);
+                        $(this).mouseover(function (e) {
+                            $(this).css('z-index', 10000);
+                            $('.tooltipevent').fadeIn('500');
+                            $('.tooltipevent').fadeTo('10', 1.9);
+                        }).mousemove(function (e) {
+                            $('.tooltipevent').css('top', e.pageY + 10);
+                            $('.tooltipevent').css('left', e.pageX + 20);
+                        });
+                    },
+                    eventMouseout: function (calEvent, jsEvent) {
+                        $(this).css('z-index', 8);
+                        $('.tooltipevent').remove();
+                    }
+                });
+
+                $.post('<?php echo site_url('/calendar/getUndatedRecords'); ?>',
+                        function (data) {
+                            console.info(data);
+                            $.each(data, function (i, val) {
+                                $('#nodated_records_block').append('<div class="alert alert-info"><strong>'+data[i].title+'</strong> <button class="btn btn-mini pull-right" type="button" onclick="closeRecords('+data[i].id+'); return false;">Завершить</button> <button class="btn btn-mini pull-right" type="button" onclick="goViewRecord('+data[i].id+');">Просмотр</button> <br/>'+data[i].task_description+'</div>');
+                            });
+
+                        }, 'json');
+                        
                 var url = window.location.href;
 
                 // passes on every "a" tag 
@@ -185,7 +317,7 @@
                         $(this).closest("li").addClass("active");
                     }
                 });
-                
+
                 $.extend(true, $.fn.dataTable.defaults, {
                     "sDom": "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
                     "sPaginationType": "bootstrap",
@@ -809,10 +941,117 @@
                 max-height: 650px;
             }
 
+            .fc-unthemed .fc-today {
+                background: #f0ad4e;
+            }
+
         </style>
     </head>
     <body>
+        <!-- Task Modal Form -->
+        <div class="modal hide fade" id="taskWindow" style="width:600px; ">
+            <div class="modal-header">
+                <a href="#" class="pull-right" data-dismiss="modal">×</a>
+                <h4>Новая запись</h4>
+            </div>
+            <div class="modal-body" style="max-height: 600px;">
+                <form action="task/addTask" class="form-horizontal" id="formTask">
+                    <fieldset>
+                        <!-- Form Name -->
+                        <input type="hidden" name="id_call" id="id_call" value=""/>
+                        <input id="source_records" name="source_records" type="hidden" value="Модуль - Все звонки" />
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label class="control-label" for="phone_num">Номер телефона</label>
+                            <div class="controls">
+                                <input id="phone_num" name="phone_num" type="text" placeholder="" class="input-medium" value="">
+                            </div>
+                        </div>
+                        <!-- Select Basic -->
+                        <div class="control-group">
+                            <label class="control-label" for="selectContact">Контакт</label>
+                            <div class="controls">
+                                <input id="contact" name="selectContact" type="text" placeholder="" class="input-xlarge" value="">
+                            </div>
+                        </div>
 
+                        <!-- Text input-->
+                        <div class="control-group">
+                            <label class="control-label" for="task_name">Заголовок</label>
+                            <div class="controls">
+                                <input id="task_name" name="task_name" type="text" placeholder="" class="input-xlarge" value="">
+
+                            </div>
+                        </div>
+
+                        <!-- Textarea -->
+                        <div class="control-group">
+                            <label class="control-label" for="task_description">Описание</label>
+                            <div class="controls">                     
+                                <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="10"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Select Basic -->
+                        <div class="control-group">
+                            <label class="control-label" for="selectAssigned">Назначена</label>
+                            <div class="controls">
+                                <select id="selectAssigned" name="selectAssigned" class="input-medium">
+                                    <option></option>
+                                    <?php
+                                    foreach ($users as $value) {
+                                        echo "<option value='" . $value->id . "'>" . $value->first_name . " " . $value->last_name . "</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label" for="create_date">Дата начала</label>
+                            <div class="controls">
+                                <input id="create_date" name="create_date" type="text" class="input-medium" value="">
+
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="end_date">Дата окончания</label>
+                            <div class="controls">
+                                <input id="end_date" name="end_date" type="text" class="input-medium" value="">
+
+                            </div>
+                        </div>
+                        <!-- Multiple Checkboxes -->
+
+                        <div id="reminder_block" style="display:none;">
+                            <!-- Text input-->
+                            <div class="control-group">
+
+                                <div class="controls">
+                                    <label class="checkbox" for="checkboxes-report">
+                                        <input type="checkbox" name="checkboxes-report" id="checkboxes-report" >
+                                        Отчет
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <!-- Button (Double) -->
+                <div class="control-group">
+                    <label class="control-label" for="button1id"></label>
+                    <div class="controls">
+                        <button id="button1id" name="button1id" class="btn btn-success">Сохранить</button>
+                        <button id="button2id" name="button2id" class="btn btn-danger" data-dismiss="modal">Отменить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End of Task Modal Form -->
         <div class="container-fluid">
             <?php
             echo $menu;

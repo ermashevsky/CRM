@@ -80,7 +80,8 @@ class AddressBook extends MX_Controller {
         $this->load->helper(array('form', 'url'));
         $this->load->library('form_validation');
         $this->form_validation->set_error_delimiters('<div class="alert alert-error">', '</div>');
-
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
         $this->form_validation->set_rules('organization_name', 'Наименование', 'required|xss_clean|trim');
         $this->form_validation->set_rules('phone_number', 'Телефон (основной)', 'required|xss_clean|trim');
         $this->form_validation->set_rules('address', 'Адрес', 'required|xss_clean|trim');
@@ -100,7 +101,13 @@ class AddressBook extends MX_Controller {
             $fax = $this->input->post('fax');
             $web_url = $this->input->post('web_url');
             $selectContact = $this->input->post('token');
-
+            
+            if($this->input->post('private') === 'accept'){
+                $initiator = $data['user']->first_name.' '.$data['user']->last_name;
+            }else{
+                $initiator = null;
+            }
+            
             $data = array(
                 'organization_name' => $organization_name,
                 'address' => $address,
@@ -113,7 +120,8 @@ class AddressBook extends MX_Controller {
                 'inn' => $inn,
                 'alt_phone_number' => $alt_phone_number,
                 'fax' => $fax,
-                'web_url' => $web_url
+                'web_url' => $web_url,
+                'initiator' => $initiator,
             );
 
 
@@ -140,7 +148,9 @@ class AddressBook extends MX_Controller {
     }
 
     function insertNewContactRow() {
-
+        
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
         $this->load->helper(array('form', 'url'));
         $this->load->library('form_validation');
         $this->form_validation->set_error_delimiters('<div class="alert alert-error">', '</div>');
@@ -161,6 +171,11 @@ class AddressBook extends MX_Controller {
             $birthday = $this->input->post('birthday');
             $comment = $this->input->post('comment');
             $organization_id = $this->input->post('organization_id');
+            if($this->input->post('private') === 'accept'){
+                $initiator = $data['user']->first_name.' '.$data['user']->last_name;
+            }else{
+                $initiator = null;
+            }
             
             if(is_numeric($this->input->post('organization_id'))){
 
@@ -174,6 +189,7 @@ class AddressBook extends MX_Controller {
                 'birthday' => $birthday,
                 'comment' => $comment,
                 'organization_id' => $organization_id,
+                'initiator' => $initiator,
 
             );
 
@@ -193,7 +209,8 @@ class AddressBook extends MX_Controller {
                 'address' => $address,
                 'birthday' => $birthday,
                 'comment' => $comment,
-                'organization_note' => $organization_note
+                'organization_note' => $organization_note,
+                'initiator' => $initiator,
             );
 
             $this->load->model('addressbook_model');

@@ -13,8 +13,7 @@
                             echo validation_errors();
                             $attributes = array('class' => 'form-horizontal', 'id' => 'editOrganizationData');
                             echo form_open('addressbook/updateOrganizationData', $attributes);
-                            echo form_hidden('organization_id',$rows->id);
-                            
+                            echo form_hidden('organization_id', $rows->id);
                             ?>
                             <fieldset>
 
@@ -117,6 +116,20 @@
                                         );
 
                                         echo form_textarea($comment);
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="control-group">
+                                    <?php
+                                    echo form_label('Приватный контакт', 'private', $attributes_label);
+                                    ?>
+                                    <div class="controls">
+                                        <?php
+                                        if (!is_null($rows->initiator)) {
+                                            echo form_checkbox('private', 'accept', TRUE);
+                                        } else {
+                                            echo form_checkbox('private', 'accept', FALSE);
+                                        }
                                         ?>
                                     </div>
                                 </div>
@@ -290,14 +303,14 @@
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    foreach($contactDetail as $contact):
+                                                    foreach ($contactDetail as $contact):
                                                         echo '<tr>'
-                                                            . '<td>'.anchor("addressbook/viewContactDetails/".$contact->id, $contact->contact_name).'</td>'
-                                                            . '<td>'.$contact->job_position.'</td>'
-                                                            . '<td>'.$contact->private_phone_number.'</td>'
-                                                            . '<td>'.$contact->email.'</td>'
-                                                            . '<td>'.$contact->address.'</td>'
-                                                            . '<input type="hidden" name="token[]" value="'.$contact->contact_name.'" />'
+                                                        . '<td>' . anchor("addressbook/viewContactDetails/" . $contact->id, $contact->contact_name) . '</td>'
+                                                        . '<td>' . $contact->job_position . '</td>'
+                                                        . '<td>' . $contact->private_phone_number . '</td>'
+                                                        . '<td>' . $contact->email . '</td>'
+                                                        . '<td>' . $contact->address . '</td>'
+                                                        . '<input type="hidden" name="token[]" value="' . $contact->contact_name . '" />'
                                                         . '</tr>';
                                                     endforeach;
                                                     ?>

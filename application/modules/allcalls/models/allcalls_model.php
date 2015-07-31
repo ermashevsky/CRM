@@ -53,7 +53,7 @@ class Allcalls_model extends CI_Model {
 //        $this->db->where("start BETWEEN " .date("Y-m-d 00:00:00"). " AND ". date("Y-m-d 23:59:59"));
 //        $this->db->where()
 //        $this->db->order_by('end','asc');
-        $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
+        $res = $this->db->query("SELECT `id` ,  `src` ,  `dst` ,  `channel`, `dstchannel`, `start` ,  `answer` ,  `end` ,  `billsec` ,  `disposition` ,  `uniqueid` ,  `cause` 
             FROM  `cdr` 
             WHERE  `end` 
             BETWEEN  '" . date('Y-m-d 00:00:00') . "'
@@ -61,6 +61,9 @@ class Allcalls_model extends CI_Model {
             AND (
              `channel` like  '%/" . $phone_number . "%'
             OR  `dstchannel` like  '%/" . $phone_number . "%'
+            OR 
+             `src` like  '%" . $external_phone . "%'
+            OR  `dst` like  '%" . $external_phone . "%'
             )
             order by `end` asc");
 
@@ -70,7 +73,9 @@ class Allcalls_model extends CI_Model {
                 $tmp = new Allcalls_model();
                 $tmp->id = $row->id;
                 $tmp->uniqueid = $row->uniqueid;
-                $tmp->src = $row->src;
+                $tmp->src = $this->reformatePhoneNumber($row->src);
+                $tmp->channel = $row->channel;
+                $tmp->dstchannel = $row->dstchannel;
                 $tmp->start = $row->start;
                 $tmp->answer = $row->answer;
                 $tmp->end = $row->end;
@@ -84,7 +89,8 @@ class Allcalls_model extends CI_Model {
                     list($str, $shlak) = explode("#", $row->dst);
                     $tmp->dst = $shlak;
                 } else {
-                    $tmp->dst = $row->dst;
+                    $tmp->dst = $this->removePrefixMera($row->dst);
+                    //тута отсекаем mera/
                 }
 
                 $results[$tmp->id] = $tmp;
@@ -98,6 +104,8 @@ class Allcalls_model extends CI_Model {
             AND (
              `src` like  '%" . $external_phone . "%'
             OR  `dst` like  '%" . $external_phone . "%'
+            OR  `channel` like  '%/" . $phone_number . "%'
+            OR  `dstchannel` like  '%/" . $phone_number . "%'
             )
             order by `end` asc");
 
@@ -107,7 +115,7 @@ class Allcalls_model extends CI_Model {
                     $tmp = new Allcalls_model();
                     $tmp->id = $row->id;
                     $tmp->uniqueid = $row->uniqueid;
-                    $tmp->src = $row->src;
+                    $tmp->src = $this->reformatePhoneNumber($row->src);
                     $tmp->start = $row->start;
                     $tmp->answer = $row->answer;
                     $tmp->end = $row->end;
@@ -121,7 +129,7 @@ class Allcalls_model extends CI_Model {
                         list($str, $shlak) = explode("#", $row->dst);
                         $tmp->dst = $shlak;
                     } else {
-                        $tmp->dst = $row->dst;
+                        $tmp->dst = $this->removePrefixMera($row->dst);
                     }
 
                     $results[$tmp->id] = $tmp;
@@ -129,6 +137,29 @@ class Allcalls_model extends CI_Model {
             }
         }
         return $results;
+    }
+
+    function reformatePhoneNumber($string) {
+
+        if (strlen($string) == 12) {
+            $str = substr($string, 2);
+            return '7' . $str;
+        }
+        if (strlen($string) == 7) {
+            $str = substr($string, 1);
+            return '78452' . $str;
+        }
+        if (mb_strlen($string) === 6) {
+            //$str = substr($string, 1);
+            return '78452' . $string;
+        }
+        if (strlen($string) > 12 || strlen($string) == 2) {
+            return $string;
+        }
+        if (strlen($string) == 11) {
+            $str = substr($string, 1);
+            return '7' . $str;
+        }
     }
 
     function getFilteredCalls($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number) {
@@ -200,7 +231,7 @@ class Allcalls_model extends CI_Model {
                 $tmp = new Allcalls_model();
                 $tmp->id = $row->id;
                 $tmp->uniqueid = $row->uniqueid;
-                $tmp->src = $row->src;
+                $tmp->src = $this->reformatePhoneNumber($row->src);
                 $tmp->start = $row->start;
                 $tmp->answer = $row->answer;
                 $tmp->end = $row->end;
@@ -209,15 +240,15 @@ class Allcalls_model extends CI_Model {
                 $tmp->cause = $row->cause;
                 $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                 $pos = strripos($row->dst, "#");
                 if ($pos === false) {
-                    $tmp->dst = $row->dst;
+                    $tmp->dst = $this->reformatePhoneNumber($row->dst);
                 } else {
                     list($str, $shlak) = explode("#", $row->dst);
-                    $tmp->dst = $shlak;
+                    $tmp->dst = $this->reformatePhoneNumber($shlak);
                 }
 
                 $results[$tmp->id] = $tmp;
@@ -254,7 +285,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -263,12 +294,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -307,7 +338,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -316,12 +347,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -332,7 +363,7 @@ class Allcalls_model extends CI_Model {
                 }
                 break;
             case "5":
-                
+
                 $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
             FROM  cdr 
             WHERE  end
@@ -354,7 +385,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -363,12 +394,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -397,7 +428,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -406,12 +437,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -424,7 +455,7 @@ class Allcalls_model extends CI_Model {
         }
         return $results;
     }
-    
+
     function getFilteredCalls3($date_time, $date_time2, $src, $dst, $status_call, $type_call, $user_phone_number, $phone_number, $phone_number2, $condition) {
 
         $results = array();
@@ -453,7 +484,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -462,12 +493,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -506,7 +537,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -515,12 +546,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -531,7 +562,7 @@ class Allcalls_model extends CI_Model {
                 }
                 break;
             case "5":
-                
+
                 $res = $this->db->query("SELECT id, src, dst, start, answer, end, billsec, disposition, uniqueid,  cause
             FROM  cdr 
             WHERE  end
@@ -554,7 +585,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -563,12 +594,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -597,7 +628,7 @@ class Allcalls_model extends CI_Model {
                         $tmp = new Allcalls_model();
                         $tmp->id = $row->id;
                         $tmp->uniqueid = $row->uniqueid;
-                        $tmp->src = $row->src;
+                        $tmp->src = $this->reformatePhoneNumber($row->src);
                         $tmp->start = $row->start;
                         $tmp->answer = $row->answer;
                         $tmp->end = $row->end;
@@ -606,12 +637,12 @@ class Allcalls_model extends CI_Model {
                         $tmp->cause = $row->cause;
                         $tmp->btn_group = '<div class="btn-group">
                         <a href="#" onclick="setCalendar();return false;" class="btn btn-info btn-mini"><i class="icon-white icon-calendar"></i></a>
-                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $row->src . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
-                        <a href="#taskWindow" onclick="setTask(' . $row->id . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
+                        <a href="#" onclick="setContactItem(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . ');return false;" class="btn btn-info btn-mini"><i class="icon-white icon-pencil"></i></a>
+                        <a href="#taskWindow" onclick="setTask(' . $row->id . ',' . $this->reformatePhoneNumber($row->src) . '); return false;" data-toggle="modal" class="btn btn-info btn-mini"><i class="icon-white icon-tasks"></i></a>
                     </div>';
                         $pos = strripos($row->dst, "#");
                         if ($pos === false) {
-                            $tmp->dst = $row->dst;
+                            $tmp->dst = $this->removePrefixMera($row->dst);
                         } else {
                             list($str, $shlak) = explode("#", $row->dst);
                             $tmp->dst = $shlak;
@@ -623,6 +654,54 @@ class Allcalls_model extends CI_Model {
                 break;
         }
         return $results;
+    }
+
+    function removePrefixMera($dst) {
+        $pos = strripos($dst, "/");
+        if ($pos === false) {
+            return $dst;
+        } else {
+            list($str, $shlak) = explode("/", $dst);
+            return $shlak;
+        }
+    }
+
+    function getContactDetail($phone_number) {
+        $results = array();
+
+        $this->db->select("id, organization_name as contact_name", false);
+        $this->db->from('organization');
+        $this->db->like('phone_number', $phone_number);
+        $this->db->or_like('alt_phone_number', $phone_number);
+
+        $res = $this->db->get();
+        if (0 < $res->num_rows) {
+            $ret = $res->row();
+            return $ret->contact_name;
+        } else {
+            $this->db->select("id,contact_name", false);
+            $this->db->from('contacts');
+            $this->db->like('private_phone_number', $phone_number);
+            $this->db->or_like('mobile_number', $phone_number);
+
+            $res = $this->db->get();
+            if (0 < $res->num_rows) {
+                $ret = $res->row();
+                return $ret->contact_name;
+            } else {
+                $this->db->select("id,first_name, last_name", false);
+                $this->db->from('users');
+                $this->db->like('phone', $phone_number);
+                $this->db->or_like('external_phone', $phone_number);
+                //$this->db->or_where('mobile_number', $phone_number);
+
+                $res = $this->db->get();
+                if (0 < $res->num_rows) {
+                    $ret = $res->row();
+                    return $ret->first_name . " " . $ret->last_name;
+                }
+            }
+        }
     }
 
 }
