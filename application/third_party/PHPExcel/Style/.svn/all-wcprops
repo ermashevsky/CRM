@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style
+END
+Conditional.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Conditional.php
+END
+Borders.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Borders.php
+END
+Protection.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Protection.php
+END
+Border.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Border.php
+END
+Font.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Font.php
+END
+NumberFormat.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/NumberFormat.php
+END
+Alignment.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Alignment.php
+END
+Color.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Color.php
+END
+Fill.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Style/Fill.php
+END

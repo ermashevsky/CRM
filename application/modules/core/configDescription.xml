@@ -2,7 +2,7 @@
 <root>
     <plugin_name>Core Module</plugin_name>
     <plugin_description>Модуль "Ядро" с основными общими методами</plugin_description>
-    <plugin_version>2.0.5</plugin_version>
+    <plugin_version>2.0.7</plugin_version>
     <plugin_system_name>core</plugin_system_name>
     <plugin_menu_visible>false</plugin_menu_visible>
     <plugin_menu_name>empty</plugin_menu_name>

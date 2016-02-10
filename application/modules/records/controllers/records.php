@@ -73,6 +73,38 @@ class Records extends MX_Controller {
         $this->load->model('records_model');
         return $this->records_model->getContactIDByPhoneNum($phone_num);
     }
+    
+    function getRecordsByPhoneNum($phone_num){
+        $this->load->model('records_model');
+        return $this->records_model->getRecordsByPhoneNum($phone_num);
+    }
+    
+    function viewOrganizationRecords($phone_num){
+        if (!$this->ion_auth->logged_in()) {
+            redirect('auth/login', 'refresh');
+        } else {
+            $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+            $test = $this->ion_auth->get_users_groups($this->session->userdata('user_id'))->result(); // Return array groups 
+            $data['user']->group = $test[0]->name;
+            $this->load->module('menu');
+
+            $this->load->model('records_model');
+            $tableData['table'] = $this->records_model->getRecordsByPhoneNum($phone_num);
+            $this->load->module('core');
+            $checkModuleStatus = new Core();
+            $count = $checkModuleStatus->checkModuleStatus('records');
+            if ($count === "YES") {
+
+                $menu = array('menu' => $this->menu->render('header'));
+                $this->load->view('header', $menu);
+                $this->load->view('viewOrganizationRecords', $tableData);
+                $this->load->view('rightsidebar', $data);
+                $this->load->view('footer');
+            } else {
+                redirect('/', 'refresh');
+            }
+        }
+    }
 
     function addTask() {
         $this->load->helper(array('form', 'url'));
@@ -104,15 +136,34 @@ class Records extends MX_Controller {
             $assigned = trim($this->input->post('selectAssigned'));
             $task_name = trim($this->input->post('task_name'));
             $task_description = trim($this->input->post('task_description'));
-            $create_date = trim($this->input->post('create_date'));
-            $end_date = trim($this->input->post('end_date'));
+            $create_date = trim($this->input->post('task_create_date'));
+            $end_date = trim($this->input->post('task_end_date'));
             $id_call = trim($this->input->post('id_call'));
             $source_records = trim($this->input->post('source_records'));
+            
 
 
             $user = $this->ion_auth->user($this->session->userdata('user_id'))->row();
             $fullname = $user->first_name . " " . $user->last_name;
+            
+            $task_reminder_date = trim($this->input->post('task_reminder_date'));
+            $user_id = $user->id;
+            
+            if($task_reminder_date !== ""){
+                
+                 $data = array(
+                'reminder_date' => date('Y-m-d H:i:s', strtotime($task_reminder_date)),
+                'user_id' => $user_id,
+                'reminder_description' => $task_description,
+                'user_id2' => $assigned,
+                'status' => '0'     
+            );
 
+            $this->load->model('core/core_model');
+            $this->core_model->addReminder($data);
+                
+            }
+            
 
             $data = array(
                 'phone_num' => $phone_num,
@@ -188,15 +239,60 @@ class Records extends MX_Controller {
         }
     }
 
-    function deleteTask($id) {
+    function deleteTask() {
+        $id = trim($this->input->post('id'));
         $this->load->model('records_model');
         $this->records_model->deleteTask($id);
-        redirect('records/index', 'refresh');
+        return;
+    }
+    
+    function getActiveRec(){
+        $date = trim($this->input->post('date'));
+        $this->load->model('records_model');
+        $data = $this->records_model->getActiveRec($date);
+        echo json_encode($data);
+    }
+    
+    function getExecutionEndRec(){
+        $this->load->model('records_model');
+        $data = $this->records_model->getExecutionEndRec();
+        echo json_encode($data);
+    }
+    
+    function getInWorkRec(){
+        $this->load->model('records_model');
+        $data = $this->records_model->getInWorkRec();
+        echo json_encode($data);
+    }
+    
+    function getAllRec(){
+        $this->load->model('records_model');
+        $data = $this->records_model->getAllRec();
+        echo json_encode($data);
+    }
+    
+    function getOverDueRec(){
+        $this->load->model('records_model');
+        $data = $this->records_model->getOverDueRec();
+        echo json_encode($data);
+    }
+    
+    function doneRecord(){
+        $id = trim($this->input->post('id'));
+        $this->load->model('records_model');
+        $this->records_model->doneRecord($id);
+        return;
     }
 
     function getUserById($id) {
         $this->load->model('records_model');
         return $this->records_model->getCRMUserById($id);
+    }
+    
+    function getAssignedUserById() {
+        $id = trim($this->input->post('id'));
+        $this->load->model('records_model');
+        return $this->records_model->getCRMAssignedUserById($id);
     }
 
     function updateTaskParameters() {
@@ -209,10 +305,12 @@ class Records extends MX_Controller {
         $task_name = trim($this->input->post('task_name'));
         $task_description = trim($this->input->post('task_description'));
         $reminder_date = trim($this->input->post('reminder_date'));
+        $create_date = trim($this->input->post('task_create_date'));
+        $end_date = trim($this->input->post('task_end_date'));
 
 
         $this->load->model('records_model');
-        $this->records_model->updateTaskParameters($id, $status, $priority, $assigned, $category, $task_description, $task_name, $reminder_date);
+        $this->records_model->updateTaskParameters($id, $status, $priority, $assigned, $category, $task_description, $task_name, $reminder_date, $create_date, $end_date);
         redirect('records/viewTask/' . $id, 'refresh');
     }
 

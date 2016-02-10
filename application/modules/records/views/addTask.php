@@ -5,7 +5,8 @@
                 <div class="row-fluid">
                     <div class="span12">
                         <?php
-                        echo form_open('records/addTask', 'class="form-horizontal"');
+                        $attributes = array('class' => 'form-horizontal', 'id' => 'formRec');
+                        echo form_open('records/addTask', $attributes);
                         ?>
                         <fieldset>
                             <!-- Form Name -->
@@ -26,9 +27,9 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <input id="source_records" name="source_records" type="hidden" value="Модуль записи">
-                            
+
                             <div class="control-group">
                                 <label class="control-label" for="task_name">Заголовок</label>
                                 <div class="controls">
@@ -64,18 +65,43 @@
 
                             <!-- Text input-->
                             <div class="control-group">
-                                <label class="control-label" for="create_date">Дата начала</label>
+                                <label class="control-label" for="task_create_date">Дата начала</label>
                                 <div class="controls">
-                                    <input name="create_date" type="text" id="create_date"  class="input-medium" value="">
+                                    <input name="task_create_date" type="text" id="task_create_date"  class="input-medium" value="">
 
                                 </div>
                             </div>
                             <!-- Text input-->
                             <div class="control-group">
-                                <label class="control-label" for="end_date">Дата окончания</label>
+                                <label class="control-label" for="task_end_date">Дата окончания</label>
                                 <div class="controls">
-                                    <input name="end_date" type="text" id="end_date" class="input-medium" value="">
+                                    <input name="task_end_date" type="text" id="task_end_date" class="input-medium" value="">
 
+                                </div>
+                            </div>
+                            
+                            <!-- Button (Double) -->
+                            <div class="control-group">
+                                <label class="control-label" for="button1id"></label>
+                                <div class="controls">
+                                    <a href="#" id="setPeriod" name="setPeriod" class="btn btn-mini btn-warning" onclick="setPeriod(); return false;">Весь день</a>
+                                </div>
+                            </div>
+
+                            <div class="controls">
+                                <label class="checkbox" for="checkboxes-report">
+                                    <input type="checkbox" name="checkboxes-reminder" id="checkboxes-reminder" value="1">
+                                    Напоминание
+                                </label>
+                            </div>
+                            
+                            <div class="control-group" id="checkboxes_reminder_block" style="display: none;">
+                                <div class="control-group">
+                                    <label class="control-label" for="task_reminder_date">Дата напоминания</label>
+                                    <div class="controls">
+                                        <input name="task_reminder_date" type="text" id="task_reminder_date" class="input-medium" value="">
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -93,7 +119,7 @@
                                 <label class="control-label" for="button1id"></label>
                                 <div class="controls">
                                     <button id="button1id" name="button1id" class="btn btn-success">Сохранить</button>
-                                    <button id="button2id" name="button2id" class="btn btn-danger">Отменить</button>
+                                    <a href="/records" id="button2id" name="button2id" class="btn btn-danger">Отменить</a>
                                 </div>
                             </div>
 

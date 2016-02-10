@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
         <title>Office WebCRM </title>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery-latest.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-button.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-fileupload.js"></script>
@@ -15,6 +15,7 @@
         <script type="text/javascript" src="/assets/js/bootbox.min.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.dataTables.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-progressbar.js"></script>
+        <script type="text/javascript" src="/assets/js/bootstrap-tooltip.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-tagsinput.js"></script>
         <script type="text/javascript" src="/assets/js/notifIt.js"></script>
         <script type="text/javascript" src="/assets/js/jquery.total-storage.min.js"></script>
@@ -36,14 +37,14 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/notifIt.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/jquery.datetimepicker.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
-        <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
         <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
+        <script src="http://office.crm64.ru:3010/socket.io/socket.io.js"></script>
         <script type="text/javascript">
-             function addRecord(phone_num) {
+            function addRecord(phone_num) {
 
-                var phone_number = $('#phone_num_hide'+phone_num).val();
-                var id_call = $('#id_call'+phone_num).val();
+                var phone_number = $('#phone_num_hide' + phone_num).val();
+                var id_call = $('#id_call' + phone_num).val();
 
                 $.post('<?php echo site_url('/core/getContactDetail'); ?>', {'phone_number': phone_number},
                 function (data) {
@@ -64,6 +65,47 @@
                     }
                 });
             }
+
+            function prepareOriginateCall(internal_number, src, dst, call_type) {
+                //panel with buttons
+
+//                console.info(src);
+//                console.info(dst);
+//                console.info(call_type);
+
+                var phone_num = '';
+
+                if (call_type === 'outgoing') {
+                    phone_num = dst;
+
+                    $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: dst, internalNumb: internal_number},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
+
+                } else {
+                    phone_num = src;
+
+                    $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: src, internalNumb: internal_number},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
+                }
+
+            }
+
+            function redirect2EditRecord(id) {
+                window.location.replace("/records/editTask/" + id);
+            }
+
             function insertDataOrganization() {
 
                 var MyRows = $('table#contact_list').find('tbody').find('tr');
@@ -84,6 +126,24 @@
                         console.log("User declined dialog");
                     }
                 });
+            }
+
+            function originateCall(internalNumb) {
+
+                var originateDst = $('#originateDst').val();
+                if ($.isNumeric(originateDst) === true) {
+                    $('#originateDstText').css('display','none');
+                    $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: originateDst, internalNumb: internalNumb},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
+                } else {
+                    $('#originateDstText').css('display','block');
+                }
             }
 
             function newContactRefererModalForm() {
@@ -165,6 +225,284 @@
                 }, 'json');
             }
 
+            function delRecord(id) {
+                bootbox.dialog("Удалить запись?", [{
+                        "label": "Да",
+                        "class": "btn-default",
+                        "callback": function () {
+                            $.post('<?php echo site_url('/records/deleteTask'); ?>', {'id': id},
+                            function (data) {
+                                location.reload();
+                            });
+                        }
+                    }, {
+                        "label": "Нет",
+                        "class": "btn-default",
+                        "callback": function () {
+
+                        }
+                    }]);
+            }
+
+            function doneRecord(id) {
+                bootbox.dialog("Нажмите кнопку 'ДА' чтобы выполнить.", [{
+                        "label": "Да",
+                        "class": "btn-default",
+                        "callback": function () {
+                            $.post('<?php echo site_url('/records/doneRecord'); ?>', {'id': id},
+                            function (data) {
+                                location.reload();
+                            });
+                        }
+                    }, {
+                        "label": "Нет",
+                        "class": "btn-default",
+                        "callback": function () {
+
+                        }
+                    }]);
+            }
+
+            function activeRec() {
+                $('#dateRange').val(new Date().format('d.m.yyyy'));
+                $('#dateRange').fadeIn();
+                $('#dateRangeButton').fadeIn();
+            }
+
+            function completeRec() {
+                $('#dateRange').val("");
+                $('#dateRange').fadeOut();
+                $('#dateRangeButton').fadeOut();
+
+                $.post('<?php echo site_url('/records/getExecutionEndRec'); ?>',
+                        function (data) {
+                            console.info(data);
+                            $("#allContactsTable").dataTable().fnClearTable();
+                            var t = $('#allContactsTable').DataTable();
+                            var n = 1;
+
+                            $.each(data, function (i, val) {
+
+                                if (data[i].task_name !== "") {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_name + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#90ee90');
+                                } else {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_description + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#90ee90');
+                                }
+
+                            });
+                        }, 'json');
+            }
+
+            function overdueRec() {
+                $('#dateRange').val("");
+                $('#dateRange').fadeOut();
+                $('#dateRangeButton').fadeOut();
+
+                $.post('<?php echo site_url('/records/getOverDueRec'); ?>',
+                        function (data) {
+                            console.info(data);
+                            $("#allContactsTable").dataTable().fnClearTable();
+                            var t = $('#allContactsTable').DataTable();
+                            var n = 1;
+
+                            $.each(data, function (i, val) {
+
+                                if (data[i].task_name !== "") {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_name + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#ffc0cb');
+                                } else {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_description + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#ffc0cb');
+                                }
+
+                            });
+                        }, 'json');
+            }
+
+            function inWorkRec() {
+                $('#dateRange').val("");
+                $('#dateRange').fadeOut();
+                $('#dateRangeButton').fadeOut();
+
+                $.post('<?php echo site_url('/records/getInWorkRec'); ?>',
+                        function (data) {
+                            console.info(data);
+                            $("#allContactsTable").dataTable().fnClearTable();
+                            var t = $('#allContactsTable').DataTable();
+                            var n = 1;
+
+                            $.each(data, function (i, val) {
+
+                                if (data[i].task_name !== "") {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_name + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#87cefa');
+                                } else {
+
+                                    var end_date = "";
+                                    var create_date = "";
+
+                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+                                        end_date = "";
+                                    } else {
+                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+                                        create_date = "";
+                                    } else {
+                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                    }
+
+                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_description + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                    $('#allContactsTable td').css('background-color', '#87cefa');
+                                }
+
+                            });
+                        }, 'json');
+            }
+
+            function allRec() {
+//                $('#dateRange').val("");
+//                $('#dateRange').fadeOut();
+//                $('#dateRangeButton').fadeOut();
+//
+//                $.post('<?php echo site_url('/records/getAllRec'); ?>',
+//                        function (data) {
+//                            console.info(data);
+//                            $("#allContactsTable").dataTable().fnClearTable();
+//                            var t = $('#allContactsTable').DataTable();
+//                            var n = 1;
+//
+//                            $.each(data, function (i, val) {
+//
+//                                if (data[i].task_name !== "") {
+//
+//                                    var end_date = "";
+//                                    var create_date = "";
+//
+//                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+//                                        end_date = "";
+//                                    } else {
+//                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+//                                    }
+//
+//                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+//                                        create_date = "";
+//                                    } else {
+//                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+//                                    }
+//
+//                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_name + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+//                                    
+//                                    
+//                                } else {
+//
+//                                    var end_date = "";
+//                                    var create_date = "";
+//
+//                                    if (data[i].end_date === "0000-00-00 00:00:00") {
+//                                        end_date = "";
+//                                    } else {
+//                                        end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+//                                    }
+//
+//                                    if (data[i].create_date === "0000-00-00 00:00:00") {
+//                                        create_date = "";
+//                                    } else {
+//                                        create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+//                                    }
+//
+//                                    t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_description + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+//                                    
+//                                }
+//
+//                            });
+//                        }, 'json');
+                window.location.reload();
+            }
+
             // javascript code
             function getval(sel) {
                 if (sel.value !== '') {
@@ -186,7 +524,7 @@
 
                 }
             }
-            
+
             function getCRMUsers() {
                 $.post('<?php echo site_url('/records/getCRMUsers'); ?>',
                         function (data) {
@@ -196,11 +534,33 @@
                         }, 'json');
             }
             ;
+            
+            function setPeriod(){
+                
+                if($("#formRec input#task_create_date").val() !== "" && $("#formRec input#task_end_date").val() !== ""){
+                    new_task_create_date = $("#formRec input#task_create_date").val().split(" ")[0];
+                    new_task_end_date = $("#formRec input#task_end_date").val().split(" ")[0];
+                    $("#formRec input#task_create_date").val(new_task_create_date+" 00:00");
+                    $("#formRec input#task_end_date").val(new_task_end_date+" 23:59");
+                    
+                }
+                
+                if($("#formRec input#task_create_date").val() === "" && $("#formRec input#task_end_date").val() === ""){
+                    $("#formRec input#task_create_date").val(new Date().format('dd.mm.yyyy 00:00'));
+                    $("#formRec input#task_end_date").val(new Date().format('dd.mm.yyyy 23:59'));
+                }
+                
+            }
 
 // /project_dir/index.html
             $(document).ready(function () {
+                
+                $('#button2id').click(function(){
+                   $("#formTask")[0].reset(); 
+                });
+                
                 getCRMUsers();
-            $("button#button1id").click(function () {
+                $("button#button1id").click(function () {
 
                     $.post('<?php echo site_url('/records/addTask'); ?>', $('form#formTask').serialize(),
                             function (data) {
@@ -210,6 +570,114 @@
                                 msg_system(message, type);
                             });
 
+                });
+
+                $("#checkboxes-reminder").click(function () {
+
+                    if ($('input:checkbox[name=checkboxes-reminder]').is(':checked')) {
+
+                        console.info('Is Checked');
+
+                        $('#checkboxes_reminder_block').css('display', 'block');
+
+                    } else {
+
+                        console.info('Is Not Checked');
+
+                        $('#checkboxes_reminder_block').css('display', 'none');
+                        $("#task_reminder_date").val("");
+
+                    }
+
+                });
+
+                $("form#formRec input#checkboxes-reminder").click(function () {
+                    console.info('ok');
+                    if ($('form#formRec input:checkbox[name=checkboxes-reminder]').is(':checked')) {
+
+                        console.info('Is Checked');
+
+                        $('form#formRec #checkboxes_reminder_block').css('display', 'block');
+
+                    } else {
+
+                        console.info('Is Not Checked');
+
+                        $('form#formRec #checkboxes_reminder_block').css('display', 'none');
+                        $("form#formRec #task_reminder_date").val("");
+
+                    }
+
+                });
+
+                function getAssignedName(id) {
+                    $.post('<?php echo site_url('/records/getAssignedUserById'); ?>', {'id': id},
+                    function (data) {
+                        return 'data';
+                    });
+                }
+
+                $('#dateRange').hide();
+                $('#dateRangeButton').hide();
+
+                $('#dateRange').focusout(function () {
+                    console.info($(this).val());
+
+                    $.post('<?php echo site_url('/records/getActiveRec'); ?>', {'date': $(this).val()},
+                    function (data) {
+
+                        console.info(data);
+                        $("#allContactsTable").dataTable().fnClearTable();
+                        var t = $('#allContactsTable').DataTable();
+                        var n = 1;
+
+                        $.each(data, function (i, val) {
+
+                            if (data[i].task_name !== "") {
+
+                                var end_date = "";
+                                var create_date = "";
+
+                                if (data[i].end_date === "0000-00-00 00:00:00") {
+                                    end_date = "";
+                                } else {
+                                    end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                }
+
+                                if (data[i].create_date === "0000-00-00 00:00:00") {
+                                    create_date = "";
+                                } else {
+                                    create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                }
+
+                                t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_name + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                $('#allContactsTable td').css('background-color', '#87cefa');
+
+                            } else {
+                                var end_date = "";
+                                var create_date = "";
+
+                                if (data[i].end_date === "0000-00-00 00:00:00") {
+                                    end_date = "";
+                                } else {
+                                    end_date = new Date(data[i].end_date).format('dd.mm.yyyy HH:MM:ss');
+                                }
+
+                                if (data[i].create_date === "0000-00-00 00:00:00") {
+                                    create_date = "";
+                                } else {
+                                    create_date = new Date(data[i].create_date).format('dd.mm.yyyy HH:MM:ss');
+                                }
+
+                                t.dataTable().fnAddData([n++, '<a href="records/viewTask/' + data[i].id + '">' + data[i].task_description + '</a>', data[i].initiator, data[i].assigned, create_date, end_date, '<div class="btn-group"><button type="button" class="btn btn-small btn-info" title="Выполнено" onclick="doneRecord(' + data[i].id + '); return false;"><i class="icon-check"> </i></button><button type="button" class="btn btn-small btn-success" title="Редактировать"  onclick="redirect2EditRecord(' + data[i].id + '); return false;"><i class="icon-edit"> </i></button><button type="button" class="btn btn-small btn-danger" title="Удалить" onclick="delRecord(' + data[i].id + '); return false;"><i class="icon-trash"> </i></button></div>']);
+                                $('#allContactsTable td').css('background-color', '#87cefa');
+
+                            }
+
+                        });
+
+
+                    }, 'json');
 
                 });
 
@@ -222,9 +690,9 @@
                         $('#reminder_block').fadeOut('fast');
 
                 });
-            
-            
-            $("#create_date").datetimepicker({
+
+
+                $("#create_date").datetimepicker({
                     format: 'd.m.Y H:i:s',
                     lang: 'ru',
                     step: 5,
@@ -241,7 +709,38 @@
                     todayButton: true,
                     dayOfWeekStart: 1
                 });
-                
+
+                $("#dateRange").datetimepicker({
+                    format: 'd.m.Y',
+                    value: new Date().format('d.m.Y'),
+                    lang: 'ru',
+                    timepicker: false,
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("#task_reminder_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    timepicker: true,
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("form#formRec #task_reminder_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    timepicker: true,
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
                 var url = window.location.href;
 
                 // passes on every "a" tag 
@@ -468,11 +967,11 @@
                 }, 'json');
 
                 $('#selectAssigned').on('change', function () {
-                    if (this.value !== ''){
+                    if (this.value !== '') {
                         console.info('Not Empty');
-                        $('#checkboxes_report_block').css('display','block');
-                    }else{
-                        $('#checkboxes_report_block').css('display','none');
+                        $('#checkboxes_report_block').css('display', 'block');
+                    } else {
+                        $('#checkboxes_report_block').css('display', 'none');
                     }
                 });
 
@@ -490,7 +989,7 @@
 //                    allowClear: true
 //                });
 
-                $("#create_date").datetimepicker({
+                $("input#create_date .input-medium").datetimepicker({
                     format: 'd.m.Y H:i:s',
                     lang: 'ru',
                     step: 5,
@@ -501,6 +1000,24 @@
 
                 $("#end_date").datetimepicker({
                     format: 'd.m.Y H:i:s',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("input#task_create_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("input#task_end_date").datetimepicker({
+                    format: 'd.m.Y H:i',
                     lang: 'ru',
                     step: 5,
                     closeOnDateSelect: true,
@@ -537,6 +1054,61 @@
                 });
 
                 var socket = io.connect('<?php echo $this->config->item('listner_address'); ?>');
+                var socket3 = io.connect('http://office.crm64.ru:3010');
+
+                socket3.on('news', function (data) {
+                    var datetime = data.datetime;
+                    var description = data.description;
+
+
+                    $.post('<?php echo site_url('/core/getUserParamsByID'); ?>',
+                            {
+                                'datetime': data.datetime,
+                                'description': data.description,
+                                'user_id': data.userid
+
+                            }, function (data) {
+                        console.info(data);
+
+                        $.each(data, function (i, value) {
+
+                            if (data[i].sms_notification === "1") {
+                                send_sms_notification();
+                            }
+
+                            if (data[i].display_notification === "1") {
+                                var message = "Напоминание в " + (new Date(datetime)).format('d.m.yyyy HH:mm:ss') + " <br/> Текст: " + description;
+                                msg_system(message, 'success');
+                            }
+
+                            if (data[i].email_notification === "1") {
+                                send_email_notification(description, data[i].email);
+                            }
+
+                            if (data[i].call_notification === "1") {
+                                send_call_notification();
+                            }
+
+                        });
+
+                    }, 'json');
+
+                });
+
+                function send_sms_notification() {
+
+                }
+
+                function send_email_notification(msg, address) {
+                    $.post('<?php echo site_url('/core/sendReminderLetter'); ?>', {'msg': msg, 'address': address}, function (data) {
+
+                    });
+
+                }
+
+                function send_call_notification() {
+
+                }
 
                 var messages = $("#messages");
 
@@ -548,7 +1120,6 @@
                         width: 300,
                         height: 300,
                         opacity: 1,
-                        autohide: false,
                         position: "center",
                         multiline: true
                     });
@@ -657,6 +1228,13 @@
                             var text = "Разговор ...";
                             var type = "success";
                             msg_system(text, type);
+                            
+                            $.post('<?php echo site_url('/core/viewCallEventUniversal'); ?>',
+                                    function (data) {
+                                        $("#lastTenCalls").empty();
+                                        $("#lastTenCalls").append(data);
+                                    });
+                            
                         }
                     }
 
@@ -673,6 +1251,12 @@
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
+                            
+                            $.post('<?php echo site_url('/core/viewCallEventUniversal'); ?>',
+                                    function (data) {
+                                        $("#lastTenCalls").empty();
+                                        $("#lastTenCalls").append(data);
+                                    });
 
                         }
                     }
@@ -912,7 +1496,7 @@
             echo $menu;
             ?>
         </div><!--/.nav-collapse -->
-<!-- Task Modal Form -->
+        <!-- Task Modal Form -->
         <div class="modal hide fade" id="taskWindow" style="width:600px; ">
             <div class="modal-header">
                 <a href="#" class="pull-right" data-dismiss="modal">×</a>
@@ -952,7 +1536,7 @@
                         <div class="control-group">
                             <label class="control-label" for="task_description">Описание</label>
                             <div class="controls">                     
-                                <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="10"></textarea>
+                                <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="6"></textarea>
                             </div>
                         </div>
 
@@ -972,19 +1556,44 @@
                         </div>
 
                         <div class="control-group">
-                            <label class="control-label" for="create_date">Дата начала</label>
+                            <label class="control-label" for="task_create_date">Дата начала</label>
                             <div class="controls">
-                                <input id="create_date" name="create_date" type="text" class="input-medium" value="">
+                                <input id="task_create_date" name="task_create_date" type="text" class="input-medium" value="">
 
                             </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label" for="end_date">Дата окончания</label>
+                            <label class="control-label" for="task_end_date">Дата окончания</label>
                             <div class="controls">
-                                <input id="end_date" name="end_date" type="text" class="input-medium" value="">
+                                <input id="task_end_date" name="task_end_date" type="text" class="input-medium" value="">
 
                             </div>
                         </div>
+                        
+                        <div class="control-group">
+                            <label class="control-label" for="setPeriod"></label>
+                            <div class="controls">
+                                <a id="setPeriod" onclick="setPeriod(); return false;" name="setPeriod" class="btn btn-mini btn-warning" >Весь день</a>
+                            </div>
+                        </div>
+
+                        <div class="controls">
+                            <label class="checkbox" for="checkboxes-report">
+                                <input type="checkbox" name="checkboxes-reminder" id="checkboxes-reminder" value="1">
+                                Напоминание
+                            </label>
+                        </div>
+
+                        <div class="control-group" id="checkboxes_reminder_block" style="display: none;">
+                            <div class="control-group">
+                                <label class="control-label" for="task_reminder_date">Дата напоминания</label>
+                                <div class="controls">
+                                    <input name="task_reminder_date" type="text" id="task_reminder_date" class="input-medium" value="">
+
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Multiple Checkboxes -->
 
                         <div id="reminder_block" style="display:none;">

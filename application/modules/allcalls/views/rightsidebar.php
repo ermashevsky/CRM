@@ -35,16 +35,24 @@
                 </tr>
             </tbody></table>
     </div>
-
-<!--    <div class="sidebar-nav">
-        <div class="messages" id="messages"></div>
-    </div>/.well -->
+    
+<div class="input-append">
+        <input class="span2" id="originateDst" name="originateDst" placeholder="Введите номер телефона" type="text">
+        
+        <button type="button" onclick="originateCall(<?php echo $user->phone; ?>);
+                return false;" class="btn btn-success" title="Вызов абонента" ><i class="icon-phone"></i></button>
+    </div>
+    <span id="originateDstText" class="label label-important" style="display:none;">Введите номер телефона</span>
+    
+    <!--    <div class="sidebar-nav">
+            <div class="messages" id="messages"></div>
+        </div>/.well -->
 
     <div class="sidebar-nav">
-        <div class="nav nav-list" >
+        <div class="nav nav-list" id="lastTenCalls">
             <?php
             $this->load->module('core');
-            $this->core->viewCallEvent($user->phone, $user->external_phone);
+            $this->core->viewCallEventUniversal();
             ?>
         </div>
-        
+

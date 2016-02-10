@@ -48,6 +48,48 @@ class Records_model extends CI_Model {
 
         $this->db->select("*");
         $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $row->assigned;
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+                if($row->execution_date !== "0000-00-00 00:00:00"){
+                    $tmp->td_color = "#90ee90;";
+                }else{
+                    $tmp->td_color = "#87cefa;";
+                }
+                
+                if(date("Y-m-d H:i:s",strtotime($row->end_date)) < date("Y-m-d H:i:s", now()) && $row->execution_date === "0000-00-00 00:00:00" && $row->end_date !== "0000-00-00 00:00:00"){
+                    $tmp->td_color = "#ffc0cb;";
+                }
+                
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
+    }
+    
+    function getRecordsByPhoneNum($phone_num){
+        $results = array();
+
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $this->db->where('phone_num',$phone_num);
         $res = $this->db->get();
         $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
         
@@ -157,8 +199,23 @@ class Records_model extends CI_Model {
         }
     }
     
+    function getCRMAssignedUserById($id){
+        $this->db->select("*");
+        $this->db->from('users');
+        $this->db->where('id', $id);
+        $res = $this->db->get();
+
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+//                echo $row->first_name;
+//                echo $row->last_name;
+            }
+            echo $row->first_name.' '.$row->last_name; 
+        }
+    }
     
-    function updateTaskParameters($id, $status, $priority, $assigned, $category, $task_description, $task_name){
+    
+    function updateTaskParameters($id, $status, $priority, $assigned, $category, $task_description, $task_name, $reminder_date, $create_date, $end_date){
 
         $data = array(
                 'status' => $status,
@@ -166,14 +223,199 @@ class Records_model extends CI_Model {
                 'assigned'=>$assigned,
                 'category'=>$category,
                 'task_name'=>$task_name,
-                'task_description'=>$task_description
+                'task_description'=>$task_description,
+                'create_date'=>date('Y-m-d H:i:s', strtotime($create_date)),
+                'end_date'=>date('Y-m-d H:i:s', strtotime($end_date))
             );
-        
+
         $this->db->trans_start();
         $this->db->where('id', $id);
         $this->db->update('tasks', $data);
         $this->db->trans_complete();
         
+    }
+    
+    function getActiveRec($date){
+        $results = array();
+        $crmUser = new Records();
+        
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $this->db->where('execution_date','0000-00-00 00:00:00');
+        $this->db->where('DATE_FORMAT(create_date,"%Y-%m-%d") <= ', date('Y-m-d', strtotime($date)));
+        $this->db->where('DATE_FORMAT(end_date,"%Y-%m-%d") >= ', date('Y-m-d', strtotime($date)));
+        $this->db->or_where('(create_date', '"0000-00-00 00:00:00"',FALSE);
+        $this->db->where('end_date','"0000-00-00 00:00:00"',FALSE);
+        $this->db->where('deleted_date','"0000-00-00 00:00:00"',FALSE);
+        $this->db->where('execution_date','"0000-00-00 00:00:00")',FALSE);
+//        $this->db->or_where('(create_date !=', '"0000-00-00 00:00:00"',FALSE);
+//        $this->db->where('end_date','"0000-00-00 00:00:00"',FALSE);
+//        $this->db->where('deleted_date','"0000-00-00 00:00:00"',FALSE);
+//        $this->db->where('execution_date','"0000-00-00 00:00:00")',FALSE);
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $crmUser->getUserById($row->assigned);
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
+    }
+    
+    function getOverDueRec(){
+        $results = array();
+        $crmUser = new Records();
+        
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $this->db->where('execution_date','0000-00-00 00:00:00');
+        $this->db->where('DATE_FORMAT(end_date,"%Y-%m-%d") < ', date('Y-m-d', now()));
+        $this->db->where('end_date !=', '0000-00-00 00:00:00');
+        
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $crmUser->getUserById($row->assigned);
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
+    }
+    
+    function getExecutionEndRec(){
+        $results = array();
+        
+        $crmUser = new Records();
+        
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $this->db->where('execution_date != ','0000-00-00 00:00:00');
+        
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $crmUser->getUserById($row->assigned);
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
+    }
+    
+    function getInWorkRec(){
+        $results = array();
+        
+        $crmUser = new Records();
+        
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        $this->db->where('execution_date','0000-00-00 00:00:00');
+        
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $crmUser->getUserById($row->assigned);
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
+    }
+    
+    function getAllRec(){
+        $results = array();
+        
+        $crmUser = new Records();
+        
+        $this->db->select("*");
+        $this->db->from('tasks');
+        $this->db->where('deleted_date','0000-00-00 00:00:00');
+        
+        $res = $this->db->get();
+        $data['user'] = $this->ion_auth->user($this->session->userdata('user_id'))->row();
+        
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Records_model();
+                if($data['user']->first_name.' '.$data['user']->last_name == $row->initiator || $this->getCRMUserById($row->assigned) == $data['user']->first_name.' '.$data['user']->last_name){
+                $tmp->id = $row->id;
+                $tmp->initiator = $row->initiator;
+                $tmp->category = $row->category;
+                $tmp->status = $row->status;
+                $tmp->priority = $row->priority;
+                $tmp->task_name = $row->task_name;
+                $tmp->task_description = $row->task_description;
+                $tmp->assigned = $crmUser->getUserById($row->assigned);
+                $tmp->create_date = $row->create_date;
+                $tmp->end_date = $row->end_date;
+
+                $results[$tmp->id] = $tmp;
+                }
+            }
+        }
+        return $results;
     }
     
     function addTask($data){
@@ -184,9 +426,28 @@ class Records_model extends CI_Model {
     
     function deleteTask($id){
         $this->db->trans_start();
+        
+        $data = array(
+               'deleted_date' => date("Y-m-d H:i:s")
+            );
+
         $this->db->where('id', $id);
-        $this->db->delete('tasks'); 
+        $this->db->update('tasks', $data); 
+
         $this->db->trans_complete();
+    }
+    
+    function doneRecord($id){
+       $this->db->trans_start();
+        
+        $data = array(
+               'execution_date' => date("Y-m-d H:i:s")
+            );
+
+        $this->db->where('id', $id);
+        $this->db->update('tasks', $data); 
+
+        $this->db->trans_complete(); 
     }
     
     function closeTask($id){

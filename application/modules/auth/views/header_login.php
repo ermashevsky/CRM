@@ -11,8 +11,6 @@
         <script src="/assets/js/bootstrap-notify.js"></script>
         <script src="/assets/js/jquery.uploadify.min.js"></script>
 
-
-
         <link href="/assets/css/bootstrap.min.css" rel="stylesheet" media="screen">
         <link href="/assets/css/bootstrap-responsive.css" rel="stylesheet">
         <link href="/assets/css/bootstrap-button.css" rel="stylesheet">
@@ -20,7 +18,10 @@
         <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
         <style>
             
-            html,body{background-image: url('/assets/img/back_login_form.jpg');}
+            html,body{
+                background-image: url('/assets/img/back_login_form.png');
+                
+            }
             
             /* Input-append and input-prepend with inline-block-level */
             

@@ -55,12 +55,43 @@
                                         </select>
                                     </div>
                                 </div>
+                                <!-- Select Basic -->
+                                <div class="control-group">
+                                    <label class="control-label" for="task_create_date">Дата начала</label>
+                                    <div class="controls">
+                                        <?php
+
+                                        if($row->create_date === '0000-00-00 00:00:00'){
+                                            $create_date = '';
+                                        }else{
+                                            $create_date = date('d.m.Y H:i:s', strtotime($row->create_date));
+                                        }
+
+                                        if($row->end_date === '0000-00-00 00:00:00'){
+                                            $end_date = '';
+                                        }else{
+                                            $end_date = date('d.m.Y H:i:s', strtotime($row->end_date));
+                                        }
+                                       
+                                        ?>
+                                            <input id="task_create_date" name="task_create_date" type="text" placeholder="" class="input-xlarge" value="<?php echo $create_date; ?>">
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- Select Basic -->
+                                <div class="control-group">
+                                    <label class="control-label" for="task_end_date">Дата окончания</label>
+                                    <div class="controls">
+                                            <input id="task_end_date" name="task_end_date" type="text" placeholder="" class="input-xlarge" value="<?php echo $end_date; ?>">
+                                        </select>
+                                    </div>
+                                </div>
                                 <!-- Button (Double) -->
                                 <div class="control-group">
                                     <label class="control-label" for="button1id"></label>
                                     <div class="controls">
                                         <button id="button1id" name="button1id" class="btn btn-success">Сохранить</button>
-                                        <button id="button2id" name="button2id" class="btn btn-danger">Отменить</button>
+                                        <a href="/records" id="button2id" name="button2id" class="btn btn-danger">Отменить</a>
                                     </div>
                                 </div>
 

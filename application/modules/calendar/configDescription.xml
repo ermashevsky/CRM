@@ -2,7 +2,7 @@
 <root>
     <plugin_name>Calendar Module</plugin_name>
     <plugin_description>Модуль "Календарь" отражает все типы записей в CRM.</plugin_description>
-    <plugin_version>2.0.5</plugin_version>
+    <plugin_version>2.0.8</plugin_version>
     <plugin_system_name>calendar</plugin_system_name>
     <plugin_menu_visible>true</plugin_menu_visible>
     <plugin_menu_name>Календарь</plugin_menu_name>

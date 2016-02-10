@@ -144,9 +144,12 @@
                             </tbody>
                         </table>
                         <br/>
+                        <button class="btn btn-danger btn-small pull-right" onclick="deleteContactDetails(<?php echo $row->id; ?>); return false;"><i class="icon-trash"> </i> Удалить</button>
+                        <button class="btn btn-success btn-small pull-right" onclick="editContactDetails(<?php echo $row->id; ?>); return false;"><i class="icon-pencil"> </i> Редактировать</button>
+                        
                         <?php
-                        echo anchor("addressbook/deleteContactDetails/" . $row->id, '<i class="icon-trash"> </i> Удалить', 'class="btn btn-danger btn-small pull-right"');
-                        echo anchor("addressbook/editContactDetails/" . $row->id, '<i class="icon-pencil"> </i>Редактировать', 'class="btn btn-success btn-small pull-right"');
+//                        echo anchor("addressbook/deleteContactDetails/" . $row->id, '<i class="icon-trash"> </i> Удалить', 'class="btn btn-danger btn-small pull-right"');
+//                        echo anchor("addressbook/editContactDetails/" . $row->id, '<i class="icon-pencil"> </i>Редактировать', 'class="btn btn-success btn-small pull-right"');
                         ?>
                     </div><!--/span-->
                 </div><!--/row-->

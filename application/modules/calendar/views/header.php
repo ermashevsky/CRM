@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
         <title>Office WebCRM </title>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery-latest.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-button.js"></script>
         <script type="text/javascript" src="/assets/js/bootstrap-fileupload.js"></script>
@@ -41,7 +41,6 @@
         <link rel="stylesheet" type="text/css" href="/assets/css/select2.css">
         <link rel="stylesheet" type="text/css" href="/assets/css/fullcalendar.min.css">
         <!--        <link rel="stylesheet" type="text/css" href="/assets/css/fullcalendar.print.css">-->
-        <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
         <script src="<?php echo $this->config->item('listner_socket_address'); ?>"></script>
         <script type="text/javascript">
@@ -123,6 +122,20 @@
                     location.reload();
                 });
 
+            }
+            
+            function originateCall(internalNumb) {
+            
+                var originateDst = $('#originateDst').val();
+
+                $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: originateDst, internalNumb:internalNumb},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
             }
 
             function deleteOrganization(id) {
@@ -218,7 +231,31 @@
 
 // /project_dir/index.html
             $(document).ready(function () {
-                
+            
+            
+            $('#button2id').click(function(){
+                   $("#formRec")[0].reset(); 
+                });
+            
+            $("#checkboxes-reminder").click(function () {
+
+                    if ($('input:checkbox[name=checkboxes-reminder]').is(':checked')) {
+
+                        console.info('Is Checked');
+                        
+                        $('#checkboxes_reminder_block').css('display','block');
+
+                    } else {
+
+                        console.info('Is Not Checked');
+                        
+                        $('#checkboxes_reminder_block').css('display','none');
+                        $("#task_reminder_date").val("");
+
+                    }
+
+                });
+            
                 getCRMUsers();
             $("button#button1id").click(function () {
 
@@ -245,7 +282,7 @@
             
             
             $("#create_date").datetimepicker({
-                    format: 'd.m.Y H:i:s',
+                    format: 'd.m.Y H:i',
                     lang: 'ru',
                     step: 5,
                     closeOnDateSelect: true,
@@ -254,8 +291,36 @@
                 });
 
                 $("#end_date").datetimepicker({
-                    format: 'd.m.Y H:i:s',
+                    format: 'd.m.Y H:i',
                     lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+                
+                $("#task_create_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+
+                $("#task_end_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    step: 5,
+                    closeOnDateSelect: true,
+                    todayButton: true,
+                    dayOfWeekStart: 1
+                });
+                
+                $("#task_reminder_date").datetimepicker({
+                    format: 'd.m.Y H:i',
+                    lang: 'ru',
+                    timepicker: true,
                     step: 5,
                     closeOnDateSelect: true,
                     todayButton: true,
@@ -547,7 +612,7 @@
 //                });
 
                 $("#reminder_date").datetimepicker({
-                    format: 'd.m.Y H:i:s',
+                    format: 'd.m.Y H:i',
                     lang: 'ru',
                     step: 5,
                     closeOnDateSelect: true,
@@ -575,7 +640,61 @@
                 });
 
                 var socket = io.connect('<?php echo $this->config->item('listner_address'); ?>');
+                var socket3 = io.connect('http://office.crm64.ru:3010');
+                
+                socket3.on('news', function (data) {
+                    var datetime = data.datetime;
+                    var description = data.description;
 
+
+                    $.post('<?php echo site_url('/core/getUserParamsByID'); ?>',
+                            {
+                                'datetime': data.datetime,
+                                'description': data.description,
+                                'user_id': data.userid
+
+                            }, function (data) {
+                        console.info(data);
+
+                        $.each(data, function (i, value) {
+
+                            if (data[i].sms_notification === "1") {
+                                send_sms_notification();
+                            }
+
+                            if (data[i].display_notification === "1") {
+                                var message = "Напоминание в " + (new Date(datetime)).format('d.m.yyyy HH:mm:ss')  + " <br/> Текст: " + description;
+                                msg_system(message, 'success');
+                            }
+
+                            if (data[i].email_notification === "1") {
+                                send_email_notification(description, data[i].email);
+                            }
+
+                            if (data[i].call_notification === "1") {
+                                send_call_notification();
+                            }
+
+                        });
+
+                    }, 'json');
+
+                });
+
+                function send_sms_notification() {
+
+                }
+
+                function send_email_notification(msg, address) {
+                    $.post('<?php echo site_url('/core/sendReminderLetter'); ?>', {'msg':msg, 'address':address},function (data) {
+                        
+                    });
+
+                }
+
+                function send_call_notification() {
+
+                }
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -695,6 +814,11 @@
                             var text = "Разговор ...";
                             var type = "success";
                             msg_system(text, type);
+                            $.post('<?php echo site_url('/core/viewCallEventUniversal'); ?>',
+                                    function (data) {
+                                        $("#lastTenCalls").empty();
+                                        $("#lastTenCalls").append(data);
+                                    });
                         }
                     }
 
@@ -711,6 +835,11 @@
                             var text = "Повесили трубку";
                             var type = "success";
                             msg_system(text, type);
+                            $.post('<?php echo site_url('/core/viewCallEventUniversal'); ?>',
+                                    function (data) {
+                                        $("#lastTenCalls").empty();
+                                        $("#lastTenCalls").append(data);
+                                    });
 
                         }
                     }
@@ -867,6 +996,24 @@
             function play() {
                 alert("Выбрано воспроизведение");
             }
+            
+            function setPeriod(){
+                
+                if($("#formRec input#task_create_date").val() !== "" && $("#formRec input#task_end_date").val() !== ""){
+                    new_task_create_date = $("#formRec input#task_create_date").val().split(" ")[0];
+                    new_task_end_date = $("#formRec input#task_end_date").val().split(" ")[0];
+                    $("#formRec input#task_create_date").val(new_task_create_date+" 00:00");
+                    $("#formRec input#task_end_date").val(new_task_end_date+" 23:59");
+                    
+                }
+                
+                if($("#formRec input#task_create_date").val() === "" && $("#formRec input#task_end_date").val() === ""){
+                    $("#formRec input#task_create_date").val(new Date().format('dd.mm.yyyy 00:00'));
+                    $("#formRec input#task_end_date").val(new Date().format('dd.mm.yyyy 23:59'));
+                }
+                
+            }
+            
         </script>
         <style>
             body,html{
@@ -955,7 +1102,7 @@
                 <h4>Новая запись</h4>
             </div>
             <div class="modal-body" style="max-height: 600px;">
-                <form action="task/addTask" class="form-horizontal" id="formTask">
+                <form action="task/addTask" class="form-horizontal" id="formRec">
                     <fieldset>
                         <!-- Form Name -->
                         <input type="hidden" name="id_call" id="id_call" value=""/>
@@ -988,7 +1135,7 @@
                         <div class="control-group">
                             <label class="control-label" for="task_description">Описание</label>
                             <div class="controls">                     
-                                <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="10"></textarea>
+                                <textarea id="task_description" name="task_description" class="input-xlarge" cols="10" rows="6"></textarea>
                             </div>
                         </div>
 
@@ -1008,19 +1155,44 @@
                         </div>
 
                         <div class="control-group">
-                            <label class="control-label" for="create_date">Дата начала</label>
+                            <label class="control-label" for="task_create_date">Дата начала</label>
                             <div class="controls">
-                                <input id="create_date" name="create_date" type="text" class="input-medium" value="">
+                                <input id="task_create_date" name="task_create_date" type="text" class="input-medium" value="">
 
                             </div>
                         </div>
                         <div class="control-group">
-                            <label class="control-label" for="end_date">Дата окончания</label>
+                            <label class="control-label" for="task_end_date">Дата окончания</label>
                             <div class="controls">
-                                <input id="end_date" name="end_date" type="text" class="input-medium" value="">
+                                <input id="task_end_date" name="task_end_date" type="text" class="input-medium" value="">
 
                             </div>
                         </div>
+                        
+                        <div class="control-group">
+                            <label class="control-label" for="setPeriod"></label>
+                            <div class="controls">
+                                <a id="setPeriod" onclick="setPeriod(); return false;" name="setPeriod" class="btn btn-mini btn-warning" >Весь день</a>
+                            </div>
+                        </div>
+                        
+                        <div class="controls">
+                                <label class="checkbox" for="checkboxes-report">
+                                    <input type="checkbox" name="checkboxes-reminder" id="checkboxes-reminder" value="1">
+                                    Напоминание
+                                </label>
+                            </div>
+                            
+                            <div class="control-group" id="checkboxes_reminder_block" style="display: none;">
+                                <div class="control-group">
+                                    <label class="control-label" for="task_reminder_date">Дата напоминания</label>
+                                    <div class="controls">
+                                        <input name="task_reminder_date" type="text" id="task_reminder_date" class="input-medium" value="">
+
+                                    </div>
+                                </div>
+                            </div>
+                        
                         <!-- Multiple Checkboxes -->
 
                         <div id="reminder_block" style="display:none;">

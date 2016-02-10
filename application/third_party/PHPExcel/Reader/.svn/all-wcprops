@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader
+END
+CSV.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/CSV.php
+END
+Gnumeric.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/Gnumeric.php
+END
+IReadFilter.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/IReadFilter.php
+END
+HTML.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/HTML.php
+END
+Excel2007.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/Excel2007.php
+END
+IReader.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/IReader.php
+END
+Excel5.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/Excel5.php
+END
+DefaultReadFilter.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/DefaultReadFilter.php
+END
+Excel2003XML.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/Excel2003XML.php
+END
+OOCalc.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/OOCalc.php
+END
+SYLK.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Reader/SYLK.php
+END

@@ -2,7 +2,7 @@
 <root>
     <plugin_name>AddressBook Module</plugin_name>
     <plugin_description>Модуль "Адресная книга" расширяет функционал CRM. Добавляет возможность сохранения и упорядочивания контактов.</plugin_description>
-    <plugin_version>2.0.5</plugin_version>
+    <plugin_version>2.0.9</plugin_version>
     <plugin_system_name>addressbook</plugin_system_name>
     <plugin_menu_visible>true</plugin_menu_visible>
     <plugin_menu_name>Адресная книга</plugin_menu_name>

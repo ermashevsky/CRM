@@ -66,6 +66,11 @@ class AddressBook extends MX_Controller {
         $this->load->model('addressbook_model');
         return $this->addressbook_model->getContactById($id);
     }
+    
+    function getRecCount($phoneNum){
+        $this->load->model('addressbook_model');
+        return $this->addressbook_model->getRecCount($phoneNum);
+    }
 
     function searchOrganizationId() {
         $organization_name = trim($this->input->post('organization_name'));
@@ -84,8 +89,8 @@ class AddressBook extends MX_Controller {
         
         $this->form_validation->set_rules('organization_name', 'Наименование', 'required|xss_clean|trim');
         $this->form_validation->set_rules('phone_number', 'Телефон (основной)', 'required|xss_clean|trim');
-        $this->form_validation->set_rules('address', 'Адрес', 'required|xss_clean|trim');
-        $this->form_validation->set_rules('email', 'Email', 'required|xss_clean|trim');
+//        $this->form_validation->set_rules('address', 'Адрес', 'required|xss_clean|trim');
+//        $this->form_validation->set_rules('email', 'Email', 'required|xss_clean|trim');
 
         if ($this->form_validation->run() === TRUE) {
             $organization_name = $this->input->post('organization_name');
@@ -156,16 +161,14 @@ class AddressBook extends MX_Controller {
         $this->form_validation->set_error_delimiters('<div class="alert alert-error">', '</div>');
 
         $this->form_validation->set_rules('contact_name', 'ФИО', 'required|xss_clean|trim');
-        $this->form_validation->set_rules('job_position', 'Должность', 'required|xss_clean|trim');
         $this->form_validation->set_rules('private_phone_number', 'Телефон (основной)', 'required|xss_clean|trim');
-        $this->form_validation->set_rules('email', 'Email', 'required|xss_clean|trim');
 
         if ($this->form_validation->run() === TRUE) {
 
             $contact_name = $this->input->post('contact_name');
             $job_position = $this->input->post('job_position');
-            $private_phone_number = $this->input->post('private_phone_number');
-            $mobile_number = $this->input->post('mobile_number');
+            $private_phone_number = str_replace ('-','',$this->input->post('private_phone_number'));
+            $mobile_number = str_replace ('-','',$this->input->post('mobile_number'));
             $email = $this->input->post('email');
             $address = $this->input->post('address');
             $birthday = $this->input->post('birthday');
@@ -218,7 +221,7 @@ class AddressBook extends MX_Controller {
             
             }
             
-            redirect('addressbook/index', 'refresh');
+            redirect('addressbook#contacts_list', 'refresh');
             
         } else {
             $this->load->helper('form');
@@ -273,6 +276,7 @@ class AddressBook extends MX_Controller {
 
             $this->load->model('addressbook_model');
             $tableData['table'] = $this->addressbook_model->getAllTableData();
+            $tableData['table2'] = $this->addressbook_model->getAllContactsTableData();
 
             $menu = array('menu' => $this->menu->render('header'));
             $this->load->view('header', $menu);
@@ -335,13 +339,14 @@ class AddressBook extends MX_Controller {
     }
 
     function getCoordinates($address) {
-
+        if($address !==""){
         $address = str_replace(" ", "+", $address); // replace all the white space with "+" sign to match with google search pattern
         $url = "http://maps.google.com/maps/api/geocode/json?sensor=false&address=$address";
         $response = file_get_contents($url);
         $json = json_decode($response, TRUE); //generate array object from the response from the web
 
         return ($json['results'][0]['geometry']['location']['lat'] . "," . $json['results'][0]['geometry']['location']['lng']);
+        }
     }
 
     function viewContactDetails($id) {
@@ -460,8 +465,8 @@ class AddressBook extends MX_Controller {
     function updateContactDetails() {
         $contact_name = $this->input->post('contact_name');
         $job_position = $this->input->post('job_position');
-        $private_phone_number = $this->input->post('private_phone_number');
-        $mobile_number = $this->input->post('mobile_number');
+        $private_phone_number = str_replace ('-','',$this->input->post('private_phone_number'));
+        $mobile_number = str_replace ('-','',$this->input->post('mobile_number'));
         $email = $this->input->post('email');
         $address = $this->input->post('address');
         $birthday = $this->input->post('birthday');
@@ -578,11 +583,11 @@ class AddressBook extends MX_Controller {
         echo json_encode($data);
     }
     
-    function deleteContactDetails($id){
+    function deleteContactDetails(){
+        $id = $this->input->post('id');
         //$id = $this->input->get('id');
         $this->load->model('addressbook_model');
         $this->addressbook_model->deleteContactDetails($id);
-        redirect('/addressbook/allContacts');
     }
 
 }

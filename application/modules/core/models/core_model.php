@@ -71,7 +71,7 @@ class Core_model extends CI_Model {
             )
             WHERE  `disposition` 
             IN (
-             'ANSWERED',  'BUSY',  'NO ANSWER'
+             'ANSWERED',  'BUSY',  'NO ANSWER',''
             )
             AND (
              `src` =  '".$phone_number."'
@@ -118,8 +118,8 @@ class Core_model extends CI_Model {
         
         $this->db->select("id, organization_name as contact_name", false);
         $this->db->from('organization');
-        $this->db->like('phone_number', $phone_number);
-        $this->db->or_like('alt_phone_number', $phone_number);
+        $this->db->where('phone_number', $phone_number);
+        $this->db->or_where('alt_phone_number', $phone_number);
         
         $res = $this->db->get();
         if (0 < $res->num_rows) {
@@ -128,8 +128,8 @@ class Core_model extends CI_Model {
         }else{
         $this->db->select("id,contact_name", false);
         $this->db->from('contacts');
-        $this->db->like('private_phone_number', $phone_number);
-        $this->db->or_like('mobile_number', $phone_number);
+        $this->db->where('private_phone_number', $phone_number);
+        $this->db->or_where('mobile_number', $phone_number);
         
         $res = $this->db->get();
         if (0 < $res->num_rows) {
@@ -138,8 +138,8 @@ class Core_model extends CI_Model {
         }else{
             $this->db->select("id,first_name, last_name", false);
             $this->db->from('users');
-            $this->db->like('phone', $phone_number);
-            $this->db->or_like('external_phone', $phone_number);
+            $this->db->where('phone', $phone_number);
+            $this->db->or_where('external_phone', $phone_number);
             //$this->db->or_where('mobile_number', $phone_number);
         
         $res = $this->db->get();
@@ -180,6 +180,76 @@ class Core_model extends CI_Model {
         }else{
             return "NO";
         }
+    }
+    
+     function getCRMUserById($id){
+        $this->db->select("*");
+        $this->db->from('users');
+        $this->db->where('id', $id);
+        $res = $this->db->get();
+
+        if (0 < $res->num_rows) {
+            foreach ($res->result() as $row) {
+                $tmp = new Core_model();
+                $tmp->id = $row->id;
+                $tmp->username = $row->username;
+                $tmp->email = $row->email;
+                $tmp->last_name = $row->last_name;
+                $tmp->first_name = $row->first_name;
+                $tmp->external_phone = $row->external_phone;
+                $tmp->phone = $row->phone;
+                $tmp->sms_notification = $row->sms_notification;
+                $tmp->call_notification = $row->call_notification;
+                $tmp->email_notification = $row->email_notification;
+                $tmp->display_notification = $row->display_notification;
+                
+                $results[$tmp->id] = $tmp;
+            }
+            return $results; 
+        }
+    }
+    
+    function addReminder($data){
+        
+        if($data['user_id2'] != ''){
+            
+            $new_data = array(
+                'reminder_date' => $data['reminder_date'],
+                'reminder_description' => $data['reminder_description'],
+                'user_id' => $data['user_id2'],
+                'status' => '0'     
+            );
+            
+            $this->db->trans_start();
+            $this->db->insert('reminders', $new_data);
+            $this->db->trans_complete();
+            
+            $new_data2 = array(
+                'reminder_date' => $data['reminder_date'],
+                'reminder_description' => $data['reminder_description'],
+                'user_id' => $data['user_id'],
+                'status' => '0'     
+            );
+            
+            $this->db->trans_start();
+            $this->db->insert('reminders', $new_data2);
+            $this->db->trans_complete();
+            
+        }else{
+            
+            $new_data3 = array(
+                'reminder_date' => $data['reminder_date'],
+                'reminder_description' => $data['reminder_description'],
+                'user_id' => $data['user_id'],
+                'status' => '0'     
+            );
+            
+            $this->db->trans_start();
+            $this->db->insert('reminders', $new_data3);
+            $this->db->trans_complete();
+        }
+        
+        
     }
 
 }

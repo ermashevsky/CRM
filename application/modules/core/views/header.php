@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta name="robots" content="noindex,nofollow"/>
         <title></title>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
+        <script src="/assets/js/jquery-latest.js"></script>
         <script src="/assets/js/bootstrap.min.js"></script>
         <script src="/assets/js/bootstrap-button.js"></script>
         <script src="/assets/js/bootstrap-fileupload.js"></script>
@@ -42,6 +42,11 @@
             // /project_dir/index.html
             $(document).ready(function() {
                 var socket = io.connect('<?php echo $this->config->item('listner_address');?>');
+                var socket3 = io.connect('http://office.crm64.ru:3010');
+                
+                socket3.on('news', function (data) {
+                    alert(data.hello);
+                });
                 var messages = $("#messages");
 
                 function msg_system(message, type) {
@@ -328,6 +333,42 @@
                         }
                     });
                 }
+                
+                function prepareOriginateCall(internal_number,src, dst, call_type) {
+                //panel with buttons
+
+//                console.info(src);
+//                console.info(dst);
+//                console.info(call_type);
+
+                var phone_num = '';
+
+                if (call_type === 'outgoing') {
+                    phone_num = dst;
+                    
+                    $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: dst, internalNumb:internal_number},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
+                    
+                } else {
+                    phone_num = src;
+                    
+                    $.ajax({
+                        url: '<?php echo site_url('/core/originateCall'); ?>',
+                        type: "POST",
+                        data: {originateDst: src, internalNumb:internal_number},
+                        success: function (data) {
+                            console.info(data);
+                        }
+                    });
+                }
+
+            }
 
             });
         </script>

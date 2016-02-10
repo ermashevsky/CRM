@@ -2,10 +2,6 @@
     <div class="container-fluid">
         <div class="row">
             <div class="span10">
-                <?php
-                $groupButton = new AddressBook();
-                $groupButton->createGroupButton();
-                ?>
                 <div class="row-fluid">
                     <div class="span12">
                         <?php

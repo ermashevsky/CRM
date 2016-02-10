@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart
+END
+Title.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/Title.php
+END
+Layout.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/Layout.php
+END
+Legend.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/Legend.php
+END
+PlotArea.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/PlotArea.php
+END
+Exception.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/Exception.php
+END
+DataSeries.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/DataSeries.php
+END
+DataSeriesValues.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/codeigniter-pb/!svn/ver/617/main/application/third_party/PHPExcel/Chart/DataSeriesValues.php
+END

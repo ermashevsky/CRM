@@ -2,7 +2,7 @@
 <root>
     <plugin_name>Records Module</plugin_name>
     <plugin_description>Модуль "Записи" расширяет функционал CRM. Добавляет функции создания записей различных типов (задач/заданий, напоминаний, заметок).</plugin_description>
-    <plugin_version>2.0.5</plugin_version>
+    <plugin_version>2.0.8</plugin_version>
     <plugin_system_name>records</plugin_system_name>
     <plugin_menu_visible>true</plugin_menu_visible>
     <plugin_menu_name>Записи</plugin_menu_name>

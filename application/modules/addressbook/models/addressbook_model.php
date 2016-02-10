@@ -69,7 +69,17 @@ class Addressbook_model extends CI_Model {
         }
         return $results;
     }
+    
+    function getRecCount($phoneNum){
+       
 
+        $this->db->where('deleted_date', '0000-00-00 00:00:00');
+        $this->db->where('phone_num', $phoneNum);
+        $this->db->from('tasks');
+        return $this->db->count_all_results();
+
+    }
+    
     function getAllOrganizations() {
         $results = array();
 

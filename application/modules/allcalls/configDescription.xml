@@ -5,7 +5,7 @@
         Модуль "История звонков" расширяет возможности CRM
         и позволяет отслеживать поступающие пользователю системы звонки.
     </plugin_description>
-    <plugin_version>2.0.6</plugin_version>
+    <plugin_version>2.0.9</plugin_version>
     <plugin_system_name>allcalls</plugin_system_name>
     <plugin_menu_visible>true</plugin_menu_visible>
     <plugin_menu_name>Все звонки</plugin_menu_name>
